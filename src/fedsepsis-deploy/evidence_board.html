@@ -1,0 +1,38 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>SepsisBridge Evidence Board</title><style>
+:root{--bg:#0f1419;--card:#182029;--ink:#e8edf2;--dim:#9aa7b4;--ok:#5fd38d;--mark:#ffd166;--line:#2a3542}
+body{margin:0;background:var(--bg);color:var(--ink);font:20px/1.45 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:1180px;margin:0 auto;padding:28px 16px 60px} h1{font-size:38px;margin:0 0 4px}
+.sub{color:var(--dim);margin:0 0 24px} section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:0 0 22px}
+h2{font-size:26px;margin:0 0 14px} pre{font:17px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;background:#0b0f13;border-radius:10px;padding:14px 16px;overflow-x:auto;margin:10px 0}
+pre.wrap{white-space:pre-wrap;word-break:break-word} mark{background:var(--mark);color:#111;border-radius:4px;padding:0 4px;font-weight:700}
+.big{display:flex;flex-wrap:wrap;gap:12px 28px;font-size:30px;font-weight:700;margin:4px 0 8px} .ok{color:var(--ok)}
+.note{color:var(--dim);font-size:17px;margin:8px 0 0} table{border-collapse:collapse;width:100%;font-size:18px;margin-bottom:10px}
+td,th{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left} th{color:var(--dim);font-weight:600} .num{text-align:right} .mono{font-family:ui-monospace,Menlo,monospace}
+</style></head><body><main><h1>SepsisBridge on IBM LinuxONE</h1>
+<p class=sub>Evidence captured on the VM (datathon-test). Built 2026-10-17 15:01 UTC from evidence/*.txt and demo/secure_summary.json. No tokens, no seeds, no patient data.</p>
+<section><h2>Platform: IBM LinuxONE</h2><div class=big><span>s390x</span><span>Machine type 9175</span><span>Big Endian</span><span>3 vCPUs</span></div><pre class=wrap>features	: esan3 zarch stfle msa ldisp eimm dfp edat etf3eh highgprs te vx vxd vxe gs vxe2 vxp sort dflt vxp2 <mark>nnpa</mark> sie </pre><p class="note">uname -m, lscpu and the features line of /proc/cpuinfo. captured 2026-10-17T15:01:51Z on datathon-test</p></section><section><h2>AI accelerator visible to PyTorch</h2><div class=big><span class=ok>True True</span></div><pre>torch.nnpa.is_available(), torch.nnpa.is_telum2_available()</pre><p class="note">Run in the Jupyter image on the VM, reported as is. The accelerator is visible; our logistic-regression model does not use it. captured 2026-10-17T15:01:54Z on datathon-test</p></section><section><h2>Containers running</h2><pre>NAMES                      IMAGE                                                                   STATUS              PORTS
+hard-hospB                 fedsepsis-hospital:hard                                                 Up About a minute   3000/tcp, 5000/tcp, 8888/tcp, 38888/tcp, 127.0.0.1:18102-&gt;8100/tcp
+hard-hospA                 fedsepsis-hospital:hard                                                 Up About a minute   3000/tcp, 5000/tcp, 8100/tcp, 8888/tcp, 38888/tcp
+hard-aggregator            fedsepsis-aggregator:hard                                               Up About a minute   3000/tcp, 5000/tcp, 8000/tcp, 8888/tcp, 38888/tcp
+hospB                      08241cb7a20d                                                            Up 17 minutes       3000/tcp, 5000/tcp, 8888/tcp, 38888/tcp, 127.0.0.1:8102-&gt;8100/tcp
+hospA                      08241cb7a20d                                                            Up 17 minutes       3000/tcp, 5000/tcp, 8888/tcp, 38888/tcp, 127.0.0.1:8101-&gt;8100/tcp
+fedsepsis-aggregator       265328153505                                                            Up 17 minutes       3000/tcp, 5000/tcp, 8000/tcp, 8888/tcp, 38888/tcp
+rev-hospA                  9dda30897aa6                                                            Up 19 minutes       3000/tcp, 5000/tcp, 8888/tcp, 38888/tcp, 127.0.0.1:8202-&gt;8100/tcp
+rev-hospB                  9dda30897aa6                                                            Up 19 minutes       3000/tcp, 5000/tcp, 8888/tcp, 38888/tcp, 127.0.0.1:8201-&gt;8100/tcp
+rev-fedsepsis-aggregator   b196064473d2                                                            Up 19 minutes       3000/tcp, 5000/tcp, 8000/tcp, 8888/tcp, 38888/tcp
+notebook                   registry.linuxone.cloud.marist.edu/l1cc/jupyterlab-image-s390x:latest   Up 11 hours         3000/tcp, 5000/tcp, 38888/tcp, 0.0.0.0:38888-&gt;8888/tcp, [::]:38888-&gt;8888/tcp</pre><p class="note">docker ps: one aggregator + one container per hospital, each direction. Hospital /score ports are bound to 127.0.0.1 only. captured 2026-10-17T15:01:51Z on datathon-test</p></section><section><h2>Aggregator log (excerpt)</h2><pre>2026-10-17T14:44:44Z event=start site=- round=0 sites=hospA,hospB expected_rounds=40 restored=False done=False secure=False
+2026-10-17T14:44:44Z event=tls_disabled site=- round=- note=plain HTTP inside the docker network
+2026-10-17T14:44:46Z event=request_keys site=hospA round=- path=/stats keys=n,site_id,sum,sumsq
+2026-10-17T14:44:46Z event=stats site=hospA round=0 sites_stats=1
+2026-10-17T14:44:47Z event=request_keys site=hospB round=- path=/stats keys=n,site_id,sum,sumsq
+2026-10-17T14:44:47Z event=stats site=hospB round=0 sites_stats=2
+2026-10-17T14:44:47Z event=norm_ready site=- round=0 total_n=679088
+2026-10-17T14:44:47Z event=request_keys site=hospB round=0 path=/update keys=b,n,round,site_id,w
+  ...  (40 rounds completed)  ...
+2026-10-17T14:45:36Z event=request_keys site=hospA round=39 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:45:36Z event=update site=hospA round=39 updated=2
+2026-10-17T14:45:36Z event=round_complete site=- round=39 new_round=40 done=True</pre><p class="note">One line per event: time, site, round, and the request-body KEYS only. No values, no patient data.</p></section><section><h2>Allowed-fields check: PASS</h2><pre>2 /stats n,site_id,sum,sumsq
+     80 /update b,n,round,site_id,w
+union of keys: [&#x27;b&#x27;, &#x27;n&#x27;, &#x27;round&#x27;, &#x27;site_id&#x27;, &#x27;sum&#x27;, &#x27;sumsq&#x27;, &#x27;w&#x27;] | ASSERT subset of allowed : True</pre><p class="note">Every key the aggregator received during the real 40-round run is in {site_id, n, sum, sumsq, round, w, b}: counts, sums and model weights. No patient rows cross the network.</p></section><section><h2>Secure aggregation: 3 sites</h2><table><tr><th>site</th><th></th><th>patients</th><th>what the aggregator saw (first 3, as fraction of 2<sup>128</sup>)</th></tr><tr><td>hospA1</td><td>hospital A, medical ICU</td><td class=num>4,296</td><td class=mono>0.2093  0.5539  0.1059</td></tr><tr><td>hospA2</td><td>hospital A, surgical ICU</td><td class=num>4,361</td><td class=mono>0.7544  0.1465  0.6817</td></tr><tr><td>hospB</td><td>hospital B, the small hospital (10% subset, training part)</td><td class=num>1,400</td><td class=mono>0.0363  0.2995  0.2124</td></tr></table><div class=big><span class=ok>secure = plain, max difference 6.9e-17</span><span>40 rounds</span><span>secure 26.6 s / plain 26.2 s</span></div><pre>first 3 final weights  secure 0.0795055090, 0.0623969065, 0.0463289269
+                       plain  0.0795055090, 0.0623969065, 0.0463289269</pre><p class="note">hospA1 and hospA2 are hospital A&#x27;s patients split in two (map-icu_map) and run as two sites: a simulation of two hospitals; hospB is the small hospital. Generated 2026-10-17T14:56:26Z.</p></section></main></body></html>

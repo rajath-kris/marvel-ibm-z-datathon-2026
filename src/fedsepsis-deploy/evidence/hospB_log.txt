@@ -1,69 +1,82 @@
 # hospB log (docker logs hospB)
-# captured 2026-10-17T10:20:14Z on datathon-test
+# captured 2026-10-17T15:01:51Z on datathon-test
 
-2026-10-17T10:19:26Z event=start site=hospB round=- mode=real lib=/app/lib lib_version=? has_rate_fns=True expected_rounds=40 port=8100
-2026-10-17T10:19:26Z event=aggregator_healthy site=hospB round=-
-2026-10-17T10:19:26Z event=data_loaded site=hospB round=- rows=52207 features=138 mode=real stub=False nan_free=True seconds=0.0
-2026-10-17T10:19:27Z event=eval_data_loaded site=hospB round=- eval=small_test_patients.npz eval_patients=9885 eval_rows=376665 retune=small_val_patients.npz retune_patients=591 retune_rows=23421
-2026-10-17T10:19:27Z event=borrowed_model_loaded site=hospB round=- features=138 feature_names_match=True
-2026-10-17T10:19:27Z event=stored_thresholds site=hospB round=- borrowed=0.5168503567531072 federated=0.428311566223493 budget=25
-2026-10-17T10:19:27Z event=train_cfg site=hospB round=- lr=0.1 epochs=3 l2=0.001 class_weight=30.0
-2026-10-17T10:19:27Z event=stats_posted site=hospB round=-
-2026-10-17T10:19:27Z event=norm_ready site=hospB round=-
-2026-10-17T10:19:27Z event=update_posted site=hospB round=0 duplicate=False train_seconds=0.08
-2026-10-17T10:19:28Z event=update_posted site=hospB round=1 duplicate=False train_seconds=0.08
-2026-10-17T10:19:29Z event=update_posted site=hospB round=2 duplicate=False train_seconds=0.09
-2026-10-17T10:19:30Z event=update_posted site=hospB round=3 duplicate=False train_seconds=0.09
-2026-10-17T10:19:32Z event=update_posted site=hospB round=4 duplicate=False train_seconds=0.15
-2026-10-17T10:19:33Z event=update_posted site=hospB round=5 duplicate=False train_seconds=0.08
-2026-10-17T10:19:34Z event=update_posted site=hospB round=6 duplicate=False train_seconds=0.08
-2026-10-17T10:19:36Z event=update_posted site=hospB round=7 duplicate=False train_seconds=0.10
-2026-10-17T10:19:37Z event=update_posted site=hospB round=8 duplicate=False train_seconds=0.09
-2026-10-17T10:19:38Z event=update_posted site=hospB round=9 duplicate=False train_seconds=0.22
-2026-10-17T10:19:39Z event=update_posted site=hospB round=10 duplicate=False train_seconds=0.14
-2026-10-17T10:19:40Z event=update_posted site=hospB round=11 duplicate=False train_seconds=0.09
-2026-10-17T10:19:41Z event=update_posted site=hospB round=12 duplicate=False train_seconds=0.08
-2026-10-17T10:19:42Z event=update_posted site=hospB round=13 duplicate=False train_seconds=0.10
-2026-10-17T10:19:44Z event=update_posted site=hospB round=14 duplicate=False train_seconds=0.15
-2026-10-17T10:19:45Z event=update_posted site=hospB round=15 duplicate=False train_seconds=0.08
-2026-10-17T10:19:46Z event=update_posted site=hospB round=16 duplicate=False train_seconds=0.11
-2026-10-17T10:19:47Z event=update_posted site=hospB round=17 duplicate=False train_seconds=0.08
-2026-10-17T10:19:48Z event=update_posted site=hospB round=18 duplicate=False train_seconds=0.16
-2026-10-17T10:19:49Z event=update_posted site=hospB round=19 duplicate=False train_seconds=0.08
-2026-10-17T10:19:50Z event=update_posted site=hospB round=20 duplicate=False train_seconds=0.10
-2026-10-17T10:19:51Z event=update_posted site=hospB round=21 duplicate=False train_seconds=0.12
-2026-10-17T10:19:52Z event=update_posted site=hospB round=22 duplicate=False train_seconds=0.15
-2026-10-17T10:19:53Z event=update_posted site=hospB round=23 duplicate=False train_seconds=0.14
-2026-10-17T10:19:54Z event=update_posted site=hospB round=24 duplicate=False train_seconds=0.09
-2026-10-17T10:19:56Z event=update_posted site=hospB round=25 duplicate=False train_seconds=0.12
-2026-10-17T10:19:57Z event=update_posted site=hospB round=26 duplicate=False train_seconds=0.08
-2026-10-17T10:19:57Z event=update_posted site=hospB round=27 duplicate=False train_seconds=0.13
-2026-10-17T10:19:58Z event=update_posted site=hospB round=28 duplicate=False train_seconds=0.12
-2026-10-17T10:20:00Z event=update_posted site=hospB round=29 duplicate=False train_seconds=0.08
-2026-10-17T10:20:01Z event=update_posted site=hospB round=30 duplicate=False train_seconds=0.07
-2026-10-17T10:20:02Z event=update_posted site=hospB round=31 duplicate=False train_seconds=0.09
-2026-10-17T10:20:03Z event=update_posted site=hospB round=32 duplicate=False train_seconds=0.15
-2026-10-17T10:20:04Z event=update_posted site=hospB round=33 duplicate=False train_seconds=0.11
-2026-10-17T10:20:05Z event=update_posted site=hospB round=34 duplicate=False train_seconds=0.08
-2026-10-17T10:20:06Z event=update_posted site=hospB round=35 duplicate=False train_seconds=0.11
-2026-10-17T10:20:07Z event=update_posted site=hospB round=36 duplicate=False train_seconds=0.08
-2026-10-17T10:20:09Z event=update_posted site=hospB round=37 duplicate=False train_seconds=0.13
-2026-10-17T10:20:09Z event=update_posted site=hospB round=38 duplicate=False train_seconds=0.07
-2026-10-17T10:20:10Z event=update_posted site=hospB round=39 duplicate=False train_seconds=0.07
-2026-10-17T10:20:11Z event=final_model_written site=hospB round=40 path=/out/final_model.json
-2026-10-17T10:20:12Z event=audit site=hospB round=- model=borrowed threshold=0.5168503567531072 patients=9885 seconds=0.2
-2026-10-17T10:20:12Z event=audit site=hospB round=- model=borrowed threshold=0.425315265515 patients=9885 seconds=0.2
-2026-10-17T10:20:12Z event=audit site=hospB round=- model=federated threshold=0.428311566223493 patients=9885 seconds=0.2
-2026-10-17T10:20:13Z event=retune site=hospB round=- model=borrowed budget=25 threshold=0.42531526551518406 data=small_val_patients.npz seconds=0.0
-2026-10-17T10:20:13Z event=audit site=hospB round=- model=retuned threshold=0.42531526551518406 patients=9885 seconds=0.2
-2026-10-17T10:20:13Z event=retune site=hospB round=- model=federated budget=25 threshold=0.4283115583229898 data=small_val_patients.npz seconds=0.0
-2026-10-17T10:20:13Z event=audit site=hospB round=- model=retuned threshold=0.4283115583229898 patients=9885 seconds=0.2
-2026-10-17T10:20:13Z event=patient_replay site=hospB round=- model=federated patient_rows=35
-2026-10-17T10:20:13Z event=patient_replay site=hospB round=- model=borrowed patient_rows=35
-2026-10-17T10:20:13Z event=patient_replay site=hospB round=- model=federated patient_rows=29
-2026-10-17T10:20:13Z event=patient_replay site=hospB round=- model=borrowed patient_rows=29
-2026-10-17T10:20:13Z event=score site=hospB round=- model=federated patient_rows=20
-2026-10-17T10:20:13Z event=score site=hospB round=- model=federated patient_rows=29
-2026-10-17T10:20:13Z event=score site=hospB round=- model=federated patient_rows=30
-2026-10-17T10:20:13Z event=score site=hospB round=- model=federated patient_rows=35
-2026-10-17T10:20:13Z event=score site=hospB round=- model=borrowed patient_rows=30
+2026-10-17T14:44:47Z event=start site=hospB round=- mode=real lib=/app/lib lib_version=? has_rate_fns=True secure=False sites=- expected_rounds=40 port=8100
+2026-10-17T14:44:47Z event=aggregator_healthy site=hospB round=-
+2026-10-17T14:44:47Z event=data_loaded site=hospB round=- rows=52207 features=138 mode=real stub=False nan_free=True seconds=0.0
+2026-10-17T14:44:47Z event=eval_data_loaded site=hospB round=- eval=small_test_patients.npz eval_patients=9885 eval_rows=376665 retune=small_val_patients.npz retune_patients=591 retune_rows=23421
+2026-10-17T14:44:47Z event=borrowed_model_loaded site=hospB round=- features=138 feature_names_match=True
+2026-10-17T14:44:47Z event=stored_thresholds site=hospB round=- borrowed=0.5168503567531072 federated=0.428311566223493 budget=25
+2026-10-17T14:44:47Z event=news2_loaded site=hospB round=- rows=376665 patients=9885 rows_match_eval=True stored_threshold=6.80049126236554 budget=25
+2026-10-17T14:44:47Z event=train_cfg site=hospB round=- lr=0.1 epochs=3 l2=0.001 class_weight=30.0
+2026-10-17T14:44:47Z event=stats_posted site=hospB round=- secure=False
+2026-10-17T14:44:47Z event=norm_ready site=hospB round=-
+2026-10-17T14:44:47Z event=update_posted site=hospB round=0 duplicate=False train_seconds=0.08
+2026-10-17T14:44:49Z event=update_posted site=hospB round=1 duplicate=False train_seconds=0.10
+2026-10-17T14:44:50Z event=update_posted site=hospB round=2 duplicate=False train_seconds=0.08
+2026-10-17T14:44:51Z event=update_posted site=hospB round=3 duplicate=False train_seconds=0.10
+2026-10-17T14:44:52Z event=update_posted site=hospB round=4 duplicate=False train_seconds=0.08
+2026-10-17T14:44:53Z event=update_posted site=hospB round=5 duplicate=False train_seconds=0.15
+2026-10-17T14:44:55Z event=update_posted site=hospB round=6 duplicate=False train_seconds=0.08
+2026-10-17T14:44:56Z event=update_posted site=hospB round=7 duplicate=False train_seconds=0.09
+2026-10-17T14:44:57Z event=update_posted site=hospB round=8 duplicate=False train_seconds=0.09
+2026-10-17T14:44:59Z event=update_posted site=hospB round=9 duplicate=False train_seconds=0.11
+2026-10-17T14:45:00Z event=update_posted site=hospB round=10 duplicate=False train_seconds=0.08
+2026-10-17T14:45:01Z event=update_posted site=hospB round=11 duplicate=False train_seconds=0.09
+2026-10-17T14:45:02Z event=update_posted site=hospB round=12 duplicate=False train_seconds=0.08
+2026-10-17T14:45:04Z event=update_posted site=hospB round=13 duplicate=False train_seconds=0.09
+2026-10-17T14:45:05Z event=update_posted site=hospB round=14 duplicate=False train_seconds=0.08
+2026-10-17T14:45:06Z event=update_posted site=hospB round=15 duplicate=False train_seconds=0.09
+2026-10-17T14:45:07Z event=update_posted site=hospB round=16 duplicate=False train_seconds=0.08
+2026-10-17T14:45:08Z event=update_posted site=hospB round=17 duplicate=False train_seconds=0.10
+2026-10-17T14:45:10Z event=update_posted site=hospB round=18 duplicate=False train_seconds=0.09
+2026-10-17T14:45:11Z event=update_posted site=hospB round=19 duplicate=False train_seconds=0.08
+2026-10-17T14:45:12Z event=update_posted site=hospB round=20 duplicate=False train_seconds=0.09
+2026-10-17T14:45:13Z event=update_posted site=hospB round=21 duplicate=False train_seconds=0.10
+2026-10-17T14:45:14Z event=update_posted site=hospB round=22 duplicate=False train_seconds=0.08
+2026-10-17T14:45:15Z event=update_posted site=hospB round=23 duplicate=False train_seconds=0.10
+2026-10-17T14:45:16Z event=update_posted site=hospB round=24 duplicate=False train_seconds=0.08
+2026-10-17T14:45:18Z event=update_posted site=hospB round=25 duplicate=False train_seconds=0.10
+2026-10-17T14:45:19Z event=update_posted site=hospB round=26 duplicate=False train_seconds=0.08
+2026-10-17T14:45:20Z event=update_posted site=hospB round=27 duplicate=False train_seconds=0.10
+2026-10-17T14:45:21Z event=update_posted site=hospB round=28 duplicate=False train_seconds=0.08
+2026-10-17T14:45:23Z event=update_posted site=hospB round=29 duplicate=False train_seconds=0.09
+2026-10-17T14:45:24Z event=update_posted site=hospB round=30 duplicate=False train_seconds=0.08
+2026-10-17T14:45:25Z event=update_posted site=hospB round=31 duplicate=False train_seconds=0.11
+2026-10-17T14:45:26Z event=update_posted site=hospB round=32 duplicate=False train_seconds=0.08
+2026-10-17T14:45:28Z event=update_posted site=hospB round=33 duplicate=False train_seconds=0.15
+2026-10-17T14:45:29Z event=update_posted site=hospB round=34 duplicate=False train_seconds=0.08
+2026-10-17T14:45:30Z event=update_posted site=hospB round=35 duplicate=False train_seconds=0.14
+2026-10-17T14:45:31Z event=update_posted site=hospB round=36 duplicate=False train_seconds=0.13
+2026-10-17T14:45:32Z event=update_posted site=hospB round=37 duplicate=False train_seconds=0.15
+2026-10-17T14:45:34Z event=update_posted site=hospB round=38 duplicate=False train_seconds=0.10
+2026-10-17T14:45:35Z event=update_posted site=hospB round=39 duplicate=False train_seconds=0.09
+2026-10-17T14:45:36Z event=final_model_written site=hospB round=40 path=/out/final_model.json
+2026-10-17T14:45:37Z event=audit site=hospB round=- model=borrowed threshold=0.5168503567531072 patients=9885 seconds=0.3
+2026-10-17T14:45:37Z event=retune site=hospB round=- model=borrowed budget=25 threshold=0.42531526551518406 data=small_val_patients.npz seconds=0.0
+2026-10-17T14:45:37Z event=audit site=hospB round=- model=retuned threshold=0.42531526551518406 patients=9885 seconds=0.3
+2026-10-17T14:45:38Z event=audit site=hospB round=- model=federated threshold=0.428311566223493 patients=9885 seconds=0.2
+2026-10-17T14:45:38Z event=audit site=hospB round=- model=news2 threshold=6.80049126236554 patients=9885 seconds=0.1
+2026-10-17T14:45:38Z event=retune_news2_fixed site=hospB round=- budget=25 threshold=6.80049126236554
+2026-10-17T14:45:38Z event=patient_replay site=hospB round=- model=federated patient_rows=35
+2026-10-17T14:45:38Z event=patient_replay site=hospB round=- model=borrowed patient_rows=35
+2026-10-17T14:45:38Z event=patient_replay site=hospB round=- model=retuned patient_rows=35
+2026-10-17T14:45:38Z event=patient_replay site=hospB round=- model=news2 patient_rows=35
+2026-10-17T14:45:38Z event=patient_replay site=hospB round=- model=federated patient_rows=29
+2026-10-17T14:45:38Z event=patient_replay site=hospB round=- model=borrowed patient_rows=29
+2026-10-17T14:45:38Z event=patient_replay site=hospB round=- model=retuned patient_rows=29
+2026-10-17T14:45:38Z event=patient_replay site=hospB round=- model=news2 patient_rows=29
+2026-10-17T14:48:33Z event=audit site=hospB round=- model=borrowed threshold=0.5168503567531072 patients=9885 seconds=0.2
+2026-10-17T14:48:33Z event=retune site=hospB round=- model=borrowed budget=25 threshold=0.42531526551518406 data=small_val_patients.npz seconds=0.1
+2026-10-17T14:48:34Z event=audit site=hospB round=- model=retuned threshold=0.42531526551518406 patients=9885 seconds=0.6
+2026-10-17T14:48:34Z event=audit site=hospB round=- model=federated threshold=0.428311566223493 patients=9885 seconds=0.4
+2026-10-17T14:48:34Z event=audit site=hospB round=- model=news2 threshold=6.80049126236554 patients=9885 seconds=0.1
+2026-10-17T14:48:34Z event=retune_news2_fixed site=hospB round=- budget=25 threshold=6.80049126236554
+2026-10-17T14:48:34Z event=patient_replay site=hospB round=- model=borrowed patient_rows=35
+2026-10-17T14:48:34Z event=patient_replay site=hospB round=- model=federated patient_rows=35
+2026-10-17T14:48:34Z event=patient_replay site=hospB round=- model=retuned patient_rows=35
+2026-10-17T14:48:34Z event=patient_replay site=hospB round=- model=news2 patient_rows=35
+2026-10-17T14:48:34Z event=patient_replay site=hospB round=- model=borrowed patient_rows=29
+2026-10-17T14:48:34Z event=patient_replay site=hospB round=- model=federated patient_rows=29
+2026-10-17T14:48:35Z event=patient_replay site=hospB round=- model=retuned patient_rows=29
+2026-10-17T14:48:35Z event=patient_replay site=hospB round=- model=news2 patient_rows=29
