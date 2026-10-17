@@ -1,12 +1,23 @@
 {
  "title": "SepsisBridge: 3-site secure aggregation (pairwise masks) vs plain FedAvg",
- "generated_utc": "2026-10-17T11:16:13Z",
+ "generated_utc": "2026-10-17T14:56:26Z",
  "sites": [
   "hospA1",
   "hospA2",
   "hospB"
  ],
- "simulation_note": "hospA1 and hospA2 are hospital A split in two by patient (random-seed2026): a simulation of two sites; hospB is the small hospital.",
+ "site_patients": {
+  "hospA1": 4296,
+  "hospA2": 4361,
+  "hospB": 1400
+ },
+ "site_description": {
+  "hospA1": "hospital A, medical ICU",
+  "hospA2": "hospital A, surgical ICU",
+  "hospB": "hospital B, the small hospital (10% subset, training part)",
+  "left_out": "7612 hospital A patients with unknown ICU unit"
+ },
+ "simulation_note": "hospA1 and hospA2 are hospital A's patients split in two (map-icu_map) and run as two sites: a simulation of two hospitals; hospB is the small hospital.",
  "rounds": 40,
  "local_epochs": 3,
  "what_the_aggregator_saw": {
@@ -14,42 +25,42 @@
   "description": "first 3 of 138 masked n*w values each site sent in that round. Integers mod 2**128, given as decimal STRINGS because they exceed JavaScript's safe integer range; *_fraction is value / 2**128 for display. On its own each value is uniform random; the masks cancel only in the 3-site sum.",
   "per_site": {
    "hospA1": {
-    "n_rows_sent_in_clear": 310792,
+    "n_rows_sent_in_clear": 163077,
     "masked_first3": [
-     "267352678515008527533197696734984670859",
-     "93237114673859811752958188001925988940",
-     "21712318926088546842598626472951148420"
+     "71227287838767692265553721580162304408",
+     "188496432875470744805468689533875418482",
+     "36041141102859401143917247242734487212"
     ],
     "masked_first3_fraction": [
-     0.7856789081789992,
-     0.27399925396523006,
-     0.06380677060217231
+     0.2093181861971611,
+     0.553941229988171,
+     0.10591539440900044
     ]
    },
    "hospA2": {
-    "n_rows_sent_in_clear": 316089,
+    "n_rows_sent_in_clear": 158049,
     "masked_first3": [
-     "96603069818879453888036969536932619490",
-     "255605747235955499228312938616806263681",
-     "248237002421780259091945021972471352579"
+     "256699763186896236123160317773914648304",
+     "49867889283416472207821622812879731081",
+     "231968907605895406847288426416510908701"
     ],
     "masked_first3_fraction": [
-     0.28389090711045956,
-     0.751157779783938,
-     0.7295029850296529
+     0.7543728037090388,
+     0.14654855535021838,
+     0.6816953511428681
     ]
    },
    "hospB": {
     "n_rows_sent_in_clear": 52207,
     "masked_first3": [
-     "316608985507988945505569679952775369304",
-     "331721871932061615945515100953441852839",
-     "70333045573069657528879230039088158727"
+     "12355315895274535074693203815030096104",
+     "101918044762051246450109908015197843717",
+     "72272318212183655472187951054571377303"
     ],
     "masked_first3_fraction": [
-     0.9304301847105413,
-     0.9748429662508319,
-     0.2066902443681747
+     0.036309010093800075,
+     0.29951021466161065,
+     0.21238925444813153
     ]
    }
   }
@@ -61,24 +72,25 @@
    "HR_delta6"
   ],
   "secure_run": [
-   0.0738367941608851,
-   0.0495706924643601,
-   0.0646488624718126
+   0.07950550901775494,
+   0.06239690651493165,
+   0.046328926897135636
   ],
   "plain_run": [
-   0.07383679416088508,
-   0.049570692464360105,
-   0.0646488624718126
+   0.07950550901775494,
+   0.06239690651493167,
+   0.046328926897135636
   ]
  },
  "final_bias": {
-  "secure_run": -1.2009180102687202,
-  "plain_run": -1.2009180102687202
+  "secure_run": -1.3380123487797724,
+  "plain_run": -1.3380123487797724
  },
- "max_abs_difference_secure_vs_plain": 1.1102230246251565e-16,
+ "max_abs_difference_secure_vs_plain": 6.938893903907228e-17,
  "max_abs_difference_scope": "all 138 weights and the bias of the final model",
  "runtime_seconds": {
-  "secure_run": 38.3,
-  "plain_run": 39.3
- }
+  "secure_run": 26.6,
+  "plain_run": 26.2
+ },
+ "deployment": "sec-* containers on the LinuxONE VM, commit 2ba0e68, fedsepsis 0.2.0, 3 sites: hospA1 medical ICU, hospA2 surgical ICU, hospB small hospital"
 }
