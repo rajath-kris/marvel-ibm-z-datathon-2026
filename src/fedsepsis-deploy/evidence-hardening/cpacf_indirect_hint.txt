@@ -1,0 +1,8 @@
+# 2026-10-17T15:08:25Z  host openssl: OpenSSL 3.0.13  (2 s per run, 16 KB blocks, bytes/s x1000)
+aes-256-gcm  default  15054612.17k
+aes-256-gcm  masked   139024.03k
+sha256       default  4386632.10k
+sha256       masked   276751.63k
+# inside the hardened hospital image (Python 3.12, OpenSSL 3.5.5, the library the federated round uses): hashlib SHA-256
+default  3965 MB/s sha256, OpenSSL 3.5.5 27 Jan 2026
+masked   258 MB/s sha256, OpenSSL 3.5.5 27 Jan 2026

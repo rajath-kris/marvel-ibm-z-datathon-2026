@@ -1,0 +1,31 @@
+stack: tag=mtls rounds=40 (full repro_config.json run)
+PASS  training: aggregator done, all rounds completed   [round 40/40]
+PASS  training: both hospitals hold the identical final model
+PASS  hospB /health: done, final model, real mode   [done]
+PASS  validation: audit unknown model -> 400   [HTTP 400]
+PASS  validation: audit threshold out of range -> 400   [HTTP 400]
+PASS  validation: retune bad budget -> 400   [HTTP 400]
+PASS  validation: retune model=retuned not allowed -> 400   [HTTP 400]
+PASS  validation: score without body fields -> 400   [HTTP 400]
+PASS  audit borrowed (stored threshold): 11.67 per 100 patient-days   [11.666600 vs experiment 11.666600]
+PASS  audit borrowed at the setup-2 threshold: 24.0   [23.995858 vs experiment 23.995858]
+PASS  retune borrowed to budget 25: threshold equals setup 2's   [0.42531526551518406 vs 0.425315265515184]
+PASS  audit retuned (borrowed model): 24.0   [23.995858]
+PASS  audit federated (stored threshold) equals setup 4 of the experiment   [22.453905 vs 22.453905]
+PASS  retune federated to budget 25: threshold equals setup 4's   [0.428311558 vs 0.428311566]
+PASS  audit retuned federated equals setup 4 of the experiment   [22.453905]
+PASS  live deployment (evidence/test_real_endpoints.txt): borrowed rate identical   [live 11.666600 vs test stack 11.666600]
+PASS  live deployment: borrowed at the setup-2 threshold identical   [live 23.995858 vs test stack 23.995858]
+PASS  replay success_example patient 71 borrowed: scores and alerts match demo_patient.json   [max |diff| 1.1e-16, alerts identical True]
+PASS  replay success_example patient 71 federated: scores and alerts match demo_patient.json   [max |diff| 2.4e-08, alerts identical True]
+PASS  replay failure_example patient 13561 borrowed: scores and alerts match demo_patient.json   [max |diff| 0.0e+00, alerts identical True]
+PASS  replay failure_example patient 13561 federated: scores and alerts match demo_patient.json   [max |diff| 1.6e-08, alerts identical True]
+PASS  replay unknown patient -> 404   [HTTP 404]
+PASS  score patient 71 hour 29 (borrowed) returns hour, score, alert   [HTTP 200]
+PASS  CORS: http://localhost origin allowed
+PASS  CORS: foreign origin gets no Access-Control-Allow-Origin
+PASS  allowed fields: request keys at the aggregator are a subset of the allowed set   [seen ['b', 'n', 'round', 'site_id', 'sum', 'sumsq', 'w']]
+PASS  hospA /health (inside its container) ok
+PASS  hospA /audit borrowed on its own rows answers   [25.712056993273045]
+
+================ E2E mtls: 28 passed, 0 failed ================

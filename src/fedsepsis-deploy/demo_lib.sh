@@ -14,6 +14,18 @@ fi
 declare -A STUB_ROWS=([hospA]=2000 [hospB]=1200)
 declare -A HOSP_MEMORY=([$BIG_SITE]=2g [$SMALL_SITE]=1g [hospA1]=1g [hospA2]=1g)
 SECURE=${SECURE:-0}
+# --- hardening (hardening-tls branch) --------------------------------------------------------------------------
+HARDEN=${HARDEN:-0}                          # 1: every container non-root, read-only rootfs, no capabilities, no new privileges
+HARDEN_FLAGS=()
+if [ "$HARDEN" = 1 ]; then
+  HARDEN_FLAGS=(--user 1000:1000 --read-only --tmpfs /tmp:rw,noexec,nosuid,nodev,size=128m -e HOME=/tmp
+                --cap-drop ALL --security-opt no-new-privileges:true --pids-limit 256)
+fi
+MTLS=${MTLS:-0}                              # 1: hospital <-> aggregator over HTTPS with MUTUAL TLS (implies TLS=1)
+MTLS_DIR=${MTLS_DIR:-$SECRET_DIR/mtls}       # CA + certificates, outside the project (setup_mtls.sh); live: ~/.fedsepsis/mtls
+if [ "$MTLS" = 1 ]; then                     # mutual TLS implies TLS; the aggregator cert + leaf pin come from the mTLS directory
+  TLS=1; TLS_DIR=$MTLS_DIR
+fi
 PAIR_DIR=${PAIR_DIR:-$SECRET_DIR/pairs}      # pairwise seeds for SECURE=1 (outside the project)
 # MODE=real: training file per site (override with REAL_DATA_hospA / REAL_DATA_hospB)
 declare -A REAL_FILE=([$BIG_SITE]=$REAL_DIR/site_big.npz [$SMALL_SITE]=$REAL_DIR/site_small.npz
@@ -114,8 +126,12 @@ start_aggregator() {
   local tls=()
   [ "$TLS" = 1 ] && tls=(-e TLS_CERT=/tls/aggregator.crt -e TLS_KEY=/tls/aggregator.key
                          -v "$TLS_DIR/aggregator.crt":/tls/aggregator.crt:ro -v "$TLS_DIR/aggregator.key":/tls/aggregator.key:ro)
+  if [ "$MTLS" = 1 ]; then   # clients must present a certificate signed by this CA; "monitor" is only for the harness health check
+    tls+=(-e TLS_CLIENT_CA=/tls/ca.crt -v "$MTLS_DIR/ca.crt":/tls/ca.crt:ro
+          -v "$MTLS_DIR/clients/monitor.crt":/tls/monitor.crt:ro -v "$MTLS_DIR/clients/monitor.key":/tls/monitor.key:ro)
+  fi
   TOKEN="$(cat "$TOKEN_FILE")" docker run -d --name "$AGG_NAME" $CPUS --memory "$AGG_MEMORY" \
-    --network "$NETWORK" --network-alias aggregator \
+    --network "$NETWORK" --network-alias aggregator "${HARDEN_FLAGS[@]}" \
     -e TOKEN -e EXPECTED_SITES="$(IFS=,; echo "${SITES[*]}")" -e EXPECTED_ROUNDS="$EXPECTED_ROUNDS" -e INIT_BIAS="$INIT_BIAS" \
     -e STATE_DIR=/state -v "$RUN_DIR/state":/state -e SECURE="$SECURE" -e SECURE_SAMPLE="${SECURE_SAMPLE:-0}" "${tls[@]}" \
     "$AGG_IMAGE" >/dev/null
@@ -154,6 +170,18 @@ start_hospital() {  # start_hospital SITE
   local tls=()
   [ "$TLS" = 1 ] && tls=(-e TLS_CA=/tls/aggregator.crt -e TLS_PIN_SHA256="${PIN_OVERRIDE:-$TLS_PIN}"
                          -v "$TLS_DIR/aggregator.crt":/tls/aggregator.crt:ro)
+  if [ "$MTLS" = 1 ]; then   # trust the throwaway CA, keep the leaf pin, present this site's own certificate
+    tls=(-e TLS_CA=/tls/ca.crt -e TLS_PIN_SHA256="${PIN_OVERRIDE:-$TLS_PIN}" -v "$MTLS_DIR/ca.crt":/tls/ca.crt:ro
+         -e TLS_CLIENT_CERT=/tls/client.crt -e TLS_CLIENT_KEY=/tls/client.key
+         -v "$MTLS_DIR/clients/$s.crt":/tls/client.crt:ro -v "$MTLS_DIR/clients/$s.key":/tls/client.key:ro)
+  fi
+  local pub=() health
+  if [ -n "${HOST_PORT[$s]:-}" ]; then
+    pub=(-p 127.0.0.1:"${HOST_PORT[$s]}":8100)
+    health="curl -sf http://127.0.0.1:${HOST_PORT[$s]}/health >/dev/null"
+  else                       # not published on the host: probe from inside the container
+    health="docker exec $NAME_PREFIX$s curl -sf http://127.0.0.1:8100/health >/dev/null"
+  fi
   local sec=()
   if [ "$SECURE" = 1 ]; then
     sec=(-e SECURE=1 -e ALL_SITES="$(IFS=,; echo "${SITES[*]}")" -e PAIR_SEED_DIR=/pairs -e SECURE_SESSION="$SECURE_SESSION")
@@ -161,19 +189,19 @@ start_hospital() {  # start_hospital SITE
       case "$(basename "$f" .seed)" in "$s"__*|*__"$s") sec+=(-v "$f":/pairs/$(basename "$f"):ro) ;; esac
     done
   fi
-  TOKEN="$(cat "$TOKEN_FILE")" docker run -d --name "$NAME_PREFIX$s" $CPUS --memory "${HOSP_MEMORY[$s]}" --network "$NETWORK" \
+  TOKEN="$(cat "$TOKEN_FILE")" docker run -d --name "$NAME_PREFIX$s" $CPUS --memory "${HOSP_MEMORY[$s]}" --network "$NETWORK" "${HARDEN_FLAGS[@]}" \
     -e TOKEN -e SITE_ID="$s" -e AGGREGATOR_URL="$(agg_scheme)://aggregator:8000" -e EXPECTED_ROUNDS="$EXPECTED_ROUNDS" \
     -e DATA_PATH="$data_path" -e MODE="$MODE" -e THRESHOLD="$THRESHOLD" -e OUT_DIR=/out "${TRAIN_ENV[@]}" \
     -v "$data_mount" -v "$RUN_DIR/out/$s":/out "${lib_mount[@]}" "${tls[@]}" "${sec[@]}" \
-    -p 127.0.0.1:"${HOST_PORT[$s]}":8100 "$HOSP_IMAGE" >/dev/null
-  wait_until 60 "$s /health" "curl -sf http://127.0.0.1:${HOST_PORT[$s]}/health >/dev/null"
+    "${pub[@]}" "$HOSP_IMAGE" >/dev/null
+  wait_until 60 "$s /health" "$health"
 }
 
 # GET an aggregator path from inside its own container; the token stays inside the container.
 # With TLS it verifies the server cert against the same pinned cert the hospitals use.
 agg_get() {
   if [ -n "$(docker exec "$AGG_NAME" printenv TLS_CERT 2>/dev/null)" ]; then
-    docker exec "$AGG_NAME" sh -c 'curl -s --cacert "$TLS_CERT" --resolve aggregator:8000:127.0.0.1 -H "X-Token: $TOKEN" "https://aggregator:8000$1"' _ "$1"
+    docker exec "$AGG_NAME" sh -c 'p=$1; if [ -n "$TLS_CLIENT_CA" ]; then curl -s --cacert "$TLS_CLIENT_CA" --cert /tls/monitor.crt --key /tls/monitor.key --resolve aggregator:8000:127.0.0.1 -H "X-Token: $TOKEN" "https://aggregator:8000$p"; else curl -s --cacert "$TLS_CERT" --resolve aggregator:8000:127.0.0.1 -H "X-Token: $TOKEN" "https://aggregator:8000$p"; fi' _ "$1"
   else
     docker exec "$AGG_NAME" sh -c 'curl -s -H "X-Token: $TOKEN" "http://127.0.0.1:8000$1"' _ "$1"
   fi

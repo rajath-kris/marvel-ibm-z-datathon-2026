@@ -23,3 +23,9 @@ curl-header
 __pycache__/
 *.py[cod]
 .DS_Store
+
+# hardening-tls: certificates and test material live in ~/.fedsepsis-hardening (outside the project); belt and braces
+*.csr
+*.srl
+.fedsepsis-hardening/
+run/hardened/

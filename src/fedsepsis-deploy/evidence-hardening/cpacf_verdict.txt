@@ -1,0 +1,2 @@
+before readable: False (0 counters); after readable: False (0 counters); counters that increased: []
+VERDICT: CPACF NOT CONFIRMED  --  cpacfstats could not read the counters (daemon not running / no socket; see cpacfstats_before.txt)

@@ -1,0 +1,11 @@
+================ mTLS RESULTS ================
+PASS  no client certificate is refused
+PASS  certificate from an untrusted CA is refused
+PASS  valid certificate without token -> 401
+PASS  valid certificate + token -> 200
+PASS  site_id must match the certificate CN -> 403
+PASS  TLS 1.2 refused
+PASS  plain HTTP gets no HTTP response
+PASS  aggregator logs a TLS 1.3 session with a client CN and a cipher
+PASS  aggregator logged refused connections
+PASS  hospitals present their certificates (client_cert=True)

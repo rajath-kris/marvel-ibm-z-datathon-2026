@@ -1,0 +1,2 @@
+default  3944 MB/s sha256, OpenSSL 3.5.5 27 Jan 2026
+off      3974 MB/s sha256, OpenSSL 3.5.5 27 Jan 2026

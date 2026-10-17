@@ -1,0 +1,10 @@
+# 2026-10-17T15:06:33Z  cpacfstats -p all
+cpacfstats: Can't access domain socket file '/run/cpacfstatsd_socket', errno=2 [No such file or directory]
+cpacfstats: Maybe cpacfstatsd daemon is not running ???
+cpacfstats: Can't connect to daemon
+# exit code 1
+# cpacfstats -n (all PAI counters, non-zero)
+cpacfstats: Can't access domain socket file '/run/cpacfstatsd_socket', errno=2 [No such file or directory]
+cpacfstats: Maybe cpacfstatsd daemon is not running ???
+cpacfstats: Can't connect to daemon
+# exit code 1

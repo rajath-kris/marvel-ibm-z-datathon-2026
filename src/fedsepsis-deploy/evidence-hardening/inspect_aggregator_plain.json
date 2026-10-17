@@ -1,0 +1,31 @@
+{
+ "name": "/hard-aggregator",
+ "user": "1000:1000",
+ "readonly_rootfs": true,
+ "cap_drop": [
+  "ALL"
+ ],
+ "cap_add": null,
+ "security_opt": [
+  "no-new-privileges:true"
+ ],
+ "privileged": false,
+ "memory_bytes": 536870912,
+ "nano_cpus": 1000000000,
+ "pids_limit": 256,
+ "tmpfs": {
+  "/tmp": "rw,noexec,nosuid,nodev,size=128m"
+ },
+ "published_ports": {},
+ "networks": [
+  "hard-net"
+ ],
+ "mounts": [
+  {
+   "source": "/home/linux1/fedsepsis-deploy-hardening/run/hardened/state",
+   "destination": "/state",
+   "rw": true
+  }
+ ],
+ "image": "fedsepsis-aggregator:hard"
+}

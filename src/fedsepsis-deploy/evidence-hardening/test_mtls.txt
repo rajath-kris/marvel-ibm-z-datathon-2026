@@ -1,0 +1,44 @@
+### 1. valid CA but NO client certificate (expect refusal)
+$ curl --cacert ca.crt https://aggregator:8000/health
+curl: (56) OpenSSL SSL_read: OpenSSL/3.5.5: error:0A00045C:SSL routines::tlsv13 alert certificate required, errno 0
+ [HTTP 000] (curl exit 56)
+
+### 2. client certificate from an UNTRUSTED CA (expect refusal)
+$ curl --cacert ca.crt --cert rogue.crt --key rogue.key https://aggregator:8000/health
+ [HTTP 000]curl: (56) OpenSSL SSL_read: OpenSSL/3.5.5: error:0A000418:SSL routines::tlsv1 alert unknown ca, errno 0
+ (curl exit 56)
+
+### 3. valid client certificate, NO token (expect TLS ok, then 401)
+$ curl --cacert ca.crt --cert hospA.crt --key hospA.key https://aggregator:8000/health
+{"ok": false, "error": "unauthorised"} [HTTP 401] (curl exit 0)
+
+### 4. valid client certificate + token (expect 200)
+$ curl --cacert ca.crt --cert hospA.crt --key hospA.key -H @token-header-file https://aggregator:8000/health
+{"ok": true} [HTTP 200] (curl exit 0)
+
+### 5. hospA's certificate posting as site hospB (expect 403: certificate CN must equal site_id)
+$ curl -X POST --cert hospA.crt ... -d '{"site_id":"hospB",...}' https://aggregator:8000/stats
+{"ok": false, "error": "site_id does not match the client certificate"} [HTTP 403] (curl exit 0)
+
+### 6. TLS 1.2 client with a valid certificate (expect refusal: TLS 1.3 only)
+curl: (35) TLS connect error: error:0A00042E:SSL routines::tlsv1 alert protocol version
+ [HTTP 000] (curl exit 35)
+
+### 7. plain HTTP to the TLS port (expect no HTTP response)
+curl: (52) Empty reply from server
+ [HTTP 000] (curl exit 52)
+
+### aggregator log: negotiated TLS sessions, refused connections, CN mismatch
+      1 event=cert_site_mismatch site=- round=- client_cn=hospA
+      1 event=connection_error site=- round=- error=SSLCertVerificationError reason=CERTIFICATE_VERIFY_FAILED
+      1 event=connection_error site=- round=- error=SSLError reason=HTTP_REQUEST
+      1 event=connection_error site=- round=- error=SSLError reason=PEER_DID_NOT_RETURN_A_CERTIFICATE
+      1 event=connection_error site=- round=- error=SSLError reason=UNSUPPORTED_PROTOCOL
+      1 event=tls_enabled site=- round=- min_version=TLSv1.3 client_cert_required=True
+      1 event=tls_session site=- round=- client_cn=hospA version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384
+      1 event=tls_session site=- round=- client_cn=hospB version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384
+      1 event=tls_session site=- round=- client_cn=monitor version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384
+
+### hospital logs: TLS parameters seen by each client
+hard-hospA: event=tls_connected site=hospA round=- version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 client_cert=True
+hard-hospB: event=tls_connected site=hospB round=- version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 client_cert=True

@@ -1,0 +1,7 @@
+groups: linux1 adm cdrom sudo dip plugdev cpacfstats lxd docker
+daemon process:   (empty = not running)
+ls: cannot access '/run/cpacfstatsd_socket': No such file or directory
+systemctl is-active cpacfstatsd: inactive
+kernel.perf_event_paranoid=4   (4 = no unprivileged perf)
+PAI event sources: pai_crypto pai_ext 
+msa vx vxd vxe vxe2 vxp vxp2 
