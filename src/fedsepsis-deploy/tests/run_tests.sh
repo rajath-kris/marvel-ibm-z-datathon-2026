@@ -5,6 +5,7 @@ set -uo pipefail
 cd "$(dirname "$0")/.."
 source ./config.sh
 source ./demo_lib.sh
+load_train_config
 require_token
 mkdir -p evidence
 EV=$PWD/evidence
@@ -127,7 +128,7 @@ echo "################ (i) score endpoint ################"
   curl -s -w ' [HTTP %{http_code}]\n' -X POST -d 'not json' http://127.0.0.1:8101/score
 } 2>&1 | tee "$EV/test_i_score.txt"
 check "i hospA scores its own patient" '[ "$(grep -c "\"threshold\": .* \[HTTP 200\]" "$EV/test_i_score.txt")" -ge 6 ]'
-check "i hospA cannot score a hospB patient (404)" 'grep -q "no rows for that patient.* \[HTTP 404\]" "$EV/test_i_score.txt"'
+check "i hospA cannot score a hospB patient (404)" 'grep -q "patient not in .* \[HTTP 404\]" "$EV/test_i_score.txt"'
 
 echo "################ (g) restart aggregator mid-run + (h) docker stats during the run ################"
 {

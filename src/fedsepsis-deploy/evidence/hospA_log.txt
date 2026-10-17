@@ -1,15 +1,54 @@
 # hospA log (docker logs hospA)
-# captured 2026-10-17T07:42:29Z on datathon-test
+# captured 2026-10-17T10:20:14Z on datathon-test
 
-2026-10-17T07:42:12Z event=start site=hospA round=- mode=stub lib=/app/stub expected_rounds=5 port=8100
-2026-10-17T07:42:12Z event=aggregator_healthy site=hospA round=-
-2026-10-17T07:42:12Z event=data_loaded site=hospA round=- rows=2000 patients=50 mode=stub stub=True
-2026-10-17T07:42:12Z event=stats_posted site=hospA round=-
-2026-10-17T07:42:25Z event=aggregator_unreachable site=hospA round=- waiting_for=norm ready error=URLError
-2026-10-17T07:42:25Z event=norm_ready site=hospA round=-
-2026-10-17T07:42:25Z event=update_posted site=hospA round=0 duplicate=False
-2026-10-17T07:42:25Z event=update_posted site=hospA round=1 duplicate=False
-2026-10-17T07:42:26Z event=update_posted site=hospA round=2 duplicate=False
-2026-10-17T07:42:26Z event=update_posted site=hospA round=3 duplicate=False
-2026-10-17T07:42:26Z event=update_posted site=hospA round=4 duplicate=False
-2026-10-17T07:42:26Z event=final_model_written site=hospA round=5 path=/out/final_model.json
+2026-10-17T10:19:25Z event=start site=hospA round=- mode=real lib=/app/lib lib_version=? has_rate_fns=True expected_rounds=40 port=8100
+2026-10-17T10:19:25Z event=aggregator_healthy site=hospA round=-
+2026-10-17T10:19:26Z event=data_loaded site=hospA round=- rows=626881 features=138 mode=real stub=False nan_free=True seconds=0.3
+2026-10-17T10:19:26Z event=eval_data_loaded site=hospA round=- eval=site_big.npz eval_patients=16269 eval_rows=626881 retune=site_big.npz retune_patients=16269 retune_rows=626881
+2026-10-17T10:19:26Z event=borrowed_model_loaded site=hospA round=- features=138 feature_names_match=True
+2026-10-17T10:19:26Z event=stored_thresholds site=hospA round=- borrowed=0.5168503567531072 federated=0.428311566223493 budget=25
+2026-10-17T10:19:26Z event=train_cfg site=hospA round=- lr=0.1 epochs=3 l2=0.001 class_weight=30.0
+2026-10-17T10:19:26Z event=stats_posted site=hospA round=-
+2026-10-17T10:19:27Z event=norm_ready site=hospA round=-
+2026-10-17T10:19:28Z event=update_posted site=hospA round=0 duplicate=False train_seconds=1.11
+2026-10-17T10:19:29Z event=update_posted site=hospA round=1 duplicate=False train_seconds=1.09
+2026-10-17T10:19:30Z event=update_posted site=hospA round=2 duplicate=False train_seconds=1.12
+2026-10-17T10:19:31Z event=update_posted site=hospA round=3 duplicate=False train_seconds=1.10
+2026-10-17T10:19:33Z event=update_posted site=hospA round=4 duplicate=False train_seconds=1.09
+2026-10-17T10:19:34Z event=update_posted site=hospA round=5 duplicate=False train_seconds=1.11
+2026-10-17T10:19:35Z event=update_posted site=hospA round=6 duplicate=False train_seconds=1.28
+2026-10-17T10:19:36Z event=update_posted site=hospA round=7 duplicate=False train_seconds=1.16
+2026-10-17T10:19:37Z event=update_posted site=hospA round=8 duplicate=False train_seconds=1.14
+2026-10-17T10:19:38Z event=update_posted site=hospA round=9 duplicate=False train_seconds=1.21
+2026-10-17T10:19:40Z event=update_posted site=hospA round=10 duplicate=False train_seconds=1.12
+2026-10-17T10:19:41Z event=update_posted site=hospA round=11 duplicate=False train_seconds=1.12
+2026-10-17T10:19:42Z event=update_posted site=hospA round=12 duplicate=False train_seconds=1.09
+2026-10-17T10:19:43Z event=update_posted site=hospA round=13 duplicate=False train_seconds=1.20
+2026-10-17T10:19:44Z event=update_posted site=hospA round=14 duplicate=False train_seconds=1.12
+2026-10-17T10:19:45Z event=update_posted site=hospA round=15 duplicate=False train_seconds=1.10
+2026-10-17T10:19:46Z event=update_posted site=hospA round=16 duplicate=False train_seconds=1.05
+2026-10-17T10:19:47Z event=update_posted site=hospA round=17 duplicate=False train_seconds=1.08
+2026-10-17T10:19:49Z event=update_posted site=hospA round=18 duplicate=False train_seconds=1.05
+2026-10-17T10:19:50Z event=update_posted site=hospA round=19 duplicate=False train_seconds=1.07
+2026-10-17T10:19:51Z event=update_posted site=hospA round=20 duplicate=False train_seconds=1.05
+2026-10-17T10:19:52Z event=update_posted site=hospA round=21 duplicate=False train_seconds=1.09
+2026-10-17T10:19:53Z event=update_posted site=hospA round=22 duplicate=False train_seconds=1.06
+2026-10-17T10:19:54Z event=update_posted site=hospA round=23 duplicate=False train_seconds=1.04
+2026-10-17T10:19:55Z event=update_posted site=hospA round=24 duplicate=False train_seconds=1.07
+2026-10-17T10:19:56Z event=update_posted site=hospA round=25 duplicate=False train_seconds=1.11
+2026-10-17T10:19:57Z event=update_posted site=hospA round=26 duplicate=False train_seconds=1.04
+2026-10-17T10:19:58Z event=update_posted site=hospA round=27 duplicate=False train_seconds=1.06
+2026-10-17T10:19:59Z event=update_posted site=hospA round=28 duplicate=False train_seconds=1.08
+2026-10-17T10:20:00Z event=update_posted site=hospA round=29 duplicate=False train_seconds=1.05
+2026-10-17T10:20:01Z event=update_posted site=hospA round=30 duplicate=False train_seconds=1.07
+2026-10-17T10:20:02Z event=update_posted site=hospA round=31 duplicate=False train_seconds=1.06
+2026-10-17T10:20:04Z event=update_posted site=hospA round=32 duplicate=False train_seconds=1.11
+2026-10-17T10:20:05Z event=update_posted site=hospA round=33 duplicate=False train_seconds=1.08
+2026-10-17T10:20:06Z event=update_posted site=hospA round=34 duplicate=False train_seconds=1.08
+2026-10-17T10:20:07Z event=update_posted site=hospA round=35 duplicate=False train_seconds=1.06
+2026-10-17T10:20:08Z event=update_posted site=hospA round=36 duplicate=False train_seconds=1.08
+2026-10-17T10:20:09Z event=update_posted site=hospA round=37 duplicate=False train_seconds=1.09
+2026-10-17T10:20:10Z event=update_posted site=hospA round=38 duplicate=False train_seconds=1.09
+2026-10-17T10:20:11Z event=update_posted site=hospA round=39 duplicate=False train_seconds=1.15
+2026-10-17T10:20:11Z event=final_model_written site=hospA round=40 path=/out/final_model.json
+2026-10-17T10:20:14Z event=audit site=hospA round=- model=borrowed threshold=0.5168503567531072 patients=16269 seconds=0.4

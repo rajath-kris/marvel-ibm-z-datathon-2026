@@ -77,15 +77,20 @@ def _sigmoid(z):
 
 
 def score_patient(model, patient_rows, threshold, silence_h=6):
-    """patient_rows: {"X": [[f]], "hour": [int]} sorted by hour.
-    Alert when score >= threshold, then stay silent for silence_h hours."""
+    """Same contract and alert rule as the real library: patient_rows = one feature row per hour, in
+    order; returns hours 0..n-1. An alert is a CROSSING (score >= threshold at t, below at t-1 or t == 0),
+    and after an alert at t no new alert until t + silence_h + 1. Features are clipped to +-5 like the real one."""
     mean, std, w, b = model["mean"], model["std"], model["w"], model["b"]
-    out, last_alert = [], None
-    for x, h in zip(patient_rows["X"], patient_rows["hour"]):
-        z = b + sum(wj * (float(xj) - mj) / sj for wj, xj, mj, sj in zip(w, x, mean, std))
+    out, last_alert, prev_above = [], None, False
+    for t, x in enumerate(patient_rows):
+        z = b + sum(wj * max(-5.0, min(5.0, (float(xj) - mj) / max(sj, 1e-8)))
+                    for wj, xj, mj, sj in zip(w, x, mean, std))
         s = _sigmoid(z)
-        alert = s >= threshold and (last_alert is None or h - last_alert >= silence_h)
+        above = s >= float(threshold)
+        silent = last_alert is not None and (t - last_alert) <= int(silence_h)
+        alert = above and not prev_above and not silent
         if alert:
-            last_alert = h
-        out.append({"hour": int(h), "score": s, "alert": bool(alert)})
+            last_alert = t
+        prev_above = above
+        out.append({"hour": t, "score": s, "alert": bool(alert)})
     return out

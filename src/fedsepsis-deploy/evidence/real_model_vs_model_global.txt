@@ -1,0 +1,9 @@
+ours      : run/out/hospA/final_model.json
+reference : /home/linux1/handoff/outputs/demo/model_global.json
+weights   : 138 vs 138
+feature_names identical (same order): True
+max |w    diff| = 5.466e-08   (at AST_since, ref value -0.0399977)
+max |mean diff| = 0.000e+00   (at HR_last, ref value 84.8202)
+max |std  diff| = 0.000e+00   (at HR_last, ref value 16.8983)
+|b diff|        = 1.762e-09   (ours -1.200642513, ref -1.200642511)
+max |w diff| relative to max |w_ref| (0.3445): 1.587e-07

@@ -11,6 +11,6 @@ test_g_restore_mid_round (__main__.Persistence.test_g_restore_mid_round) ... ok
 test_refuses_state_from_a_different_config (__main__.Persistence.test_refuses_state_from_a_different_config) ... ok
 
 ----------------------------------------------------------------------
-Ran 11 tests in 0.007s
+Ran 11 tests in 0.008s
 
 OK

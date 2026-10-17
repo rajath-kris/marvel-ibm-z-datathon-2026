@@ -59,7 +59,7 @@ def _count(v, name):
 class AggregatorState:
     """Pure aggregation logic. Thread-safe; persists via save_fn after each change."""
 
-    def __init__(self, expected_sites, expected_rounds, state_path=None):
+    def __init__(self, expected_sites, expected_rounds, state_path=None, init_bias=0.0):
         if not expected_sites:
             raise ValueError("EXPECTED_SITES is empty")
         if expected_rounds < 1:
@@ -73,7 +73,7 @@ class AggregatorState:
             "stats": {},        # site_id -> {n, sum, sumsq}
             "norm": None,       # {mean, std} once every site has posted
             "round": 0,
-            "model": {"w": None, "b": 0.0},
+            "model": {"w": None, "b": float(init_bias)},   # zero weights, bias b0 (repro_config.json: -1.0)
             "updates": {},      # site_id -> {w, b, n} for the current round
             "done": False,
             "body_keys_seen": [],
@@ -136,7 +136,8 @@ class AggregatorState:
             self.s["stats"][site_id] = {"n": n, "sum": ssum, "sumsq": ssq}
             log("stats", site_id, self.s["round"], sites_stats=len(self.s["stats"]))
             if set(self.s["stats"]) == set(self.s["expected_sites"]):
-                self.s["norm"] = combine_totals(self.s["stats"].values())
+                # fixed site order, so float sums do not depend on arrival order
+                self.s["norm"] = combine_totals(self.s["stats"][k] for k in self.s["expected_sites"])
                 log("norm_ready", "-", self.s["round"], total_n=sum(v["n"] for v in self.s["stats"].values()))
             self._save()
             return {"ok": True}
@@ -182,7 +183,7 @@ class AggregatorState:
             self.s["updates"][site_id] = {"w": w, "b": b, "n": n}
             log("update", site_id, rnd, updated=len(self.s["updates"]))
             if set(self.s["updates"]) == set(self.s["expected_sites"]):
-                self.s["model"] = weighted_average(self.s["updates"].values())
+                self.s["model"] = weighted_average(self.s["updates"][k] for k in self.s["expected_sites"])
                 self.s["updates"] = {}
                 self.s["round"] += 1
                 if self.s["round"] >= self.s["expected_rounds"]:
@@ -304,7 +305,8 @@ def main():
     state_dir = os.environ.get("STATE_DIR", "/state")
     port = int(os.environ.get("PORT", "8000"))
     os.makedirs(state_dir, exist_ok=True)
-    state = AggregatorState(sites, rounds, os.path.join(state_dir, "state.json"))
+    state = AggregatorState(sites, rounds, os.path.join(state_dir, "state.json"),
+                            init_bias=float(os.environ.get("INIT_BIAS", "0.0")))
     log("start", "-", state.s["round"], sites=",".join(state.s["expected_sites"]),
         expected_rounds=rounds, restored=state.restored, done=state.s["done"])
     server = ThreadingHTTPServer(("0.0.0.0", port), make_handler(state, token))

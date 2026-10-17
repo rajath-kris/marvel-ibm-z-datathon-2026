@@ -1,0 +1,31 @@
+PASS  test_original_functions_spot_checks  (0.0s)
+PASS  test_alert_rate_handmade_known_answers  (0.0s)
+PASS  test_alert_rate_equals_sum_of_score_patient  (0.0s)
+PASS  test_alert_rate_patients_straddling_internal_blocks  (0.1s)
+PASS  test_alert_rate_rejects_nan  (0.0s)
+PASS  test_threshold_for_budget_handmade_known_answers  (0.0s)
+PASS  test_threshold_for_budget_properties_random  (0.1s)
+      (src/fed_metrics.py not present: cross-check against the experiment's code skipped)
+SKIP  test_threshold_search_identical_to_experiment_code  (0.0s)
+      test: 9885 patients, 376665 rows; validation: 591 patients, 23421 rows
+      setup 1 budget  5: threshold 0.708068 -> alert_rate on test 1.694875 (266 alerts / 15694.38 patient-days); experiment reported 1.694875
+      setup 1 budget 10: threshold 0.637705 -> alert_rate on test 3.631874 (570 alerts / 15694.38 patient-days); experiment reported 3.631874
+      setup 1 budget 25: threshold 0.516850 -> alert_rate on test 11.666600 (1831 alerts / 15694.38 patient-days); experiment reported 11.666600
+      setup 1 budget 50: threshold 0.398004 -> alert_rate on test 28.812871 (4522 alerts / 15694.38 patient-days); experiment reported 28.812871
+      setup 4 budget  5: threshold 0.670501 -> alert_rate on test 3.427980 (538 alerts / 15694.38 patient-days); experiment reported 3.427980
+      setup 4 budget 10: threshold 0.548135 -> alert_rate on test 9.837920 (1544 alerts / 15694.38 patient-days); experiment reported 9.837920
+      setup 4 budget 25: threshold 0.428312 -> alert_rate on test 22.453905 (3524 alerts / 15694.38 patient-days); experiment reported 22.453905
+      setup 4 budget 50: threshold 0.331529 -> alert_rate on test 47.074191 (7388 alerts / 15694.38 patient-days); experiment reported 47.074191
+      setup 2 budget  5: threshold_for_budget(validation) = 0.617740892041 (experiment 0.617740892041), realized on validation 5.0211, on test 4.479312 (experiment 4.479312)
+      setup 2 budget 10: threshold_for_budget(validation) = 0.543683382052 (experiment 0.543683382052), realized on validation 10.0423, on test 9.207120 (experiment 9.207120)
+      setup 2 budget 25: threshold_for_budget(validation) = 0.425315265515 (experiment 0.425315265515), realized on validation 25.0032, on test 23.995858 (experiment 23.995858)
+      setup 2 budget 50: threshold_for_budget(validation) = 0.378817490655 (experiment 0.378817490655), realized on validation 49.6990, on test 46.016487 (experiment 46.016487)
+      setup 4 budget  5: threshold_for_budget(validation) = 0.670501415369 (experiment 0.670501415369), realized on validation 5.0211, on test 3.427980 (experiment 3.427980)
+      setup 4 budget 10: threshold_for_budget(validation) = 0.548135352477 (experiment 0.548135352477), realized on validation 10.0423, on test 9.837920 (experiment 9.837920)
+      setup 4 budget 25: threshold_for_budget(validation) = 0.428311566223 (experiment 0.428311566223), realized on validation 25.1057, on test 22.453905 (experiment 22.453905)
+      setup 4 budget 50: threshold_for_budget(validation) = 0.331528930306 (experiment 0.331528930306), realized on validation 49.5965, on test 47.074191 (experiment 47.074191)
+      max |rate difference| 0.00e+00; max |threshold difference| 5.55e-17
+PASS  test_demo_data_matches_experiment_numbers  (4.1s)
+======================================================================
+8 passed, 0 failed, 1 skipped
+fedsepsis VERSION: 0.2.0 | numpy 2.0.2 | byteorder big

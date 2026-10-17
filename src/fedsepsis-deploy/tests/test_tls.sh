@@ -6,6 +6,7 @@ cd "$(dirname "$0")/.."
 export TLS=1
 source ./config.sh
 source ./demo_lib.sh
+load_train_config
 ./setup_tls.sh >/dev/null
 require_token
 EV=$PWD/evidence; mkdir -p "$EV"

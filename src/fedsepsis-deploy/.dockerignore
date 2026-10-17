@@ -5,3 +5,5 @@ lib
 data
 *.npz
 .git
+results
+tools

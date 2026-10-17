@@ -1,8 +1,9 @@
 # docker stats --no-stream
-# captured 2026-10-17T07:42:29Z on datathon-test
+# captured 2026-10-17T10:20:14Z on datathon-test
 
 NAME                   CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           PIDS
-hospB                  0.01%     14.19MiB / 1GiB       1.39%     32.7kB / 18.3kB   2
-hospA                  0.01%     15.27MiB / 1GiB       1.49%     47.3kB / 33.7kB   2
-fedsepsis-aggregator   0.01%     11.2MiB / 1GiB        1.09%     32.9kB / 60.2kB   1
-notebook               0.15%     733.2MiB / 7.821GiB   9.16%     4.19MB / 25MB     48
+hospB                  0.01%     284.5MiB / 1GiB       27.79%    1.51MB / 292kB    2
+hospA                  0.01%     414.8MiB / 2GiB       20.25%    781kB / 218kB     2
+fedsepsis-aggregator   0.01%     11.44MiB / 512MiB     2.23%     486kB / 2.28MB    1
+fedseed_17             100.83%   556.2MiB / 3GiB       18.10%    796B / 126B       2
+notebook               0.09%     734.8MiB / 7.821GiB   9.17%     5.88MB / 34.3MB   48

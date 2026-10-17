@@ -100,38 +100,72 @@ The unit tests on their own:
 docker run --rm -v $PWD:/w:ro --entrypoint /opt/venv/bin/python registry.linuxone.cloud.marist.edu/l1cc/jupyterlab-image-s390x:latest -B /w/tests/test_aggregator_logic.py
 ```
 
-## Swapping in the real library (MODE=real)
+## How to get the data (not in this repository)
 
-1. Copy the package so that `lib/fedsepsis/__init__.py` exists. It's mounted read-only at `/app/lib` and
-   `import fedsepsis` picks it up.
-   ```bash
-   scp -r fedsepsis l1cc:~/fedsepsis-deploy/lib/
-   ```
-2. Put the data in place. hospA gets `site_big.npz` and hospB gets `site_small.npz`. Each container sees **only its own
-   file**, mounted read-only at `/data/<name>.npz`. To use other paths, set `REAL_DATA_hospA=/path/a.npz REAL_DATA_hospB=/path/b.npz`.
-   ```bash
-   mkdir -p data && cp site_big.npz site_small.npz data/
-   ```
-   The required format is numpy arrays only, with keys `X, y, patient_id, hour, feature_names`. The client always loads with
-   `np.load(path, allow_pickle=False)`, so object arrays (e.g. Python-string `patient_id` with dtype `object`) are
-   **rejected**. Use fixed-width unicode (`dtype='<U…'`) or integers.
-3. Rerun:
-   ```bash
-   MODE=real ./run_demo.sh
-   ```
-   Then run `./tests/run_tests.sh` again. Tests (c), (e) and (i) currently use stub patient ids (`hospA-0003`) and the
-   stub `site.json` filename, so adjust those lines for real data.
-4. Check the real library against the frozen contract. The client calls exactly these, and converts every result to plain
-   floats and lists before it is sent:
-   - `local_stats(X) -> {"n","sum":[f],"sumsq":[f]}`
-   - `local_train(model, X, y, cfg) -> {"w":[f],"b":f,"n":int}`. `model` is `{w, b, mean, std}`. `cfg` is
-     `{site_id, round, seed, lr, epochs}` (`SEED`, `LR`, `EPOCHS` env vars).
-   - `score_patient(model, patient_rows, threshold, silence_h=6) -> [{"hour","score","alert"}]`.
-     **Assumption:** `patient_rows` is passed as `{"X": <rows sorted by hour>, "hour": [int]}`. In real mode `X` is a numpy
-     slice. If the real library expects something else, change `patient_rows()` in `hospital/client.py`, which is one function.
-   - `combine_stats` and `fedavg_aggregate` are **not called** by the deployment. The aggregator re-implements them in the
-     standard library, so it never needs numpy. The unit tests check the stub's versions against the aggregator. Do the
-     same with the real ones.
+No data, patient-level output, key or token is committed (see `.gitignore`). To rebuild the inputs:
+
+1. Download the public **PhysioNet/CinC Challenge 2019** training data (hospital systems A and B, hourly `.psv` files):
+   <https://physionet.org/content/challenge-2019/1.0.0/>. Put `training_setA/` and `training_setB/` under the project's
+   `data/` folder (`config.py: DATA_DIR`).
+2. In the SepsisBridge project (Reju's folder, `src/`):
+   - `src/load_data.py` parses the `.psv` files into one table per hospital.
+   - `src/fed_data.py: build_fed_features` builds the 138 causal features: `_last`, `_mean6`, `_delta6` and `_since` for
+     34 variables, plus Age and Gender. Each site fills missing values with its own training median.
+   - `src/fed_experiment.py` runs the sweep (outputs in `outputs/fed/`).
+   - `python src/fed_demo.py --dirs outputs/fed/raw outputs/fed/raw_vm` exports `outputs/demo/`: `site_big.npz`,
+     `site_small.npz`, `small_test_patients.npz`, `small_val_patients.npz`, the model JSONs, `demo_patient.json`,
+     `repro_config.json` and `SHA256SUMS.txt`.
+3. Copy `outputs/demo/` and the `fedsepsis/` library to the VM as `~/handoff/outputs/demo/` and `~/handoff/fedsepsis/`.
+   Then run `./setup_real.sh`, which checks every file against `SHA256SUMS.txt` before use.
+
+The row conventions (training rows vs alert-metric rows, `keep_row`, onset) are in `HANDOFF.md`, which ships with the export.
+
+## Real mode (MODE=real): Reju's handoff, library 0.2.0
+
+Inputs are read-only from `~/handoff` (`REAL_DIR=~/handoff/outputs/demo`, `LIB_SRC=~/handoff/fedsepsis`). See `HANDOFF.md` there.
+
+```bash
+./setup_real.sh        # sha256sum -c the handoff's SHA256SUMS.txt (18 files), then copy fedsepsis into ./lib
+MODE=real RUN_LABEL=tuned-40x3 ALLOW_JOBS="fedcurve,fedseed_[0-9]+" ./run_demo.sh
+MODE=real EXPECTED_ROUNDS=5 RUN_LABEL=short-demo-5r ALLOW_JOBS="fedcurve,fedseed_[0-9]+" ./run_demo.sh   # "short demo run"
+./tests/test_real_endpoints.sh      # /audit, /retune, /patient, /score vs HANDOFF.md section 6 + allowed fields
+python3 tools/compare_models.py results/tuned-40x3/final_model.json ~/handoff/outputs/demo/model_global.json
+```
+
+- **Pre-flight.** `run_demo.sh` refuses to start if MemAvailable is under 3 GB, or if any other container or busy process is
+  running. `ALLOW_JOBS` lists the containers the team agreed may run alongside (Reju's sweep); the memory floor still applies.
+- **Training settings** come from `repro_config.json` (setup 4): 40 rounds x 3 local epochs, lr 0.1, l2 0.001,
+  class_weight 30, zero weights, bias -1.0. Normalisation is pooled over both sites. Memory: hospA 2 GB, hospB 1 GB,
+  aggregator 512 MB, 1 CPU each.
+- **Data per container** (read-only mounts; each container sees only its own files):
+
+  | | training | /audit, /score, /patient | /retune |
+  |---|---|---|---|
+  | hospA | `site_big.npz` | `site_big.npz` | `site_big.npz` |
+  | hospB | `site_small.npz` | `small_test_patients.npz` (all rows) | `small_val_patients.npz`, as in the experiment (override: `RETUNE_DATA_hospB`) |
+
+  Alert metrics use **all rows** of the test file, as HANDOFF.md sections 3 and 5 specify. `keep_row` is for AUROC only and is
+  not used. `onset_by_row` is only returned by `GET /patient`, for the onset marker. Rows must be NaN-free: the client checks
+  every file at load and fails with a clear `training_failed ... DataError` if not.
+- **Hospital endpoints** (port 8100, published on 127.0.0.1:8101 / 8102). Rates and thresholds come only from
+  `fedsepsis.alert_rate` and `fedsepsis.threshold_for_budget`:
+  - `POST /audit {"model": "borrowed"|"federated"|"retuned", "threshold"?}` -> `{alerts_per_100_patient_days, patients, patient_days, threshold}`.
+    Default model is `borrowed` (`model_big_asis.json`). Stored thresholds come from `demo_patient.json`: borrowed 0.516850 (setup 1 @25),
+    federated 0.428312 (setup 4 @25), retuned = the last `/retune` result.
+  - `POST /retune {"model": "borrowed"|"federated", "budget": 25}` -> `{threshold, alerts_per_100_patient_days}` (rate on the re-tune data).
+    The result is stored, also in `/out/retuned.json`, so it survives a restart.
+  - `POST /score {"patient_id", "hour", "model"?}` and `GET /patient?patient_id=&model=` (full hourly replay with alert hours,
+    onset and window). Default model is `federated`. `federated` is this run's final global model; it is available after training.
+- **Results** (`results/<label>/`): final model with `feature_names`, aggregator and hospital logs, runtime.
+
+Measured on the VM, 2026-10-17, while Reju's sweep was running:
+- tuned 40 x 3 run: 51.9 s. Max |w - model_global.w| = 5.5e-8, |b diff| = 1.8e-9, mean/std identical.
+- The test-set audit reproduces HANDOFF section 6 exactly: borrowed 11.666600, setup-2 threshold 23.995858, federated 22.453905.
+- Replay of patients 71 and 13561 matches `demo_patient.json` (alerts identical, scores within 2.4e-8).
+- Re-tune on `small_val_patients.npz` reproduces the experiment. Borrowed: 0.425315265515, giving 23.995858 on test
+  (setup 2). Federated: 0.42831155832, giving 22.453905 (setup 4). An earlier run re-tuned on `site_small.npz`
+  (borrowed 0.415496, test 25.61), which is why the data source is a setting.
+- API for the demo page: `DEMO_API.md`.
 
 ## What is NOT implemented / not protected
 

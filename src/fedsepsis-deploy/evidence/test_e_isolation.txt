@@ -1,15 +1,15 @@
 $ docker exec hospA ls -la /data /out
 /data:
 total 840
-drwxrwxr-x 2 ibm-user ibm-user   4096 Oct 17 07:34 .
-drwxr-xr-x 1 root     root       4096 Oct 17 07:42 ..
+drwxr-xr-x 2 ibm-user ibm-user   4096 Oct 17 07:34 .
+drwxr-xr-x 1 root     root       4096 Oct 17 10:05 ..
 -rw-r--r-- 1 ibm-user ibm-user 849924 Oct 17 07:34 site.json
 
 /out:
 total 12
-drwxrwxr-x 2 ibm-user ibm-user 4096 Oct 17 07:42 .
-drwxr-xr-x 1 root     root     4096 Oct 17 07:42 ..
--rw-r--r-- 1 ibm-user ibm-user 1526 Oct 17 07:42 final_model.json
+drwxrwxr-x 2 ibm-user ibm-user 4096 Oct 17 10:05 .
+drwxr-xr-x 1 root     root     4096 Oct 17 10:05 ..
+-rw-r--r-- 1 ibm-user ibm-user 1834 Oct 17 10:05 final_model.json
 $ docker inspect hospA  (mounts only)
 /home/linux1/fedsepsis-deploy/run/data/hospA -> /data (rw=false)
 /home/linux1/fedsepsis-deploy/run/out/hospA -> /out (rw=true)

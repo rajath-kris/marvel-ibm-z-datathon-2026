@@ -1,0 +1,25 @@
+# Never commit data, patient-level outputs or secrets.
+# Data (PhysioNet-derived rows and exports): see README "How to get the data"
+*.npz
+*.npy
+*.pkl
+*.psv
+*.parquet
+*.csv
+data/
+# generated per run: per-patient replays, state, outputs, stub data
+run/
+# the real library is Reju's deliverable (~/handoff/fedsepsis); setup_real.sh copies it in
+lib/fedsepsis/
+# secrets: the token and TLS key live in ~/.fedsepsis/ outside the project, but just in case
+*.pem
+*.key
+*.crt
+token
+curl-header
+.fedsepsis/
+.env
+# python / OS
+__pycache__/
+*.py[cod]
+.DS_Store

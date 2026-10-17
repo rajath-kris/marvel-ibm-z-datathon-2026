@@ -1,11 +1,11 @@
 # docker network inspect fedsepsis-net
-# captured 2026-10-17T07:42:29Z on datathon-test
+# captured 2026-10-17T10:20:14Z on datathon-test
 
 [
     {
         "Name": "fedsepsis-net",
-        "Id": "0102abc5503e96b98c26ff997d6de501c204a8aff184ea417643a5a59372907c",
-        "Created": "2026-10-17T07:34:30.902415146Z",
+        "Id": "72425b72875d8a72c903d7d1d1005726a116b73363af1d422a76e75a6f3542f0",
+        "Created": "2026-10-17T10:03:06.73815483Z",
         "Scope": "local",
         "Driver": "bridge",
         "EnableIPv4": true,
@@ -30,25 +30,25 @@
         "Options": {},
         "Labels": {},
         "Containers": {
-            "66083adda46ed7407704a4fafcd8397ff5ac99a5f6516c80028e12e8549f81d7": {
-                "Name": "fedsepsis-aggregator",
-                "EndpointID": "e20c7d80489416ee006f88794dabe499d4daf0853b34287763f7b1dd5743e298",
-                "MacAddress": "ae:e5:f8:0a:28:be",
-                "IPv4Address": "172.18.0.2/16",
+            "6bb80bd241ed9678ea2769727cc32b7a528dafee2eb544a702827f4acdfddf50": {
+                "Name": "hospB",
+                "EndpointID": "2ef5657be9c1136263ba9218393cef44edaddb75085de95b5d52cd18dbb88c39",
+                "MacAddress": "a2:6a:88:f2:a3:35",
+                "IPv4Address": "172.18.0.4/16",
                 "IPv6Address": ""
             },
-            "71f25e03b1028735eabfd1ab57dde5e4032135b2daa78fc0811b925dddec9156": {
+            "a880801f47a776c592843f7db3dd0098f293140ec21d3ec20c1fc88d9a490deb": {
                 "Name": "hospA",
-                "EndpointID": "868a7ecb20a6d02ca4e71e905e008bd96851f7e89b4e53d2c3d2371af973c19d",
-                "MacAddress": "4a:c1:f6:61:d9:29",
+                "EndpointID": "cc3b53798e1af685664e0afc4afa8649466e89997eb68bfe9d0c9e21323a35bc",
+                "MacAddress": "9a:cf:9f:dc:bd:8d",
                 "IPv4Address": "172.18.0.3/16",
                 "IPv6Address": ""
             },
-            "c53cbba46f57dfaa0cd1f4aa6e7ca6e35de457bf3114c6ecc00c70a27ff02706": {
-                "Name": "hospB",
-                "EndpointID": "02f724e96647cc6e288b23621e3f7e5558edd9e3e073d70e194403f2d2cd2108",
-                "MacAddress": "9a:46:8f:c1:a9:5a",
-                "IPv4Address": "172.18.0.4/16",
+            "f3144659bcfd10a680e7310b4b67e9ca669e29f44828fbe8ed58ba64b45d2446": {
+                "Name": "fedsepsis-aggregator",
+                "EndpointID": "7c977b86eab381b74606887e9ab54986c2ec9930ce5cef2b8c18ba17a68290ea",
+                "MacAddress": "76:30:91:b7:96:07",
+                "IPv4Address": "172.18.0.2/16",
                 "IPv6Address": ""
             }
         },

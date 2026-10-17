@@ -1,0 +1,101 @@
+# MODE=real endpoint checks  (2026-10-17T10:20:12Z)
+--- hospB health
+$ curl -X GET :8102/health 
+{"ok": true, "site_id": "hospB", "status": "done", "final_model": true, "mode": "real", "eval_data": "small_test_patients.npz", "retune_data": "small_val_patients.npz"} [HTTP 200]
+
+=== input validation
+--- audit: unknown model (expect 400)
+$ curl -X POST :8102/audit -d '{"model":"bogus"}'
+{"error": "model must be borrowed, federated or retuned"} [HTTP 400]
+--- audit: threshold out of range (expect 400)
+$ curl -X POST :8102/audit -d '{"model":"borrowed","threshold":2}'
+{"error": "threshold must be a number in [0, 1]"} [HTTP 400]
+--- retune: bad budget (expect 400)
+$ curl -X POST :8102/retune -d '{"model":"borrowed","budget":-5}'
+{"error": "budget must be a positive number (alerts per 100 patient-days)"} [HTTP 400]
+--- retune: model=retuned is not allowed (expect 400)
+$ curl -X POST :8102/retune -d '{"model":"retuned","budget":25}'
+{"error": "model must be borrowed or federated"} [HTTP 400]
+
+=== /audit at hospB on small_test_patients.npz (all rows; HANDOFF section 6)
+--- audit borrowed, stored threshold (experiment setup 1 @25: 11.67)
+$ curl -X POST :8102/audit -d '{}'
+{"alerts_per_100_patient_days": 11.66660029469157, "patients": 9885, "patient_days": 15694.375, "threshold": 0.5168503567531072, "alerts": 1831, "model": "borrowed", "data": "small_test_patients.npz"} [HTTP 200]
+--- audit borrowed at the setup-2 threshold 0.425315265515 (experiment: 23.995858)
+$ curl -X POST :8102/audit -d '{"model":"borrowed","threshold":0.425315265515}'
+{"alerts_per_100_patient_days": 23.995858388753934, "patients": 9885, "patient_days": 15694.375, "threshold": 0.425315265515, "alerts": 3766, "model": "borrowed", "data": "small_test_patients.npz"} [HTTP 200]
+--- audit federated (this run's model), stored threshold 0.428312 (experiment setup 4 @25 with model_global: 22.453905)
+$ curl -X POST :8102/audit -d '{"model":"federated"}'
+{"alerts_per_100_patient_days": 22.45390466329497, "patients": 9885, "patient_days": 15694.375, "threshold": 0.428311566223493, "alerts": 3524, "model": "federated", "data": "small_test_patients.npz"} [HTTP 200]
+
+=== /retune at hospB (data: small_val_patients.npz)
+--- retune borrowed to budget 25 (experiment setup 2 on small_val_patients: 0.425315265515)
+$ curl -X POST :8102/retune -d '{"model":"borrowed","budget":25}'
+{"threshold": 0.42531526551518406, "alerts_per_100_patient_days": 25.003202254387087, "model": "borrowed", "budget": 25, "data": "small_val_patients.npz", "patients": 591} [HTTP 200]
+--- audit retuned borrowed on the test patients (experiment setup 2 @25: 23.995858)
+$ curl -X POST :8102/audit -d '{"model":"retuned"}'
+{"alerts_per_100_patient_days": 23.995858388753934, "patients": 9885, "patient_days": 15694.375, "threshold": 0.42531526551518406, "alerts": 3766, "model": "retuned", "data": "small_test_patients.npz"} [HTTP 200]
+--- retune federated to budget 25 (experiment setup 4: 0.428311566 sweep / 0.42831155832 float64 run_repro)
+$ curl -X POST :8102/retune -d '{"model":"federated","budget":25}'
+{"threshold": 0.4283115583229898, "alerts_per_100_patient_days": 25.10567439477392, "model": "federated", "budget": 25, "data": "small_val_patients.npz", "patients": 591} [HTTP 200]
+--- audit retuned federated on the test patients (experiment setup 4 @25: 22.453905)
+$ curl -X POST :8102/audit -d '{"model":"retuned"}'
+{"alerts_per_100_patient_days": 22.45390466329497, "patients": 9885, "patient_days": 15694.375, "threshold": 0.4283115583229898, "alerts": 3524, "model": "retuned", "data": "small_test_patients.npz"} [HTTP 200]
+
+=== replay: demo_patient.json examples (any test patient works)
+  patient 71 model=federated threshold=0.428312 data=small_test_patients.npz hours 0..34 onset=31.0 window=[19.0, 34.0] alert_hours=[29] max_score=0.5163
+  patient 71 model=borrowed threshold=0.516850 data=small_test_patients.npz hours 0..34 onset=31.0 window=[19.0, 34.0] alert_hours=[] max_score=0.4028
+  patient 13561 model=federated threshold=0.428312 data=small_test_patients.npz hours 0..28 onset=25.0 window=[13.0, 28.0] alert_hours=[] max_score=0.3292
+  patient 13561 model=borrowed threshold=0.516850 data=small_test_patients.npz hours 0..28 onset=25.0 window=[13.0, 28.0] alert_hours=[] max_score=0.3780
+--- replay unknown patient (expect 404)
+$ curl -X GET :8102/patient?patient_id=999999&model=federated 
+{"error": "patient not in small_test_patients.npz"} [HTTP 404]
+
+=== /score at hospB
+--- score patient 71 hour 19, federated
+$ curl -X POST :8102/score -d '{"patient_id":71,"hour":19,"model":"federated"}'
+{"hour": 19, "score": 0.15832383152858237, "alert": false, "threshold": 0.428311566223493, "model": "federated", "final_model": true} [HTTP 200]
+--- score patient 71 hour 28, federated
+$ curl -X POST :8102/score -d '{"patient_id":71,"hour":28,"model":"federated"}'
+{"hour": 28, "score": 0.3060515467839317, "alert": false, "threshold": 0.428311566223493, "model": "federated", "final_model": true} [HTTP 200]
+--- score patient 71 hour 29, federated
+$ curl -X POST :8102/score -d '{"patient_id":71,"hour":29,"model":"federated"}'
+{"hour": 29, "score": 0.4543896320605181, "alert": true, "threshold": 0.428311566223493, "model": "federated", "final_model": true} [HTTP 200]
+--- score patient 71 hour 34, federated
+$ curl -X POST :8102/score -d '{"patient_id":71,"hour":34,"model":"federated"}'
+{"hour": 34, "score": 0.4862958044362129, "alert": false, "threshold": 0.428311566223493, "model": "federated", "final_model": true} [HTTP 200]
+--- score patient 71 hour 29, borrowed
+$ curl -X POST :8102/score -d '{"patient_id":71,"hour":29,"model":"borrowed"}'
+{"hour": 29, "score": 0.29250881870092793, "alert": false, "threshold": 0.5168503567531072, "model": "borrowed", "final_model": true} [HTTP 200]
+
+=== replay vs demo_patient.json (reference: model_federated_best.json / model_big_asis.json, same thresholds)
+  success_example  patient    71 federated: max |score diff| 2.43e-08, alerts identical: True, alert hours (ours) [29]
+  success_example  patient    71 borrowed : max |score diff| 1.11e-16, alerts identical: True, alert hours (ours) []
+  failure_example  patient 13561 federated: max |score diff| 1.62e-08, alerts identical: True, alert hours (ours) []
+  failure_example  patient 13561 borrowed : max |score diff| 0.00e+00, alerts identical: True, alert hours (ours) []
+
+=== hospA (big site) audit on its own training rows, borrowed model + its own threshold
+--- hospA health
+$ curl -X GET :8101/health 
+{"ok": true, "site_id": "hospA", "status": "done", "final_model": true, "mode": "real", "eval_data": "site_big.npz", "retune_data": "site_big.npz"} [HTTP 200]
+--- hospA audit borrowed
+$ curl -X POST :8101/audit -d '{}'
+{"alerts_per_100_patient_days": 25.712056993273045, "patients": 16269, "patient_days": 26120.041666666668, "threshold": 0.5168503567531072, "alerts": 6716, "model": "borrowed", "data": "site_big.npz"} [HTTP 200]
+
+=== CORS (demo page on http://localhost)
+$ curl -i -X OPTIONS -H 'Origin: http://localhost:5173' -H 'Access-Control-Request-Method: POST' /audit
+HTTP/1.0 204 No Content
+Access-Control-Allow-Origin: http://localhost:5173
+Access-Control-Allow-Methods: GET, POST, OPTIONS
+Access-Control-Allow-Headers: Content-Type
+Access-Control-Max-Age: 600
+$ curl -i -H 'Origin: http://localhost:5173' /health
+HTTP/1.0 200 OK
+Access-Control-Allow-Origin: http://localhost:5173
+$ curl -i -H 'Origin: http://evil.example' /health   (expect no Access-Control-Allow-Origin)
+HTTP/1.0 200 OK
+
+=== (f) allowed fields on the real run
+      2 /stats n,site_id,sum,sumsq
+     80 /update b,n,round,site_id,w
+union of keys: ['b', 'n', 'round', 'site_id', 'sum', 'sumsq', 'w'] | ASSERT subset of allowed : True

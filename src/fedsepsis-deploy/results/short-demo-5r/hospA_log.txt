@@ -1,0 +1,15 @@
+2026-10-17T10:03:07Z event=start site=hospA round=- mode=real lib=/app/lib lib_version=? has_rate_fns=True expected_rounds=5 port=8100
+2026-10-17T10:03:07Z event=aggregator_healthy site=hospA round=-
+2026-10-17T10:03:09Z event=data_loaded site=hospA round=- rows=626881 features=138 mode=real stub=False nan_free=True seconds=1.2
+2026-10-17T10:03:09Z event=eval_data_loaded site=hospA round=- eval=site_big.npz eval_patients=16269 eval_rows=626881 retune=site_big.npz retune_patients=16269 retune_rows=626881
+2026-10-17T10:03:09Z event=borrowed_model_loaded site=hospA round=- features=138 feature_names_match=True
+2026-10-17T10:03:09Z event=stored_thresholds site=hospA round=- borrowed=0.5168503567531072 federated=0.428311566223493 budget=25
+2026-10-17T10:03:09Z event=train_cfg site=hospA round=- lr=0.1 epochs=3 l2=0.001 class_weight=30.0
+2026-10-17T10:03:09Z event=stats_posted site=hospA round=-
+2026-10-17T10:03:10Z event=norm_ready site=hospA round=-
+2026-10-17T10:03:12Z event=update_posted site=hospA round=0 duplicate=False train_seconds=1.43
+2026-10-17T10:03:13Z event=update_posted site=hospA round=1 duplicate=False train_seconds=1.13
+2026-10-17T10:03:14Z event=update_posted site=hospA round=2 duplicate=False train_seconds=1.10
+2026-10-17T10:03:15Z event=update_posted site=hospA round=3 duplicate=False train_seconds=1.19
+2026-10-17T10:03:16Z event=update_posted site=hospA round=4 duplicate=False train_seconds=1.14
+2026-10-17T10:03:16Z event=final_model_written site=hospA round=5 path=/out/final_model.json
