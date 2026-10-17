@@ -1,0 +1,56 @@
+# secure aggregation, 3 sites  (2026-10-17T10:28:00Z)
+### unit tests (fedsecure + aggregator SECURE mode)
+Ran 9 tests in 0.029s
+OK
+    one masked update (hospB, 138 values): KS vs uniform 0.050 (1% critical 0.139), corr with true n*w +0.058, decoding it alone is off by 7.73e+21 x max|n*w|
+    aggregator secure vs plain: mean/std rel diff 0.00e+00, final w diff 1.39e-17, done=True
+    max |secure - plain FedAvg| over 20 rounds x 139 values: 2.776e-17
+
+### 3-site run, plain
+pre-flight: MemAvailable 4820 MB (need >= 3072); other containers: fedseed_18
+hospA1: 310792 rows, 8134 patients, 4296 positive rows -> hospA1.npz
+hospA2: 316089 rows, 8135 patients, 4296 positive rows -> hospA2.npz
+split: random 50/50 by patient, seed 2026; source site_big.npz 626881 rows, 16269 patients
+rounds completed: 40 / 40   done=True   sites=['hospA1', 'hospA2', 'hospB']
+all sites hold the identical final model: True
+2026-10-17T10:28:06Z event=start site=- round=0 sites=hospA1,hospA2,hospB expected_rounds=40 restored=False done=False secure=False
+secure=0 split=random-seed2026 runtime=38.1s
+results saved in results/secure3-plain/
+
+### 3-site run, masked
+pre-flight: MemAvailable 4448 MB (need >= 3072); other containers: fedseed_18
+keeping split (random-seed2026)
+pair seeds in /home/linux1/.fedsepsis/pairs: 3 (3 new)
+rounds completed: 40 / 40   done=True   sites=['hospA1', 'hospA2', 'hospB']
+all sites hold the identical final model: True
+2026-10-17T10:28:47Z event=start site=- round=0 sites=hospA1,hospA2,hospB expected_rounds=40 restored=False done=False secure=True
+secure=1 split=random-seed2026 runtime=38.6s
+results saved in results/secure3-masked/
+--- what the aggregator stores for hospB's normalisation sums (secure mode): first 4 of 138, as fractions of 2**128
+  secure flag in state: True | stored values are integers: True
+   [0.738031, 0.022914, 0.372515, 0.465665] ...
+   KS distance from uniform over all 138: 0.056 (1% critical 0.139)
+--- hospB's real sums for comparison (local only, computed in hospB's container; never sent in the clear)
+   [4411498.0, 4414157.7, -478.5, 45371.0] ...
+--- (f) allowed fields, secure run
+      3 /stats n,site_id,sum,sumsq
+    120 /update b,n,round,site_id,w
+  union of keys: ['b', 'n', 'round', 'site_id', 'sum', 'sumsq', 'w'] | ASSERT subset of allowed : True
+
+### masked vs plain, same 3 sites, 40 rounds
+ours      : results/secure3-masked/final_model.json
+reference : results/secure3-plain/final_model.json
+weights   : 138 vs 138
+feature_names identical (same order): True
+max |w    diff| = 1.110e-16   (at Calcium_since, ref value -0.163108)
+max |mean diff| = 0.000e+00   (at HR_last, ref value 84.8202)
+max |std  diff| = 6.939e-18   (at pH_delta6, ref value 0.0270457)
+|b diff|        = 0.000e+00   (ours -1.200918010, ref -1.200918010)
+max |w diff| relative to max |w_ref| (0.3445): 3.222e-16
+ASSERT max |masked - plain| <= 1e-9 : True  (1.110e-16)
+
+### for reference: 3-site plain vs the 2-site model_global.json (different sites, so NOT expected to match)
+max |w    diff| = 3.440e-04   (at Alkalinephos_delta6, ref value -0.0116705)
+max |mean diff| = 0.000e+00   (at HR_last, ref value 84.8202)
+|b diff|        = 2.755e-04   (ours -1.200918010, ref -1.200642511)
+max |w diff| relative to max |w_ref| (0.3445): 9.986e-04

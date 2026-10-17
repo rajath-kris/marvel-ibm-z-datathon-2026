@@ -5,6 +5,7 @@ WORKDIR /app
 COPY hospital/client.py /app/client.py
 COPY hospital/make_stub_data.py /app/make_stub_data.py
 COPY stub /app/stub
+COPY fedsecure /app/fedsecure
 USER 1000:1000
 ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
 EXPOSE 8100

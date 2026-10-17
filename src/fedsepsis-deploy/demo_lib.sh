@@ -1,14 +1,19 @@
 # Functions shared by run_demo.sh and the tests. Source after config.sh.
 # Every wait is a bounded until-loop poll; there are no fixed sleeps.
 
-AGG_NAME=fedsepsis-aggregator
-RUN_DIR=$PWD/run
-SITES=(hospA hospB)
-declare -A HOST_PORT=([hospA]=8101 [hospB]=8102)
+# Overridable so a second deployment (run_secure.sh) can run beside the main one with its own names.
+AGG_NAME=${AGG_NAME:-fedsepsis-aggregator}
+NAME_PREFIX=${NAME_PREFIX:-}                 # container name = $NAME_PREFIX$site
+RUN_DIR=${RUN_DIR:-$PWD/run}
+read -r -a SITES <<< "${FED_SITES:-hospA hospB}"
+declare -A HOST_PORT=([hospA]=8101 [hospB]=8102 [hospA1]=8111 [hospA2]=8112)
 declare -A STUB_ROWS=([hospA]=2000 [hospB]=1200)
-declare -A HOSP_MEMORY=([hospA]=2g [hospB]=1g)
+declare -A HOSP_MEMORY=([hospA]=2g [hospB]=1g [hospA1]=1g [hospA2]=1g)
+SECURE=${SECURE:-0}
+PAIR_DIR=${PAIR_DIR:-$SECRET_DIR/pairs}      # pairwise seeds for SECURE=1 (outside the project)
 # MODE=real: training file per site (override with REAL_DATA_hospA / REAL_DATA_hospB)
-declare -A REAL_FILE=([hospA]=${REAL_DATA_hospA:-$REAL_DIR/site_big.npz} [hospB]=${REAL_DATA_hospB:-$REAL_DIR/site_small.npz})
+declare -A REAL_FILE=([hospA]=${REAL_DATA_hospA:-$REAL_DIR/site_big.npz} [hospB]=${REAL_DATA_hospB:-$REAL_DIR/site_small.npz}
+                      [hospA1]=${REAL_DATA_hospA1:-$RUN_DIR/split/hospA1.npz} [hospA2]=${REAL_DATA_hospA2:-$RUN_DIR/split/hospA2.npz})
 # /audit, /score, /patient data per site (default: its training file). hospB: held-out test patients, all rows
 # (HANDOFF.md section 3/5: alert metrics use all rows; keep_row is only for AUROC and is not used here).
 declare -A EVAL_FILE=([hospB]=${EVAL_DATA_hospB:-$REAL_DIR/small_test_patients.npz})
@@ -44,7 +49,7 @@ EOF
 preflight() {
   local avail others busy
   avail=$(awk '/^MemAvailable:/ {print int($2/1024)}' /proc/meminfo)
-  others=$(docker ps --format '{{.Names}}' | grep -v -x -E "notebook|$AGG_NAME|$(IFS='|'; echo "${SITES[*]}")" || true)
+  others=$(docker ps --format '{{.Names}}' | grep -v -x -E "notebook|$AGG_NAME|$(container_names | paste -sd'|' -)" || true)
   busy=$(ps -eo pcpu=,user=,comm= --sort=-pcpu | awk '$1 > 50' | tr '\n' ';' || true)
   echo "pre-flight: MemAvailable ${avail} MB (need >= $MIN_AVAILABLE_MB); other containers: ${others:-none}; processes >50% CPU: ${busy:-none}"
   # ALLOW_JOBS=name1,name2: containers the team agreed may run alongside (CPU check is then skipped; memory is not)
@@ -69,7 +74,7 @@ require_token() {
 agg_scheme() { [ "$TLS" = 1 ] && echo https || echo http; }
 
 build_images() {
-  docker build -q -t "$AGG_IMAGE" aggregator >/dev/null
+  docker build -q -t "$AGG_IMAGE" -f aggregator/Dockerfile . >/dev/null
   docker build -q -t "$HOSP_IMAGE" -f hospital/Dockerfile . >/dev/null
   echo "built $AGG_IMAGE and $HOSP_IMAGE"
 }
@@ -79,8 +84,10 @@ ensure_network() {
   echo "network $NETWORK ready"
 }
 
+container_names() { for s in "${SITES[@]}"; do echo "$NAME_PREFIX$s"; done; }
+
 remove_containers() {
-  docker rm -f "$AGG_NAME" "${SITES[@]}" >/dev/null 2>&1 || true
+  docker rm -f "$AGG_NAME" $(container_names) >/dev/null 2>&1 || true
 }
 
 fresh_run_dirs() {
@@ -104,7 +111,7 @@ start_aggregator() {
   TOKEN="$(cat "$TOKEN_FILE")" docker run -d --name "$AGG_NAME" $CPUS --memory "$AGG_MEMORY" \
     --network "$NETWORK" --network-alias aggregator \
     -e TOKEN -e EXPECTED_SITES="$(IFS=,; echo "${SITES[*]}")" -e EXPECTED_ROUNDS="$EXPECTED_ROUNDS" -e INIT_BIAS="$INIT_BIAS" \
-    -e STATE_DIR=/state -v "$RUN_DIR/state":/state "${tls[@]}" \
+    -e STATE_DIR=/state -v "$RUN_DIR/state":/state -e SECURE="$SECURE" "${tls[@]}" \
     "$AGG_IMAGE" >/dev/null
   wait_until 60 "aggregator healthy" 'agg_get /health | grep -q "\"ok\": true"'
 }
@@ -135,10 +142,17 @@ start_hospital() {  # start_hospital SITE
   local tls=()
   [ "$TLS" = 1 ] && tls=(-e TLS_CA=/tls/aggregator.crt -e TLS_PIN_SHA256="${PIN_OVERRIDE:-$TLS_PIN}"
                          -v "$TLS_DIR/aggregator.crt":/tls/aggregator.crt:ro)
-  TOKEN="$(cat "$TOKEN_FILE")" docker run -d --name "$s" $CPUS --memory "${HOSP_MEMORY[$s]}" --network "$NETWORK" \
+  local sec=()
+  if [ "$SECURE" = 1 ]; then
+    sec=(-e SECURE=1 -e ALL_SITES="$(IFS=,; echo "${SITES[*]}")" -e PAIR_SEED_DIR=/pairs)
+    for f in "$PAIR_DIR"/*.seed; do                 # mount ONLY the seeds this site is part of
+      case "$(basename "$f" .seed)" in "$s"__*|*__"$s") sec+=(-v "$f":/pairs/$(basename "$f"):ro) ;; esac
+    done
+  fi
+  TOKEN="$(cat "$TOKEN_FILE")" docker run -d --name "$NAME_PREFIX$s" $CPUS --memory "${HOSP_MEMORY[$s]}" --network "$NETWORK" \
     -e TOKEN -e SITE_ID="$s" -e AGGREGATOR_URL="$(agg_scheme)://aggregator:8000" -e EXPECTED_ROUNDS="$EXPECTED_ROUNDS" \
     -e DATA_PATH="$data_path" -e MODE="$MODE" -e THRESHOLD="$THRESHOLD" -e OUT_DIR=/out "${TRAIN_ENV[@]}" \
-    -v "$data_mount" -v "$RUN_DIR/out/$s":/out "${lib_mount[@]}" "${tls[@]}" \
+    -v "$data_mount" -v "$RUN_DIR/out/$s":/out "${lib_mount[@]}" "${tls[@]}" "${sec[@]}" \
     -p 127.0.0.1:"${HOST_PORT[$s]}":8100 "$HOSP_IMAGE" >/dev/null
   wait_until 60 "$s /health" "curl -sf http://127.0.0.1:${HOST_PORT[$s]}/health >/dev/null"
 }
@@ -194,7 +208,7 @@ save_results() {  # save_results LABEL RUNTIME_S
   rm -rf "$d"; mkdir -p "$d"
   cp "$RUN_DIR/out/${SITES[0]}/final_model.json" "$d/final_model.json"
   docker logs "$AGG_NAME" > "$d/aggregator_log.txt" 2>&1
-  for s in "${SITES[@]}"; do docker logs "$s" > "$d/${s}_log.txt" 2>&1; done
+  for s in "${SITES[@]}"; do docker logs "$NAME_PREFIX$s" > "$d/${s}_log.txt" 2>&1; done
   python3 - "$d/run_info.json" "$1" "$2" "$MODE" "$EXPECTED_ROUNDS" <<'EOF'
 import json, sys
 p, label, secs, mode, rounds = sys.argv[1:]

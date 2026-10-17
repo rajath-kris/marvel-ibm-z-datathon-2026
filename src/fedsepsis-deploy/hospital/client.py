@@ -60,6 +60,21 @@ sys.path.insert(0, LIB_DIR)
 fedsepsis = importlib.import_module("fedsepsis")
 HAS_RATE_FNS = hasattr(fedsepsis, "alert_rate") and hasattr(fedsepsis, "threshold_for_budget")
 
+# Secure aggregation (stretch): pairwise masks from fedsecure/ (next to client.py in the image, at /app).
+SECURE = os.environ.get("SECURE", "0") == "1"
+ALL_SITES = [x for x in os.environ.get("ALL_SITES", "").split(",") if x]
+if SECURE:
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import fedsecure
+    PAIR_SEEDS = fedsecure.load_pair_seeds(os.environ.get("PAIR_SEED_DIR", "/pairs"), SITE_ID)
+    if sorted(PAIR_SEEDS) != sorted(x for x in ALL_SITES if x != SITE_ID):
+        sys.exit(f"SECURE=1: need one pair seed per peer of {SITE_ID} in {ALL_SITES}, found {sorted(PAIR_SEEDS)}")
+
+
+def secure_payload(tag, values):
+    """Masked fixed-point integers; masks cancel only when every site's vector is summed."""
+    return fedsecure.mask_vector(SITE_ID, ALL_SITES, PAIR_SEEDS, tag, values)
+
 
 def log(event, rnd="-", **extra):
     parts = [datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -340,8 +355,12 @@ def training_loop():
     log("train_cfg", **{k: TRAIN_CFG[k] for k in ("lr", "epochs", "l2", "class_weight")})
 
     stats = plain(fedsepsis.local_stats(data["X"]))
+    if SECURE:
+        d = len(stats["sum"])
+        masked = secure_payload("stats", stats["sum"] + stats["sumsq"])
+        stats = dict(stats, sum=masked[:d], sumsq=masked[d:])
     post_retry("/stats", {"site_id": SITE_ID, "n": stats["n"], "sum": stats["sum"], "sumsq": stats["sumsq"]})
-    log("stats_posted")
+    log("stats_posted", secure=SECURE)
 
     Shared.status = "waiting_for_norm"
     poll("norm ready", lambda: call("GET", "/norm")[1].get("ready"))
@@ -357,6 +376,10 @@ def training_loop():
         t0 = time.monotonic()
         upd = plain(fedsepsis.local_train(g["model"], data["X"], data["y"], dict(TRAIN_CFG, round=r)))
         train_s = f"{time.monotonic() - t0:.2f}"
+        if SECURE:
+            # send n*w and n*b masked, n in the clear; the aggregator divides the unmasked sum by the total n
+            masked = secure_payload(f"round-{r}", [upd["n"] * x for x in upd["w"]] + [upd["n"] * upd["b"]])
+            upd = dict(upd, w=masked[:-1], b=masked[-1])
         status, resp = poll(f"POST /update round {r}",
                             lambda: call("POST", "/update", {"site_id": SITE_ID, "round": r, "w": upd["w"],
                                                              "b": upd["b"], "n": upd["n"]}, ok_statuses=(409,)))
@@ -560,7 +583,7 @@ def main():
     server.daemon_threads = True
     threading.Thread(target=server.serve_forever, daemon=True).start()
     log("start", mode=MODE, lib=LIB_DIR, lib_version=getattr(fedsepsis, "__version__", "?"),
-        has_rate_fns=HAS_RATE_FNS, expected_rounds=EXPECTED_ROUNDS, port=PORT)
+        has_rate_fns=HAS_RATE_FNS, secure=SECURE, sites=",".join(ALL_SITES) or "-", expected_rounds=EXPECTED_ROUNDS, port=PORT)
     try:
         training_loop()
     except Exception as e:

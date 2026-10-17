@@ -167,6 +167,55 @@ Measured on the VM, 2026-10-17, while Reju's sweep was running:
   (borrowed 0.415496, test 25.61), which is why the data source is a setting.
 - API for the demo page: `DEMO_API.md`.
 
+## Stretch: 3-site secure aggregation (`fedsecure/`, `run_secure.sh`)
+
+This is its own package, standard library only, and is not part of `fedsepsis/`. It runs beside the main demo with its
+own names (`sec-aggregator`, `sec-hospA1`, `sec-hospA2`, `sec-hospB`), network (`fedsecure-net`), state (`run/secure/`)
+and ports (127.0.0.1:8111 to 8113).
+
+**Sites.** hospA1 and hospA2 are hospital A split in two by patient. **This is a simulation**: for now the split is a
+random 50/50 by patient (seed 2026). Run with `SPLIT_MAP=map.json` to split by Reju's patient-to-ICU map (medical /
+surgical) instead. hospB is the small hospital.
+
+**How it works.**
+- Every pair of sites shares a 32-byte seed. The seeds live in `~/.fedsepsis/pairs/`, outside the project. Each
+  hospital container mounts only its own pairs' seeds; the aggregator gets none.
+- For each message, both sites in a pair derive the same mask, `SHAKE-256(seed | "round-<r>")` (or `"stats"`). The site
+  with the smaller id adds it and the other subtracts it.
+- Values are fixed-point integers mod 2^128 (resolution 2^-40), so the masks cancel **exactly** in the all-site sum,
+  and one masked value is uniform on [0, 2^128).
+- Each site sends masked `n*w` and `n*b`, with `n` in the clear. The normalisation `sum`/`sumsq` are masked the same way.
+- The aggregator (`SECURE=1`) sums mod 2^128, decodes and divides by the total `n`. Its state file holds only masked
+  values. The JSON keys are unchanged (`site_id, n, sum, sumsq, round, w, b`), so the allowed-fields check still applies.
+
+```bash
+SECURE=0 RUN_LABEL=secure3-plain  ./run_secure.sh      # baseline: same 3 sites, plain FedAvg
+SECURE=1 RUN_LABEL=secure3-masked ./run_secure.sh      # masked
+./tests/test_secure_e2e.sh                             # both runs + unit tests + comparison -> evidence/test_secure_aggregation.txt
+docker run --rm -v $PWD:/w:ro --entrypoint /opt/venv/bin/python <image> -B /w/tests/test_fedsecure.py    # unit tests only
+```
+
+**Measured on the VM** (2026-10-17, 40 rounds x 3 local epochs, random split; `evidence/test_secure_aggregation.txt`):
+- Masked vs plain FedAvg on the same 3 sites: max |w diff| 1.1e-16, b identical. That passes the 1e-9 bound.
+- Runtime: masked 38.6 s, plain 38.1 s.
+- The aggregator's stored hospB normalisation sums look uniform on [0, 2^128) (KS 0.056 vs a 1% critical value of 0.139).
+- Allowed fields: 3 stats posts + 120 updates, keys within `{site_id, n, sum, sumsq, round, w, b}`.
+- Unit tests: 9/9. One masked update has KS 0.050 and correlation +0.06 with the true n*w; decoded alone, it is off by
+  about 7.7e21 x |n*w|.
+
+**What it protects.** An honest-but-curious aggregator learns only the sum over all three sites, never one site's
+weights or normalisation sums.
+
+**What it does not protect.**
+- The aggregator still sees each site's `n` and the final model.
+- No dropout recovery: if one site fails, its partners' masks don't cancel and the round can't be decoded (by design;
+  real protocols add secret-shared seed recovery).
+- The aggregator colluding with one site can learn the sum of the other two.
+- Seeds are pre-shared files rather than a Diffie-Hellman key agreement.
+- With only two sites it protects nothing, because each site can subtract its own update from the average. That's why
+  this uses three.
+- Nothing here hides data from the VM's administrators (no Secure Execution).
+
 ## What is NOT implemented / not protected
 
 - **By default there is no TLS.** The shared token and all aggregates (stats, weights) travel in **plain HTTP** inside the

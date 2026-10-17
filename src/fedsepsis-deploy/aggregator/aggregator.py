@@ -50,6 +50,24 @@ def _number(v, name):
     return float(v)
 
 
+def _masked(v, name, mod):
+    """secure mode: a masked value is a JSON integer in [0, 2**128)."""
+    if not isinstance(v, list) or not all(isinstance(x, int) and not isinstance(x, bool) and 0 <= x < mod for x in v):
+        raise ApiError(400, f"{name} must be a list of masked integers in [0, 2**128)")
+    return v
+
+
+def load_fedsecure():
+    # aggregator.py runs with python -I (script dir not on sys.path); fedsecure sits next to it in the image (/app)
+    # or one level up in the repo.
+    here = os.path.dirname(os.path.abspath(__file__))
+    for d in (here, os.path.dirname(here)):
+        if os.path.isdir(os.path.join(d, "fedsecure")) and d not in sys.path:
+            sys.path.insert(0, d)
+    import fedsecure
+    return fedsecure
+
+
 def _count(v, name):
     if not isinstance(v, int) or isinstance(v, bool) or v <= 0:
         raise ApiError(400, f"{name} must be a positive integer")
@@ -59,13 +77,14 @@ def _count(v, name):
 class AggregatorState:
     """Pure aggregation logic. Thread-safe; persists via save_fn after each change."""
 
-    def __init__(self, expected_sites, expected_rounds, state_path=None, init_bias=0.0):
+    def __init__(self, expected_sites, expected_rounds, state_path=None, init_bias=0.0, secure=False):
         if not expected_sites:
             raise ValueError("EXPECTED_SITES is empty")
         if expected_rounds < 1:
             raise ValueError("EXPECTED_ROUNDS must be >= 1")
         self.lock = threading.Lock()
         self.state_path = state_path
+        self.sec = load_fedsecure() if secure else None
         self.s = {
             "expected_sites": sorted(expected_sites),
             "expected_rounds": expected_rounds,
@@ -77,6 +96,7 @@ class AggregatorState:
             "updates": {},      # site_id -> {w, b, n} for the current round
             "done": False,
             "body_keys_seen": [],
+            "secure": bool(secure),   # True: sum/sumsq/w/b are pairwise-masked integers (fedsecure)
         }
         self.restored = self._load()
 
@@ -87,7 +107,8 @@ class AggregatorState:
         with open(self.state_path) as f:
             saved = json.load(f)
         if saved.get("expected_sites") != self.s["expected_sites"] or \
-                saved.get("expected_rounds") != self.s["expected_rounds"]:
+                saved.get("expected_rounds") != self.s["expected_rounds"] or \
+                bool(saved.get("secure")) != self.s["secure"]:
             raise ValueError(f"{self.state_path} was written for a different site list or round count; "
                              "remove it to start a fresh run")
         self.s = saved
@@ -119,8 +140,12 @@ class AggregatorState:
     def post_stats(self, body):
         site_id = body.get("site_id")
         n = _count(body.get("n"), "n")
-        ssum = _floats(body.get("sum"), "sum")
-        ssq = _floats(body.get("sumsq"), "sumsq")
+        if self.sec:
+            ssum = _masked(body.get("sum"), "sum", self.sec.MOD)
+            ssq = _masked(body.get("sumsq"), "sumsq", self.sec.MOD)
+        else:
+            ssum = _floats(body.get("sum"), "sum")
+            ssq = _floats(body.get("sumsq"), "sumsq")
         if len(ssum) != len(ssq) or not ssum:
             raise ApiError(400, "sum and sumsq must be non-empty and the same length")
         with self.lock:
@@ -137,7 +162,13 @@ class AggregatorState:
             log("stats", site_id, self.s["round"], sites_stats=len(self.s["stats"]))
             if set(self.s["stats"]) == set(self.s["expected_sites"]):
                 # fixed site order, so float sums do not depend on arrival order
-                self.s["norm"] = combine_totals(self.s["stats"][k] for k in self.s["expected_sites"])
+                per_site = [self.s["stats"][k] for k in self.s["expected_sites"]]
+                if self.sec:
+                    # masks cancel only in the all-site sum: the aggregator never sees one site's sums
+                    per_site = [{"n": sum(v["n"] for v in per_site),
+                                 "sum": self.sec.unmask_sum(v["sum"] for v in per_site),
+                                 "sumsq": self.sec.unmask_sum(v["sumsq"] for v in per_site)}]
+                self.s["norm"] = combine_totals(per_site)
                 log("norm_ready", "-", self.s["round"], total_n=sum(v["n"] for v in self.s["stats"].values()))
             self._save()
             return {"ok": True}
@@ -163,8 +194,12 @@ class AggregatorState:
         rnd = body.get("round")
         if not isinstance(rnd, int) or isinstance(rnd, bool):
             raise ApiError(400, "round must be an integer")
-        w = _floats(body.get("w"), "w")
-        b = _number(body.get("b"), "b")
+        if self.sec:
+            w = _masked(body.get("w"), "w", self.sec.MOD)          # masked n*w
+            b = _masked([body.get("b")], "b", self.sec.MOD)[0]     # masked n*b
+        else:
+            w = _floats(body.get("w"), "w")
+            b = _number(body.get("b"), "b")
         n = _count(body.get("n"), "n")
         with self.lock:
             self._check_site(site_id)
@@ -183,7 +218,14 @@ class AggregatorState:
             self.s["updates"][site_id] = {"w": w, "b": b, "n": n}
             log("update", site_id, rnd, updated=len(self.s["updates"]))
             if set(self.s["updates"]) == set(self.s["expected_sites"]):
-                self.s["model"] = weighted_average(self.s["updates"][k] for k in self.s["expected_sites"])
+                ups = [self.s["updates"][k] for k in self.s["expected_sites"]]
+                if self.sec:
+                    total_n = sum(u["n"] for u in ups)
+                    nw = self.sec.unmask_sum(u["w"] for u in ups)
+                    nb = self.sec.unmask_sum([u["b"]] for u in ups)[0]
+                    self.s["model"] = {"w": [x / total_n for x in nw], "b": nb / total_n}
+                else:
+                    self.s["model"] = weighted_average(ups)
                 self.s["updates"] = {}
                 self.s["round"] += 1
                 if self.s["round"] >= self.s["expected_rounds"]:
@@ -306,9 +348,10 @@ def main():
     port = int(os.environ.get("PORT", "8000"))
     os.makedirs(state_dir, exist_ok=True)
     state = AggregatorState(sites, rounds, os.path.join(state_dir, "state.json"),
-                            init_bias=float(os.environ.get("INIT_BIAS", "0.0")))
+                            init_bias=float(os.environ.get("INIT_BIAS", "0.0")),
+                            secure=os.environ.get("SECURE", "0") == "1")
     log("start", "-", state.s["round"], sites=",".join(state.s["expected_sites"]),
-        expected_rounds=rounds, restored=state.restored, done=state.s["done"])
+        expected_rounds=rounds, restored=state.restored, done=state.s["done"], secure=state.s["secure"])
     server = ThreadingHTTPServer(("0.0.0.0", port), make_handler(state, token))
     server.daemon_threads = True
     cert, key = os.environ.get("TLS_CERT"), os.environ.get("TLS_KEY")
