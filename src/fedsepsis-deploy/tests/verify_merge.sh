@@ -7,6 +7,7 @@
 set -uo pipefail
 cd "$(dirname "$0")/.."
 export SECRET_DIR=$HOME/.fedsepsis-mtest HARDEN=1 MTLS=1 MODE=real PORT_OFFSET=1000
+export AGG_IMAGE=fedsepsis-aggregator:mtest HOSP_IMAGE=fedsepsis-hospital:mtest   # never the live :dev tags
 export ALLOW_JOBS="fedsepsis-aggregator,hospA,hospB,rev-fedsepsis-aggregator,rev-hospA,rev-hospB,sec-.*,hard-.*,mtest-.*,fedseed_[0-9]+"
 OUT=evidence/verify_merge.txt; : > "$OUT"; fail=0
 log() { echo "$*" | tee -a "$OUT"; }

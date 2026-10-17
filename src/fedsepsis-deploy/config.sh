@@ -1,7 +1,7 @@
 # Shared settings, sourced by run_demo.sh, stop_demo.sh and the tests. No secrets here.
 BASE_IMAGE=registry.linuxone.cloud.marist.edu/l1cc/jupyterlab-image-s390x:latest
-AGG_IMAGE=fedsepsis-aggregator:dev
-HOSP_IMAGE=fedsepsis-hospital:dev
+AGG_IMAGE=${AGG_IMAGE:-fedsepsis-aggregator:dev}
+HOSP_IMAGE=${HOSP_IMAGE:-fedsepsis-hospital:dev}
 LIMITS="--memory 1g --cpus 1"          # one-off helper containers
 CPUS="--cpus 1"
 AGG_MEMORY=512m                        # per-container memory: see HOSP_MEMORY in demo_lib.sh (hospA 2g, hospB 1g)
