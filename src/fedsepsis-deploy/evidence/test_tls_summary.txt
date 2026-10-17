@@ -1,0 +1,10 @@
+================ TLS RESULTS ================
+PASS  TLS demo completes all rounds
+PASS  aggregator reports tls_enabled
+PASS  plain HTTP to TLS port gets no HTTP response
+PASS  untrusted cert rejected by curl
+PASS  TLSv1.3 negotiated with pinned cert
+PASS  token still required over TLS (401)
+PASS  TLS 1.2 refused
+PASS  wrong pin -> hospital refuses (PinMismatch)
+PASS  rogue cert -> hospital refuses (cert verify)

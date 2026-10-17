@@ -1,0 +1,4 @@
+# token leak check over evidence/
+# captured 2026-10-17T07:42:35Z on datathon-test
+
+no file in evidence/ contains the token

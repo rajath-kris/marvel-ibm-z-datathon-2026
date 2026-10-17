@@ -1,0 +1,64 @@
+$ docker exec hospA ls -la /data /out
+/data:
+total 840
+drwxrwxr-x 2 ibm-user ibm-user   4096 Oct 17 07:34 .
+drwxr-xr-x 1 root     root       4096 Oct 17 07:42 ..
+-rw-r--r-- 1 ibm-user ibm-user 849924 Oct 17 07:34 site.json
+
+/out:
+total 12
+drwxrwxr-x 2 ibm-user ibm-user 4096 Oct 17 07:42 .
+drwxr-xr-x 1 root     root     4096 Oct 17 07:42 ..
+-rw-r--r-- 1 ibm-user ibm-user 1526 Oct 17 07:42 final_model.json
+$ docker inspect hospA  (mounts only)
+/home/linux1/fedsepsis-deploy/run/data/hospA -> /data (rw=false)
+/home/linux1/fedsepsis-deploy/run/out/hospA -> /out (rw=true)
+
+$ docker exec hospA: count patient ids by site prefix in /data/site.json
+hospA rows: 2000
+hospB rows: 0
+$ docker exec hospA: every data-sized file (.json >50k or .npz) anywhere in the container, and which contain hospB ids
+/opt/venv/lib/python3.12/site-packages/scipy/special/tests/data/local.npz
+/opt/venv/lib/python3.12/site-packages/scipy/special/tests/data/gsl.npz
+/opt/venv/lib/python3.12/site-packages/scipy/special/tests/data/boost.npz
+/opt/venv/lib/python3.12/site-packages/scipy/sparse/tests/data/csc_py2.npz
+/opt/venv/lib/python3.12/site-packages/scipy/sparse/tests/data/csc_py3.npz
+/opt/venv/lib/python3.12/site-packages/scipy/sparse/linalg/tests/propack_test_data.npz
+/opt/venv/lib/python3.12/site-packages/scipy/linalg/tests/data/carex_19_data.npz
+/opt/venv/lib/python3.12/site-packages/scipy/linalg/tests/data/carex_20_data.npz
+/opt/venv/lib/python3.12/site-packages/scipy/linalg/tests/data/carex_15_data.npz
+/opt/venv/lib/python3.12/site-packages/scipy/linalg/tests/data/gendare_20170120_data.npz
+/opt/venv/lib/python3.12/site-packages/scipy/linalg/tests/data/carex_18_data.npz
+/opt/venv/lib/python3.12/site-packages/scipy/linalg/tests/data/carex_6_data.npz
+/opt/venv/lib/python3.12/site-packages/scipy/interpolate/tests/data/bug-1310.npz
+/opt/venv/lib/python3.12/site-packages/scipy/interpolate/tests/data/gcvspl.npz
+/opt/venv/lib/python3.12/site-packages/scipy/stats/_sobol_direction_numbers.npz
+/opt/venv/lib/python3.12/site-packages/scipy/spatial/tests/data/degenerate_pointset.npz
+/opt/venv/lib/python3.12/site-packages/scipy/fftpack/tests/test.npz
+/opt/venv/lib/python3.12/site-packages/scipy/fftpack/tests/fftw_single_ref.npz
+/opt/venv/lib/python3.12/site-packages/scipy/fftpack/tests/fftw_longdouble_ref.npz
+/opt/venv/lib/python3.12/site-packages/scipy/fftpack/tests/fftw_double_ref.npz
+/opt/venv/lib/python3.12/site-packages/numpy/lib/tests/data/py3-objarr.npz
+/opt/venv/lib/python3.12/site-packages/numpy/lib/tests/data/py2-objarr.npz
+/opt/venv/lib/python3.12/site-packages/jsonschema/benchmarks/issue232/issue.json
+/opt/venv/lib/python3.12/site-packages/torch/_dynamo/graph_break_registry.json
+/opt/venv/lib/python3.12/site-packages/tokenizers-0.23.2.dist-info/sboms/tokenizers-python.cyclonedx.json
+/opt/venv/lib/python3.12/site-packages/notebook/static/third-party-licenses.json
+/opt/venv/lib/python3.12/site-packages/jupyterlab/static/third-party-licenses.json
+/opt/venv/lib/python3.12/site-packages/jupyter_builder-1.2.3.dist-info/licenses/THIRD_PARTY_LICENSES/yarn.js.third-party-licenses.json
+/opt/venv/lib/python3.12/site-packages/skimage/data/motorcycle_disp.npz
+/opt/venv/lib/python3.12/site-packages/debugpy/_vendored/pydevd/_pydevd_bundle/_debug_adapter/debugProtocol.json
+/opt/venv/lib/python3.12/site-packages/matplotlib/mpl-data/sample_data/topobathy.npz
+/opt/venv/lib/python3.12/site-packages/matplotlib/mpl-data/sample_data/goog.npz
+/opt/venv/lib/python3.12/site-packages/matplotlib/mpl-data/sample_data/jacksboro_fault_dem.npz
+/opt/venv/share/jupyter/lab/static/third-party-licenses.json
+/usr/share/doc/freetype-devel/reference/search/search_index.json
+/usr/share/iso-codes/json/iso_639-3.json
+/usr/share/iso-codes/json/iso_3166-2.json
+/usr/share/cmake/Help/manual/presets/schema.json
+/data/site.json
+(matches: 0)
+$ docker exec hospA ls /home/linux1/fedsepsis-deploy/run/data/hospB
+ls: cannot access '/home/linux1/fedsepsis-deploy/run/data/hospB': No such file or directory
+$ docker exec hospA touch /data/x   (expect read-only)
+touch: cannot touch '/data/x': Read-only file system

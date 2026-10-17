@@ -1,0 +1,16 @@
+# base image Python probe
+# captured 2026-10-17T07:42:31Z on datathon-test
+
+$ docker run --rm --entrypoint sh registry.linuxone.cloud.marist.edu/l1cc/jupyterlab-image-s390x:latest -c "which python3; ls /opt/venv/bin | head; /opt/venv/bin/python -c 'import numpy,sys; print(numpy.__version__, sys.byteorder)'"
+/opt/venv/bin/python3
+Activate.ps1
+activate
+activate.csh
+activate.fish
+backend-test-tools
+cffi-gen-src
+check-model
+check-node
+debugpy
+debugpy-adapter
+2.0.2 big

@@ -1,0 +1,35 @@
+network fedsepsis-net ready
+ok: aggregator healthy
+ok: hospA /health
+# hospB not started yet, so the run is held in the stats phase
+ok: aggregator has hospA stats
+status before restart: {"round": 0, "done": false, "sites_stats": ["hospA"], "sites_updated_this_round": [], "expected_sites": ["hospA", "hospB"], "expected_rounds": 5, "body_keys_seen": ["n", "site_id", "sum", "sumsq"]}
+$ docker stats --no-stream   (run in progress: hospA waiting for hospB)
+NAME                   CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           PIDS
+hospA                  0.19%     15.01MiB / 1GiB       1.47%     6.07kB / 6.72kB   2
+fedsepsis-aggregator   0.15%     11.16MiB / 1GiB       1.09%     6.77kB / 4.97kB   1
+notebook               0.05%     733.2MiB / 7.821GiB   9.16%     4.19MB / 25MB     48
+$ docker stop fedsepsis-aggregator && docker start fedsepsis-aggregator
+ok: aggregator healthy after restart
+status after restart : {"round": 0, "done": false, "sites_stats": ["hospA"], "sites_updated_this_round": [], "expected_sites": ["hospA", "hospB"], "expected_rounds": 5, "body_keys_seen": ["n", "site_id", "sum", "sumsq"]}
+start lines in aggregator log:
+2026-10-17T07:42:11Z event=start site=- round=0 sites=hospA,hospB expected_rounds=5 restored=False done=False
+2026-10-17T07:42:25Z event=start site=- round=0 sites=hospA,hospB expected_rounds=5 restored=True done=False
+ok: hospB /health
+ok: aggregator done=true
+ok: hospA final_model.json
+ok: hospB final_model.json
+final status: {"round": 5, "done": true, "sites_stats": ["hospA", "hospB"], "sites_updated_this_round": [], "expected_sites": ["hospA", "hospB"], "expected_rounds": 5, "body_keys_seen": ["b", "n", "round", "site_id", "sum", "sumsq", "w"]}
+hospA log (shows it rode out the restart):
+2026-10-17T07:42:12Z event=start site=hospA round=- mode=stub lib=/app/stub expected_rounds=5 port=8100
+2026-10-17T07:42:12Z event=aggregator_healthy site=hospA round=-
+2026-10-17T07:42:12Z event=data_loaded site=hospA round=- rows=2000 patients=50 mode=stub stub=True
+2026-10-17T07:42:12Z event=stats_posted site=hospA round=-
+2026-10-17T07:42:25Z event=aggregator_unreachable site=hospA round=- waiting_for=norm ready error=URLError
+2026-10-17T07:42:25Z event=norm_ready site=hospA round=-
+2026-10-17T07:42:25Z event=update_posted site=hospA round=0 duplicate=False
+2026-10-17T07:42:25Z event=update_posted site=hospA round=1 duplicate=False
+2026-10-17T07:42:26Z event=update_posted site=hospA round=2 duplicate=False
+2026-10-17T07:42:26Z event=update_posted site=hospA round=3 duplicate=False
+2026-10-17T07:42:26Z event=update_posted site=hospA round=4 duplicate=False
+2026-10-17T07:42:26Z event=final_model_written site=hospA round=5 path=/out/final_model.json

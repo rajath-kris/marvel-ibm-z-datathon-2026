@@ -1,0 +1,7 @@
+# Never bake data, outputs, evidence or the real library into an image.
+run
+evidence
+lib
+data
+*.npz
+.git

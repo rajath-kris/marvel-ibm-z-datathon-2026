@@ -1,0 +1,11 @@
+{"ok": true} [HTTP 200]
+{"ok": true} [HTTP 200]
+# hospA round 0, then the same update again
+{"ok": true} [HTTP 200]
+{"ok": true, "duplicate": true} [HTTP 200]
+{"round": 0, "done": false, "sites_stats": ["hospA", "hospB"], "sites_updated_this_round": ["hospA"], "expected_sites": ["hospA", "hospB"], "expected_rounds": 3, "body_keys_seen": ["b", "n", "round", "site_id", "sum", "sumsq", "w"]} [HTTP 200]
+# hospB posts for round 1 while round 0 is open
+{"ok": false, "error": "round 1 != current round 0"} [HTTP 409]
+{"ok": true} [HTTP 200]
+# expect round 1, w=[2.5,3.5] (duplicate not counted)
+{"round": 1, "model": {"w": [2.5, 3.5], "b": 0.0, "mean": [2.5, 3.5], "std": [1.3228756555322954, 1.224744871391589]}, "done": false} [HTTP 200]

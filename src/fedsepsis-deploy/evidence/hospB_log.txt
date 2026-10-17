@@ -1,0 +1,14 @@
+# hospB log (docker logs hospB)
+# captured 2026-10-17T07:42:29Z on datathon-test
+
+2026-10-17T07:42:25Z event=start site=hospB round=- mode=stub lib=/app/stub expected_rounds=5 port=8100
+2026-10-17T07:42:25Z event=aggregator_healthy site=hospB round=-
+2026-10-17T07:42:25Z event=data_loaded site=hospB round=- rows=1200 patients=30 mode=stub stub=True
+2026-10-17T07:42:25Z event=stats_posted site=hospB round=-
+2026-10-17T07:42:25Z event=norm_ready site=hospB round=-
+2026-10-17T07:42:25Z event=update_posted site=hospB round=0 duplicate=False
+2026-10-17T07:42:26Z event=update_posted site=hospB round=1 duplicate=False
+2026-10-17T07:42:26Z event=update_posted site=hospB round=2 duplicate=False
+2026-10-17T07:42:26Z event=update_posted site=hospB round=3 duplicate=False
+2026-10-17T07:42:26Z event=update_posted site=hospB round=4 duplicate=False
+2026-10-17T07:42:27Z event=final_model_written site=hospB round=5 path=/out/final_model.json

@@ -1,0 +1,4 @@
+NAME                   CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           PIDS
+hospA                  0.19%     15.01MiB / 1GiB       1.47%     6.07kB / 6.72kB   2
+fedsepsis-aggregator   0.15%     11.16MiB / 1GiB       1.09%     6.77kB / 4.97kB   1
+notebook               0.05%     733.2MiB / 7.821GiB   9.16%     4.19MB / 25MB     48

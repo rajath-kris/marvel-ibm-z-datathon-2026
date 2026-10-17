@@ -1,0 +1,11 @@
+FROM registry.linuxone.cloud.marist.edu/l1cc/jupyterlab-image-s390x:latest
+# Jupyter image: has numpy/pandas/scikit-learn for the real library (pip cannot install them on this host).
+# Build from the project root: docker build -f hospital/Dockerfile .
+WORKDIR /app
+COPY hospital/client.py /app/client.py
+COPY hospital/make_stub_data.py /app/make_stub_data.py
+COPY stub /app/stub
+USER 1000:1000
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
+EXPOSE 8100
+ENTRYPOINT ["/opt/venv/bin/python", "-I", "/app/client.py"]

@@ -1,0 +1,18 @@
+$ curl -X POST http://127.0.0.1:8101/score -d '{"patient_id":"hospA-0003","hour":0}'
+{"hour": 0, "score": 0.5156721554875259, "alert": true, "threshold": 0.5, "final_model": true} [HTTP 200]
+$ curl -X POST http://127.0.0.1:8101/score -d '{"patient_id":"hospA-0003","hour":5}'
+{"hour": 5, "score": 0.5271469856866673, "alert": false, "threshold": 0.5, "final_model": true} [HTTP 200]
+$ curl -X POST http://127.0.0.1:8101/score -d '{"patient_id":"hospA-0003","hour":10}'
+{"hour": 10, "score": 0.5908417999229022, "alert": false, "threshold": 0.5, "final_model": true} [HTTP 200]
+$ curl -X POST http://127.0.0.1:8101/score -d '{"patient_id":"hospA-0003","hour":20}'
+{"hour": 20, "score": 0.44220107959444904, "alert": false, "threshold": 0.5, "final_model": true} [HTTP 200]
+$ curl -X POST http://127.0.0.1:8101/score -d '{"patient_id":"hospA-0003","hour":39}'
+{"hour": 39, "score": 0.5062244326071516, "alert": false, "threshold": 0.5, "final_model": true} [HTTP 200]
+$ curl -X POST http://127.0.0.1:8101/score -d '{"patient_id":"hospA-0003","hour":99}'
+{"hour": 39, "score": 0.5062244326071516, "alert": false, "threshold": 0.5, "final_model": true} [HTTP 200]
+$ curl -X POST http://127.0.0.1:8101/score -d '{"patient_id":"hospB-0001","hour":10}'   # hospB patient at hospA
+{"error": "no rows for that patient up to that hour"} [HTTP 404]
+$ curl -X POST http://127.0.0.1:8102/score -d '{"patient_id":"hospB-0001","hour":10}'
+{"hour": 10, "score": 0.6145468152754675, "alert": false, "threshold": 0.5, "final_model": true} [HTTP 200]
+$ curl -X POST http://127.0.0.1:8101/score -d 'not json'
+{"error": "body must be {patient_id, hour}"} [HTTP 400]

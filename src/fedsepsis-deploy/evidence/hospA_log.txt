@@ -1,0 +1,15 @@
+# hospA log (docker logs hospA)
+# captured 2026-10-17T07:42:29Z on datathon-test
+
+2026-10-17T07:42:12Z event=start site=hospA round=- mode=stub lib=/app/stub expected_rounds=5 port=8100
+2026-10-17T07:42:12Z event=aggregator_healthy site=hospA round=-
+2026-10-17T07:42:12Z event=data_loaded site=hospA round=- rows=2000 patients=50 mode=stub stub=True
+2026-10-17T07:42:12Z event=stats_posted site=hospA round=-
+2026-10-17T07:42:25Z event=aggregator_unreachable site=hospA round=- waiting_for=norm ready error=URLError
+2026-10-17T07:42:25Z event=norm_ready site=hospA round=-
+2026-10-17T07:42:25Z event=update_posted site=hospA round=0 duplicate=False
+2026-10-17T07:42:25Z event=update_posted site=hospA round=1 duplicate=False
+2026-10-17T07:42:26Z event=update_posted site=hospA round=2 duplicate=False
+2026-10-17T07:42:26Z event=update_posted site=hospA round=3 duplicate=False
+2026-10-17T07:42:26Z event=update_posted site=hospA round=4 duplicate=False
+2026-10-17T07:42:26Z event=final_model_written site=hospA round=5 path=/out/final_model.json

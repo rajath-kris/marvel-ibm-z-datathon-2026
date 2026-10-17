@@ -1,0 +1,53 @@
+built fedsepsis-aggregator:dev and fedsepsis-hospital:dev
+network fedsepsis-net ready
+hospA: keeping existing stub data
+hospB: keeping existing stub data
+ok: aggregator healthy
+ok: hospA /health
+ok: hospB /health
+ok: aggregator done=true
+ok: hospA final_model.json
+ok: hospB final_model.json
+=== summary ===
+rounds completed: 5 / 5   done=True   sites=['hospA', 'hospB']
+final global model (from hospA/out/final_model.json):
+  w = [-0.121247, 0.005756, -0.091156, 0.078811, -0.068565, -0.014619, 0.081876, -0.140934, 0.132423, 0.141769, -0.167704, 0.088345, 0.169421, 0.103078, -0.030230, -0.072128, 0.016579, 0.109547, 0.197127, 0.067073]
+  b = 0.063157
+all sites hold the identical final model: True
+=== aggregator log ===
+2026-10-17T07:42:04Z event=start site=- round=0 sites=hospA,hospB expected_rounds=5 restored=False done=False
+2026-10-17T07:42:04Z event=tls_disabled site=- round=- note=plain HTTP inside the docker network
+2026-10-17T07:42:04Z event=request_keys site=hospA round=- path=/stats keys=n,site_id,sum,sumsq
+2026-10-17T07:42:04Z event=stats site=hospA round=0 sites_stats=1
+2026-10-17T07:42:05Z event=request_keys site=hospB round=- path=/stats keys=n,site_id,sum,sumsq
+2026-10-17T07:42:05Z event=stats site=hospB round=0 sites_stats=2
+2026-10-17T07:42:05Z event=norm_ready site=- round=0 total_n=3200
+2026-10-17T07:42:05Z event=request_keys site=hospB round=0 path=/update keys=b,n,round,site_id,w
+2026-10-17T07:42:05Z event=update site=hospB round=0 updated=1
+2026-10-17T07:42:05Z event=request_keys site=hospA round=0 path=/update keys=b,n,round,site_id,w
+2026-10-17T07:42:05Z event=update site=hospA round=0 updated=2
+2026-10-17T07:42:05Z event=round_complete site=- round=0 new_round=1 done=False
+2026-10-17T07:42:05Z event=request_keys site=hospA round=1 path=/update keys=b,n,round,site_id,w
+2026-10-17T07:42:05Z event=update site=hospA round=1 updated=1
+2026-10-17T07:42:06Z event=request_keys site=hospB round=1 path=/update keys=b,n,round,site_id,w
+2026-10-17T07:42:06Z event=update site=hospB round=1 updated=2
+2026-10-17T07:42:06Z event=round_complete site=- round=1 new_round=2 done=False
+2026-10-17T07:42:06Z event=request_keys site=hospB round=2 path=/update keys=b,n,round,site_id,w
+2026-10-17T07:42:06Z event=update site=hospB round=2 updated=1
+2026-10-17T07:42:06Z event=request_keys site=hospA round=2 path=/update keys=b,n,round,site_id,w
+2026-10-17T07:42:06Z event=update site=hospA round=2 updated=2
+2026-10-17T07:42:06Z event=round_complete site=- round=2 new_round=3 done=False
+2026-10-17T07:42:06Z event=request_keys site=hospA round=3 path=/update keys=b,n,round,site_id,w
+2026-10-17T07:42:06Z event=update site=hospA round=3 updated=1
+2026-10-17T07:42:06Z event=request_keys site=hospB round=3 path=/update keys=b,n,round,site_id,w
+2026-10-17T07:42:06Z event=update site=hospB round=3 updated=2
+2026-10-17T07:42:06Z event=round_complete site=- round=3 new_round=4 done=False
+2026-10-17T07:42:06Z event=request_keys site=hospB round=4 path=/update keys=b,n,round,site_id,w
+2026-10-17T07:42:06Z event=update site=hospB round=4 updated=1
+2026-10-17T07:42:06Z event=request_keys site=hospA round=4 path=/update keys=b,n,round,site_id,w
+2026-10-17T07:42:06Z event=update site=hospA round=4 updated=2
+2026-10-17T07:42:06Z event=round_complete site=- round=4 new_round=5 done=True
+
+Demo is up. /score: curl -s -X POST -d '{"patient_id":"hospA-0003","hour":10}' http://127.0.0.1:8101/score
+Stop with ./stop_demo.sh
+final /status: {"round": 5, "done": true, "sites_stats": ["hospA", "hospB"], "sites_updated_this_round": [], "expected_sites": ["hospA", "hospB"], "expected_rounds": 5, "body_keys_seen": ["b", "n", "round", "site_id", "sum", "sumsq", "w"]}

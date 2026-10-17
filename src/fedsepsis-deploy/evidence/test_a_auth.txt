@@ -1,0 +1,10 @@
+$ curl http://aggregator:8000/status        # from a container on fedsepsis-net, no X-Token
+{"ok": false, "error": "unauthorised"} [HTTP 401]
+$ curl -H 'X-Token: not-the-token' http://aggregator:8000/global
+{"ok": false, "error": "unauthorised"} [HTTP 401]
+$ curl -X POST http://aggregator:8000/update   # no token
+{"ok": false, "error": "unauthorised"} [HTTP 401]
+$ curl http://127.0.0.1:8000/health          # from the VM host: aggregator has no published port
+ [HTTP 000] (curl exit 7)
+$ (with token, from inside the aggregator container) GET /health
+{"ok": true}

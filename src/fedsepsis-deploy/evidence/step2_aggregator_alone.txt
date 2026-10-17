@@ -1,0 +1,93 @@
+--- no token (expect 401)
+$ curl http://127.0.0.1:18000/health   (no X-Token header)
+{"ok": false, "error": "unauthorised"}  [HTTP 401]
+--- wrong token (expect 401)
+{"ok": false, "error": "unauthorised"}  [HTTP 401]
+--- health
+$ curl -X GET /health 
+{"ok": true}  [HTTP 200]
+--- norm before stats
+$ curl -X GET /norm 
+{"ready": false, "mean": null, "std": null}  [HTTP 200]
+--- global before stats
+$ curl -X GET /global 
+{"round": 0, "model": {"w": null, "b": 0.0, "mean": null, "std": null}, "done": false}  [HTTP 200]
+--- stats hospA
+$ curl -X POST /stats -d '{"site_id":"hospA","n":100,"sum":[100,200],"sumsq":[200,500]}'
+{"ok": true}  [HTTP 200]
+--- stats hospA again (duplicate)
+$ curl -X POST /stats -d '{"site_id":"hospA","n":100,"sum":[100,200],"sumsq":[200,500]}'
+{"ok": true, "duplicate": true}  [HTTP 200]
+--- update before norm ready (expect 409)
+$ curl -X POST /update -d '{"site_id":"hospA","round":0,"w":[1,2],"b":0.5,"n":100}'
+{"ok": false, "error": "normalisation not ready"}  [HTTP 409]
+--- stats unknown site (expect 403)
+$ curl -X POST /stats -d '{"site_id":"hospZ","n":1,"sum":[1,1],"sumsq":[1,1]}'
+{"ok": false, "error": "unknown site_id"}  [HTTP 403]
+--- stats wrong dimension (expect 400)
+$ curl -X POST /stats -d '{"site_id":"hospB","n":1,"sum":[1],"sumsq":[1]}'
+{"ok": false, "error": "dimension 1 != 2"}  [HTTP 400]
+--- stats hospB
+$ curl -X POST /stats -d '{"site_id":"hospB","n":300,"sum":[900,1200],"sumsq":[3000,5000]}'
+{"ok": true}  [HTTP 200]
+    expected mean=[2.5,3.5] std=[sqrt(1.75)=1.3229, sqrt(1.5)=1.2247]
+--- norm after both sites
+$ curl -X GET /norm 
+{"ready": true, "mean": [2.5, 3.5], "std": [1.3228756555322954, 1.224744871391589]}  [HTTP 200]
+--- global round 0
+$ curl -X GET /global 
+{"round": 0, "model": {"w": [0.0, 0.0], "b": 0.0, "mean": [2.5, 3.5], "std": [1.3228756555322954, 1.224744871391589]}, "done": false}  [HTTP 200]
+--- update hospA round 0
+$ curl -X POST /update -d '{"site_id":"hospA","round":0,"w":[1,2],"b":0.5,"n":100}'
+{"ok": true}  [HTTP 200]
+--- update hospA round 0 duplicate (expect ok, duplicate)
+$ curl -X POST /update -d '{"site_id":"hospA","round":0,"w":[9,9],"b":9,"n":100}'
+{"ok": true, "duplicate": true}  [HTTP 200]
+--- update hospB wrong round 1 (expect 409)
+$ curl -X POST /update -d '{"site_id":"hospB","round":1,"w":[3,4],"b":1.5,"n":300}'
+{"ok": false, "error": "round 1 != current round 0"}  [HTTP 409]
+--- status mid-round
+$ curl -X GET /status 
+{"round": 0, "done": false, "sites_stats": ["hospA", "hospB"], "sites_updated_this_round": ["hospA"], "expected_sites": ["hospA", "hospB"], "expected_rounds": 2, "body_keys_seen": ["b", "n", "round", "site_id", "sum", "sumsq", "w"]}  [HTTP 200]
+=== restart aggregator mid-round (test g) ===
+state file on host: -rw-r--r-- linux1 497 /home/linux1/fedsepsis-deploy/run/step2-state/state.json
+--- status after restart (expect round 0, sites_updated_this_round=[hospA])
+$ curl -X GET /status 
+{"round": 0, "done": false, "sites_stats": ["hospA", "hospB"], "sites_updated_this_round": ["hospA"], "expected_sites": ["hospA", "hospB"], "expected_rounds": 2, "body_keys_seen": ["b", "n", "round", "site_id", "sum", "sumsq", "w"]}  [HTTP 200]
+--- update hospB round 0
+$ curl -X POST /update -d '{"site_id":"hospB","round":0,"w":[3,4],"b":1.5,"n":300}'
+{"ok": true}  [HTTP 200]
+    expected w=[2.5,3.5] b=(0.5*100+1.5*300)/400=1.25, round=1
+--- global round 1
+$ curl -X GET /global 
+{"round": 1, "model": {"w": [2.5, 3.5], "b": 1.25, "mean": [2.5, 3.5], "std": [1.3228756555322954, 1.224744871391589]}, "done": false}  [HTTP 200]
+--- update hospA round 1
+$ curl -X POST /update -d '{"site_id":"hospA","round":1,"w":[2,2],"b":0,"n":100}'
+{"ok": true}  [HTTP 200]
+--- update hospB round 1
+$ curl -X POST /update -d '{"site_id":"hospB","round":1,"w":[2,2],"b":0,"n":300}'
+{"ok": true}  [HTTP 200]
+--- global after final round (expect round 2, done true)
+$ curl -X GET /global 
+{"round": 2, "model": {"w": [2.0, 2.0], "b": 0.0, "mean": [2.5, 3.5], "std": [1.3228756555322954, 1.224744871391589]}, "done": true}  [HTTP 200]
+--- update after done (expect 409)
+$ curl -X POST /update -d '{"site_id":"hospA","round":2,"w":[2,2],"b":0,"n":100}'
+{"ok": false, "error": "training is done"}  [HTTP 409]
+--- status final
+$ curl -X GET /status 
+{"round": 2, "done": true, "sites_stats": ["hospA", "hospB"], "sites_updated_this_round": [], "expected_sites": ["hospA", "hospB"], "expected_rounds": 2, "body_keys_seen": ["b", "n", "round", "site_id", "sum", "sumsq", "w"]}  [HTTP 200]
+--- unknown path (expect 404)
+$ curl -X GET /nope 
+{"ok": false, "error": "not found"}  [HTTP 404]
+=== aggregator log (since restart) ===
+2026-10-17T07:42:00Z event=start site=- round=0 sites=hospA,hospB expected_rounds=2 restored=True done=False
+2026-10-17T07:42:00Z event=tls_disabled site=- round=- note=plain HTTP inside the docker network
+2026-10-17T07:42:01Z event=request_keys site=hospB round=0 path=/update keys=b,n,round,site_id,w
+2026-10-17T07:42:01Z event=update site=hospB round=0 updated=2
+2026-10-17T07:42:01Z event=round_complete site=- round=0 new_round=1 done=False
+2026-10-17T07:42:01Z event=request_keys site=hospA round=1 path=/update keys=b,n,round,site_id,w
+2026-10-17T07:42:01Z event=update site=hospA round=1 updated=1
+2026-10-17T07:42:01Z event=request_keys site=hospB round=1 path=/update keys=b,n,round,site_id,w
+2026-10-17T07:42:01Z event=update site=hospB round=1 updated=2
+2026-10-17T07:42:01Z event=round_complete site=- round=1 new_round=2 done=True
+2026-10-17T07:42:01Z event=request_keys site=hospA round=2 path=/update keys=b,n,round,site_id,w

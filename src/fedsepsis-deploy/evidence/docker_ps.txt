@@ -1,0 +1,8 @@
+# docker ps
+# captured 2026-10-17T07:42:29Z on datathon-test
+
+NAMES                  IMAGE                                                                   STATUS          PORTS
+hospB                  fedsepsis-hospital:dev                                                  Up 4 seconds    3000/tcp, 5000/tcp, 8888/tcp, 38888/tcp, 127.0.0.1:8102->8100/tcp
+hospA                  fedsepsis-hospital:dev                                                  Up 17 seconds   3000/tcp, 5000/tcp, 8888/tcp, 38888/tcp, 127.0.0.1:8101->8100/tcp
+fedsepsis-aggregator   fedsepsis-aggregator:dev                                                Up 4 seconds    3000/tcp, 5000/tcp, 8000/tcp, 8888/tcp, 38888/tcp
+notebook               registry.linuxone.cloud.marist.edu/l1cc/jupyterlab-image-s390x:latest   Up 4 hours      3000/tcp, 5000/tcp, 38888/tcp, 0.0.0.0:38888->8888/tcp, [::]:38888->8888/tcp

@@ -1,0 +1,37 @@
+# aggregator log (docker logs fedsepsis-aggregator)
+# captured 2026-10-17T07:42:29Z on datathon-test
+
+2026-10-17T07:42:11Z event=start site=- round=0 sites=hospA,hospB expected_rounds=5 restored=False done=False
+2026-10-17T07:42:11Z event=tls_disabled site=- round=- note=plain HTTP inside the docker network
+2026-10-17T07:42:12Z event=request_keys site=hospA round=- path=/stats keys=n,site_id,sum,sumsq
+2026-10-17T07:42:12Z event=stats site=hospA round=0 sites_stats=1
+2026-10-17T07:42:25Z event=start site=- round=0 sites=hospA,hospB expected_rounds=5 restored=True done=False
+2026-10-17T07:42:25Z event=tls_disabled site=- round=- note=plain HTTP inside the docker network
+2026-10-17T07:42:25Z event=request_keys site=hospB round=- path=/stats keys=n,site_id,sum,sumsq
+2026-10-17T07:42:25Z event=stats site=hospB round=0 sites_stats=2
+2026-10-17T07:42:25Z event=norm_ready site=- round=0 total_n=3200
+2026-10-17T07:42:25Z event=request_keys site=hospB round=0 path=/update keys=b,n,round,site_id,w
+2026-10-17T07:42:25Z event=update site=hospB round=0 updated=1
+2026-10-17T07:42:25Z event=request_keys site=hospA round=0 path=/update keys=b,n,round,site_id,w
+2026-10-17T07:42:25Z event=update site=hospA round=0 updated=2
+2026-10-17T07:42:25Z event=round_complete site=- round=0 new_round=1 done=False
+2026-10-17T07:42:25Z event=request_keys site=hospA round=1 path=/update keys=b,n,round,site_id,w
+2026-10-17T07:42:25Z event=update site=hospA round=1 updated=1
+2026-10-17T07:42:26Z event=request_keys site=hospB round=1 path=/update keys=b,n,round,site_id,w
+2026-10-17T07:42:26Z event=update site=hospB round=1 updated=2
+2026-10-17T07:42:26Z event=round_complete site=- round=1 new_round=2 done=False
+2026-10-17T07:42:26Z event=request_keys site=hospB round=2 path=/update keys=b,n,round,site_id,w
+2026-10-17T07:42:26Z event=update site=hospB round=2 updated=1
+2026-10-17T07:42:26Z event=request_keys site=hospA round=2 path=/update keys=b,n,round,site_id,w
+2026-10-17T07:42:26Z event=update site=hospA round=2 updated=2
+2026-10-17T07:42:26Z event=round_complete site=- round=2 new_round=3 done=False
+2026-10-17T07:42:26Z event=request_keys site=hospA round=3 path=/update keys=b,n,round,site_id,w
+2026-10-17T07:42:26Z event=update site=hospA round=3 updated=1
+2026-10-17T07:42:26Z event=request_keys site=hospB round=3 path=/update keys=b,n,round,site_id,w
+2026-10-17T07:42:26Z event=update site=hospB round=3 updated=2
+2026-10-17T07:42:26Z event=round_complete site=- round=3 new_round=4 done=False
+2026-10-17T07:42:26Z event=request_keys site=hospB round=4 path=/update keys=b,n,round,site_id,w
+2026-10-17T07:42:26Z event=update site=hospB round=4 updated=1
+2026-10-17T07:42:26Z event=request_keys site=hospA round=4 path=/update keys=b,n,round,site_id,w
+2026-10-17T07:42:26Z event=update site=hospA round=4 updated=2
+2026-10-17T07:42:26Z event=round_complete site=- round=4 new_round=5 done=True

@@ -1,0 +1,17 @@
+================ RESULTS ================
+PASS  b+d unit tests (one-round arithmetic [2.5,3.5], duplicate, 409, restore)
+PASS  c all 5 rounds complete, done=true
+PASS  a no/wrong token -> 401 (3 requests)
+PASS  a aggregator not reachable from host
+PASS  d duplicate -> ok+duplicate
+PASS  d wrong round -> 409
+PASS  d weights [2.5,3.5] after duplicate
+PASS  e hospA sees no hospB rows
+PASS  e hospA data mount is read-only
+PASS  e hospA mounts only its own dirs
+PASS  f keys seen across run are a subset of allowed
+PASS  i hospA scores its own patient
+PASS  i hospA cannot score a hospB patient (404)
+PASS  g state restored after restart (restored=True, hospA stats kept)
+PASS  g run completes after restart
+PASS  h docker stats captured

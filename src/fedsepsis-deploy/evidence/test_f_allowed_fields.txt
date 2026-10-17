@@ -1,0 +1,7 @@
+request body keys seen by the aggregator during the run (from its log, values are never logged):
+      2 /stats n,site_id,sum,sumsq
+     10 /update b,n,round,site_id,w
+union of keys in log     : ['b', 'n', 'round', 'site_id', 'sum', 'sumsq', 'w']
+aggregator body_keys_seen: ['b', 'n', 'round', 'site_id', 'sum', 'sumsq', 'w']
+allowed                  : ['b', 'n', 'round', 'site_id', 'sum', 'sumsq', 'w']
+ASSERT subset of allowed : True
