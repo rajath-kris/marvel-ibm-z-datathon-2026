@@ -4,6 +4,7 @@
 # for one site in secure mode looks random, and the allowed-fields check still passes.
 set -uo pipefail
 cd "$(dirname "$0")/.."
+P=${SEC_PREFIX:-sec-}; SR=${SEC_RUN_DIR:-run/secure}   # names / state dir of the secure stack under test
 EV=$PWD/evidence; mkdir -p "$EV"
 OUT=$EV/test_secure_aggregation.txt
 {
@@ -18,7 +19,7 @@ OUT=$EV/test_secure_aggregation.txt
     grep -E "^hospA[12]:|^split:|keeping split|pair seeds|pre-flight: Mem|rounds completed|identical|secure=|results saved" run/secure_$mode.log
     if [ $mode = masked ]; then
       echo "--- what the aggregator stores for hospB's normalisation sums (secure mode): first 4 of 138, as fractions of 2**128"
-      python3 - run/secure/state/state.json <<'PY'
+      python3 - $SR/state/state.json <<'PY'
 import json, math, sys
 s = json.load(open(sys.argv[1]))
 v = s["stats"]["hospB"]["sum"]
@@ -29,10 +30,10 @@ print("  ", [round(x / 2 ** 128, 6) for x in v[:4]], "...")
 print(f"   KS distance from uniform over all 138: {ks:.3f} (1% critical {1.63 / math.sqrt(len(us)):.3f})")
 PY
       echo "--- hospB's real sums for comparison (local only, computed in hospB's container; never sent in the clear)"
-      docker exec sec-hospB /opt/venv/bin/python -c "import numpy as np; z=np.load('/data/site_small.npz', allow_pickle=False); print('  ', [round(float(x),1) for x in z['X'].astype(np.float64).sum(axis=0)[:4]], '...')"
+      docker exec ${P}hospB /opt/venv/bin/python -c "import numpy as np; z=np.load('/data/site_small.npz', allow_pickle=False); print('  ', [round(float(x),1) for x in z['X'].astype(np.float64).sum(axis=0)[:4]], '...')"
       echo "--- (f) allowed fields, secure run"
-      docker logs sec-aggregator 2>&1 | grep 'event=request_keys' | sed -E 's/.*path=([^ ]*) keys=(.*)/\1 \2/' | sort | uniq -c
-      python3 - "$(docker logs sec-aggregator 2>&1)" <<'PY'
+      docker logs ${P}aggregator 2>&1 | grep 'event=request_keys' | sed -E 's/.*path=([^ ]*) keys=(.*)/\1 \2/' | sort | uniq -c
+      python3 - "$(docker logs ${P}aggregator 2>&1)" <<'PY'
 import re, sys
 allowed = {"site_id", "n", "sum", "sumsq", "round", "w", "b"}
 seen = set()
@@ -55,7 +56,7 @@ PY
   echo; echo "### demo summary (demo/secure_summary.json)"
   mkdir -p demo
   # patient count per site, read inside each site's own container from its own training file
-  python3 - run/secure/split/split_counts.json "$(docker exec sec-hospB /opt/venv/bin/python -c "import numpy as np; print(len(np.unique(np.load('/data/site_small.npz', allow_pickle=False)['patient_id'])))")" "${SPLIT_MAP:-}" > run/secure/site_counts.json <<'PY'
+  python3 - $SR/split/split_counts.json "$(docker exec ${P}hospB /opt/venv/bin/python -c "import numpy as np; print(len(np.unique(np.load('/data/site_small.npz', allow_pickle=False)['patient_id'])))")" "${SPLIT_MAP:-}" > $SR/site_counts.json <<'PY'
 import json, sys
 c = json.load(open(sys.argv[1])); mapped = bool(sys.argv[3])
 out = {s: c[s] for s in ("hospA1", "hospA2")}
@@ -66,9 +67,9 @@ out["_description"] = {"hospA1": "hospital A, medical ICU" if mapped else "hospi
                        "left_out": f"{c['left_out_patients']} hospital A patients with unknown ICU unit" if mapped else "none"}
 print(json.dumps(out))
 PY
-  python3 tools/secure_summary.py results/secure3-masked results/secure3-plain run/secure/state/secure_seen.json \
-    "$(cat run/secure/split/TAG)" demo/secure_summary.json run/secure/site_counts.json \
-    "sec-* containers on the LinuxONE VM, commit $(cat run/secure/COMMIT 2>/dev/null || echo unknown), fedsepsis 0.2.0"
+  python3 tools/secure_summary.py results/secure3-masked results/secure3-plain $SR/state/secure_seen.json \
+    "$(cat $SR/split/TAG)" demo/secure_summary.json $SR/site_counts.json \
+    "${P}* containers on the LinuxONE VM, commit $(cat $SR/COMMIT 2>/dev/null || echo unknown), fedsepsis 0.2.0"
   echo; echo "### for reference: 3-site plain vs the 2-site model_global.json (different sites, so NOT expected to match)"
   python3 tools/compare_models.py results/secure3-plain/final_model.json ~/handoff/outputs/demo/model_global.json | grep -E "max .w |b diff|mean diff"
 } 2>&1 | tee "$OUT"

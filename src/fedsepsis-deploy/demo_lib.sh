@@ -11,6 +11,8 @@ if [ "$DIRECTION" = reverse ]; then
 else
   declare -A HOST_PORT=([hospA]=8101 [hospB]=8102 [hospA1]=8111 [hospA2]=8112)
 fi
+# PORT_OFFSET=N shifts every published port (a test stack beside the live one, e.g. 1000 -> 9101/9102)
+for _k in "${!HOST_PORT[@]}"; do HOST_PORT[$_k]=$(( ${HOST_PORT[$_k]} + ${PORT_OFFSET:-0} )); done
 declare -A STUB_ROWS=([hospA]=2000 [hospB]=1200)
 declare -A HOSP_MEMORY=([$BIG_SITE]=2g [$SMALL_SITE]=1g [hospA1]=1g [hospA2]=1g)
 SECURE=${SECURE:-0}

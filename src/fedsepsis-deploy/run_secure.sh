@@ -8,12 +8,14 @@
 #   SPLIT_MAP=/path/map.json ./run_secure.sh             # split hospital A by Reju's patient-to-ICU map instead
 set -euo pipefail
 cd "$(dirname "$0")"
-export FED_SITES="hospA1 hospA2 hospB" NAME_PREFIX=sec- AGG_NAME=sec-aggregator RUN_DIR=$PWD/run/secure MODE=real
+SEC_PREFIX=${SEC_PREFIX:-sec-}            # container prefix; a test stack uses another one (e.g. mtest-sec-)
+export FED_SITES="hospA1 hospA2 hospB" NAME_PREFIX=$SEC_PREFIX AGG_NAME=${SEC_PREFIX}aggregator MODE=real
+export RUN_DIR=${SEC_RUN_DIR:-$PWD/run/secure}
 export SECURE_SAMPLE=${SECURE_SAMPLE:-3}   # keep the first 3 masked values each site sent (demo page)
 source ./config.sh
-NETWORK=fedsecure-net
+NETWORK=${SEC_NETWORK:-fedsecure-net}
 source ./demo_lib.sh
-HOST_PORT[hospB]=8113
+HOST_PORT[hospB]=$(( 8113 + ${PORT_OFFSET:-0} ))
 # the main demo and Reju's sweep may run alongside; the memory floor still applies
 ALLOW_JOBS="${ALLOW_JOBS:+$ALLOW_JOBS,}fedsepsis-aggregator,hospA,hospB,rev-fedsepsis-aggregator,rev-hospA,rev-hospB,hard-.*,fedcurve,fedseed_[0-9]+"
 
