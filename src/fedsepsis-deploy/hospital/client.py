@@ -36,6 +36,9 @@ EVAL_DATA_PATH = os.environ.get("EVAL_DATA_PATH") or DATA_PATH            # /aud
 RETUNE_DATA_PATH = os.environ.get("RETUNE_DATA_PATH") or DATA_PATH        # /retune (scores only, no labels)
 BORROWED_MODEL_PATH = os.environ.get("BORROWED_MODEL_PATH", "")          # model_big_asis.json
 DEMO_PATIENT_PATH = os.environ.get("DEMO_PATIENT_PATH", "")              # demo_patient.json: stored thresholds
+NEWS2_PATH = os.environ.get("NEWS2_PATH", "")                            # news2_scores.npz, rows = EVAL rows
+NEWS2_THRESHOLDS_PATH = os.environ.get("NEWS2_THRESHOLDS_PATH", "")      # news2_thresholds.json (experiment)
+NEWS2_BUDGET = os.environ.get("NEWS2_BUDGET", "25")                      # budget whose threshold is "stored"
 THRESHOLD = float(os.environ.get("THRESHOLD", "0.5"))                     # stub mode only
 OUT_DIR = os.environ.get("OUT_DIR", "/out")
 PORT = int(os.environ.get("PORT", "8100"))
@@ -273,7 +276,21 @@ class Shared:
     borrowed = None    # model_big_asis.json
     thresholds = {}    # stored per model: borrowed / federated from demo_patient.json, retuned after POST /retune
     retuned_base = None
+    news2_patients = None   # per-patient (rows x 1) arrays of NEWS2 points, aligned with eval.patients
+    news2_budgets = {}      # budget -> documented NEWS2 threshold (points), from news2_thresholds.json
     status = "starting"
+
+
+# NEWS2 goes through the library unchanged: an identity "model" with one input (the NEWS2 points), mean 0,
+# std 4, w 4, b 0, so the library's output is exactly sigmoid(points) (z = points/4 is exact, z*w = points).
+# sigmoid is strictly increasing, so "sigmoid(points) >= sigmoid(T)" is "points >= T": alert_rate and
+# score_patient then apply the experiment's crossing / 6 h silence / patient-day rules to NEWS2 as is.
+NEWS2_MODEL = {"w": [4.0], "b": 0.0, "mean": [0.0], "std": [4.0], "feature_names": ["NEWS2_partial_points"]}
+
+
+def news2_lib_threshold(points):
+    import numpy as np
+    return float(fedsepsis._sigmoid(np.float64(points)))   # same arithmetic as the library's scores
 
 
 def with_names(model):
@@ -298,12 +315,16 @@ def resolve_model(name):
             if not Shared.final:
                 return None, None, f"federated training not finished (status: {Shared.status})"
             return Shared.model, Shared.thresholds.get("federated"), None
+        if name == "news2":
+            if Shared.news2_patients is None:
+                return None, None, "no NEWS2 scores mounted for this site"
+            return NEWS2_MODEL, Shared.thresholds.get("news2"), None
         if name == "retuned":
             if Shared.retuned_base is None:
                 return None, None, "no retuned threshold yet: POST /retune first"
             base = Shared.retuned_base
         else:
-            return None, None, "model must be borrowed, federated or retuned"
+            return None, None, "model must be borrowed, federated, retuned or news2"
     m, _, err = resolve_model(base)
     return m, Shared.thresholds.get("retuned"), err
 
@@ -314,8 +335,8 @@ def load_side_inputs(train):
         Shared.eval = EvalSet("training", train)
         Shared.thresholds = {"federated": THRESHOLD}
         return
-    Shared.eval = EvalSet(os.path.basename(EVAL_DATA_PATH), train if EVAL_DATA_PATH == DATA_PATH
-                          else load_npz(EVAL_DATA_PATH, EVAL_KEYS, optional=("onset_by_row",)))
+    eval_d = train if EVAL_DATA_PATH == DATA_PATH else load_npz(EVAL_DATA_PATH, EVAL_KEYS, optional=("onset_by_row",))
+    Shared.eval = EvalSet(os.path.basename(EVAL_DATA_PATH), eval_d)
     Shared.retune = Shared.eval if RETUNE_DATA_PATH == EVAL_DATA_PATH else EvalSet(
         os.path.basename(RETUNE_DATA_PATH), train if RETUNE_DATA_PATH == DATA_PATH else load_npz(RETUNE_DATA_PATH, EVAL_KEYS))
     log("eval_data_loaded", eval=Shared.eval.name, eval_patients=len(Shared.eval.patients), eval_rows=Shared.eval.rows,
@@ -333,12 +354,38 @@ def load_side_inputs(train):
                              "federated": float(t["federated_best_threshold_from_small_validation"])}
         log("stored_thresholds", borrowed=Shared.thresholds["borrowed"], federated=Shared.thresholds["federated"],
             budget=t.get("budget_alerts_per_100_patient_days"))
+    if NEWS2_PATH:
+        load_news2(eval_d)
     saved = os.path.join(OUT_DIR, "retuned.json")
     if os.path.exists(saved):                                   # survive a container restart
         with open(saved) as f:
             r = json.load(f)
         Shared.retuned_base, Shared.thresholds["retuned"] = r["model"], float(r["threshold"])
         log("retuned_threshold_restored", base=r["model"], threshold=r["threshold"])
+
+
+def load_news2(eval_d):
+    """news2_scores.npz has one score per row of the eval file, same order (HANDOFF.md section 11): verify, then slice
+    it with the eval patients' bounds so NEWS2 is audited on exactly the same rows and patients as the models."""
+    import numpy as np
+    with np.load(NEWS2_PATH, allow_pickle=False) as z:
+        pid, hour, score = z["patient_id"], z["hour"], z["score"]
+    same = (len(pid) == len(eval_d["patient_id"]) and np.array_equal(pid, eval_d["patient_id"])
+            and np.array_equal(hour, eval_d["hour"]))
+    order_kept = np.array_equal(np.lexsort((eval_d["hour"], eval_d["patient_id"])), np.arange(len(pid)))
+    if not (same and order_kept):
+        raise DataError(f"{NEWS2_PATH}: rows do not match {Shared.eval.name} row for row")
+    if not np.isfinite(score).all():
+        raise DataError(f"{NEWS2_PATH}: non-finite NEWS2 score")
+    pts = score.astype(np.float64).reshape(-1, 1)
+    Shared.news2_patients = [pts[s:e] for s, e in Shared.eval.bounds]
+    if NEWS2_THRESHOLDS_PATH:
+        with open(NEWS2_THRESHOLDS_PATH) as f:
+            b = json.load(f)["budgets"]
+        Shared.news2_budgets = {float(k): float(v["threshold"]) for k, v in b.items()}
+        Shared.thresholds["news2"] = Shared.news2_budgets[float(NEWS2_BUDGET)]
+    log("news2_loaded", rows=len(pid), patients=len(Shared.news2_patients), rows_match_eval=True,
+        stored_threshold=Shared.thresholds.get("news2"), budget=NEWS2_BUDGET)
 
 
 def training_loop():
@@ -480,6 +527,13 @@ class Handler(BaseHTTPRequestHandler):
         X, hours = ev.rows_of(k)
         return k, X, hours, None
 
+    @staticmethod
+    def _lib_inputs(name, model, thr):
+        """-> (library model, library threshold, eval patients) for this model name; NEWS2 via the identity model."""
+        if name == "news2":
+            return NEWS2_MODEL, news2_lib_threshold(thr), Shared.news2_patients
+        return model, thr, Shared.eval.patients
+
     def _model_for(self, name):
         model, thr, err = resolve_model(name)
         if err:
@@ -503,8 +557,12 @@ class Handler(BaseHTTPRequestHandler):
         n = sum(1 for h in hours if h <= hour)      # hours are sorted, so this is a prefix
         if n == 0:
             return self._send(404, {"error": "no rows for that patient up to that hour"})
-        scored = plain(fedsepsis.score_patient(model, X[:n], thr))
+        lib_model, lib_thr, pats = self._lib_inputs(name, model, thr)
+        rows = pats[k] if name == "news2" else X
+        scored = plain(fedsepsis.score_patient(lib_model, rows[:n], lib_thr))
         last = dict(scored[-1], hour=hours[n - 1])   # library numbers rows 0..n-1; report the real hour
+        if name == "news2":
+            last["score"] = float(rows[n - 1][0])    # report NEWS2 points, not sigmoid(points)
         log("score", model=name, patient_rows=n)     # no patient id or score in the log
         self._send(200, {"hour": last["hour"], "score": last["score"], "alert": last["alert"],
                          "threshold": thr, "model": name, "final_model": Shared.final})
@@ -519,21 +577,26 @@ class Handler(BaseHTTPRequestHandler):
         k, X, hours, err = self._patient_rows(q["patient_id"])
         if err:
             return self._send(*err)
-        scored = plain(fedsepsis.score_patient(model, X, thr))
+        lib_model, lib_thr, pats = self._lib_inputs(name, model, thr)
+        rows = pats[k] if name == "news2" else X
+        scored = plain(fedsepsis.score_patient(lib_model, rows, lib_thr))
+        scores = [float(v[0]) for v in rows] if name == "news2" else [r["score"] for r in scored]
         onset = Shared.eval.onset[k]                 # display only: never used in /audit or /retune
         log("patient_replay", model=name, patient_rows=len(hours))
-        self._send(200, {"patient_id": q["patient_id"], "model": name, "threshold": thr, "data": Shared.eval.name,
-                         "hours": hours, "score": [r["score"] for r in scored], "alert": [r["alert"] for r in scored],
+        extra = {"score_kind": "NEWS2 points (partial NEWS2, 0-15)" if name == "news2" else "model probability"}
+        self._send(200, {"patient_id": q["patient_id"], "model": name, "threshold": thr, "data": Shared.eval.name, **extra,
+                         "hours": hours, "score": scores, "alert": [r["alert"] for r in scored],
                          "alert_hours": [h for h, r in zip(hours, scored) if r["alert"]],
                          "onset_hour": onset, "window": None if onset is None else [onset - 12, onset + 3]})
 
     def _audit(self, body):
         name = body.get("model", "borrowed")
-        if name not in ("borrowed", "federated", "retuned"):
-            return self._send(400, {"error": "model must be borrowed, federated or retuned"})
+        if name not in ("borrowed", "federated", "retuned", "news2"):
+            return self._send(400, {"error": "model must be borrowed, federated, retuned or news2"})
         thr = body.get("threshold")
-        if thr is not None and not _num(thr, 0.0, 1.0):
-            return self._send(400, {"error": "threshold must be a number in [0, 1]"})
+        hi = 20.0 if name == "news2" else 1.0
+        if thr is not None and not _num(thr, 0.0, hi):
+            return self._send(400, {"error": f"threshold must be a number in [0, {hi:g}]" + (" (NEWS2 points)" if name == "news2" else "")})
         if not HAS_RATE_FNS:
             return self._send(501, {"error": "this fedsepsis has no alert_rate (stub mode)"})
         model, stored, err = resolve_model(name)
@@ -543,7 +606,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(409, {"error": f"no stored threshold for model {name}: pass threshold"})
         thr = stored if thr is None else float(thr)
         t0 = time.monotonic()
-        r = plain(fedsepsis.alert_rate(model, Shared.eval.patients, thr))
+        lib_model, lib_thr, pats = self._lib_inputs(name, model, thr)
+        r = plain(fedsepsis.alert_rate(lib_model, pats, lib_thr))
         log("audit", model=name, threshold=thr, patients=len(Shared.eval.patients), seconds=f"{time.monotonic() - t0:.1f}")
         self._send(200, {"alerts_per_100_patient_days": r["alerts_per_100pd"], "patients": len(Shared.eval.patients),
                          "patient_days": r["patient_days"], "threshold": thr,
@@ -551,11 +615,24 @@ class Handler(BaseHTTPRequestHandler):
 
     def _retune(self, body):
         name = body.get("model", "borrowed")
-        if name not in ("borrowed", "federated"):
-            return self._send(400, {"error": "model must be borrowed or federated"})
+        if name not in ("borrowed", "federated", "news2"):
+            return self._send(400, {"error": "model must be borrowed, federated or news2"})
         budget = body.get("budget", 25)
         if not _num(budget, 1e-6, 1000):
             return self._send(400, {"error": "budget must be a positive number (alerts per 100 patient-days)"})
+        if name == "news2":
+            # There are no NEWS2 scores for the validation patients, so no search here (searching on the test
+            # patients would grade the demo on its own tuning data): return the experiment's documented threshold.
+            if Shared.news2_patients is None:
+                return self._send(409, {"error": "no NEWS2 scores mounted for this site"})
+            if float(budget) not in Shared.news2_budgets:
+                return self._send(400, {"error": f"NEWS2 thresholds are documented only for budgets {sorted(Shared.news2_budgets)}"})
+            t = Shared.news2_budgets[float(budget)]
+            log("retune_news2_fixed", budget=budget, threshold=t)
+            return self._send(200, {"threshold": t, "alerts_per_100_patient_days": None, "model": "news2", "budget": budget,
+                                    "note": "fixed from experiment", "source": "news2_thresholds.json (chosen on the small "
+                                    "hospital's validation set in the experiment); not stored as 'retuned'",
+                                    "rule": f"alert when NEWS2 points >= {math.ceil(t)} (crossing, then 6 h silence)"})
         if not HAS_RATE_FNS:
             return self._send(501, {"error": "this fedsepsis has no threshold_for_budget (stub mode)"})
         model, _, err = resolve_model(name)

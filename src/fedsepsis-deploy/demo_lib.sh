@@ -2,24 +2,30 @@
 # Every wait is a bounded until-loop poll; there are no fixed sleeps.
 
 # Overridable so a second deployment (run_secure.sh) can run beside the main one with its own names.
-AGG_NAME=${AGG_NAME:-fedsepsis-aggregator}
-NAME_PREFIX=${NAME_PREFIX:-}                 # container name = $NAME_PREFIX$site
-RUN_DIR=${RUN_DIR:-$PWD/run}
-read -r -a SITES <<< "${FED_SITES:-hospA hospB}"
-declare -A HOST_PORT=([hospA]=8101 [hospB]=8102 [hospA1]=8111 [hospA2]=8112)
+NAME_PREFIX=${NAME_PREFIX:-$DIR_PREFIX}      # container name = $NAME_PREFIX$site
+AGG_NAME=${AGG_NAME:-${NAME_PREFIX}fedsepsis-aggregator}
+RUN_DIR=${RUN_DIR:-$PWD/$DIR_RUN}
+read -r -a SITES <<< "${FED_SITES:-$BIG_SITE $SMALL_SITE}"
+if [ "$DIRECTION" = reverse ]; then
+  declare -A HOST_PORT=([hospB]=8201 [hospA]=8202)
+else
+  declare -A HOST_PORT=([hospA]=8101 [hospB]=8102 [hospA1]=8111 [hospA2]=8112)
+fi
 declare -A STUB_ROWS=([hospA]=2000 [hospB]=1200)
-declare -A HOSP_MEMORY=([hospA]=2g [hospB]=1g [hospA1]=1g [hospA2]=1g)
+declare -A HOSP_MEMORY=([$BIG_SITE]=2g [$SMALL_SITE]=1g [hospA1]=1g [hospA2]=1g)
 SECURE=${SECURE:-0}
 PAIR_DIR=${PAIR_DIR:-$SECRET_DIR/pairs}      # pairwise seeds for SECURE=1 (outside the project)
 # MODE=real: training file per site (override with REAL_DATA_hospA / REAL_DATA_hospB)
-declare -A REAL_FILE=([hospA]=${REAL_DATA_hospA:-$REAL_DIR/site_big.npz} [hospB]=${REAL_DATA_hospB:-$REAL_DIR/site_small.npz}
-                      [hospA1]=${REAL_DATA_hospA1:-$RUN_DIR/split/hospA1.npz} [hospA2]=${REAL_DATA_hospA2:-$RUN_DIR/split/hospA2.npz})
+declare -A REAL_FILE=([$BIG_SITE]=$REAL_DIR/site_big.npz [$SMALL_SITE]=$REAL_DIR/site_small.npz
+                      [hospA1]=$RUN_DIR/split/hospA1.npz [hospA2]=$RUN_DIR/split/hospA2.npz)
 # /audit, /score, /patient data per site (default: its training file). hospB: held-out test patients, all rows
 # (HANDOFF.md section 3/5: alert metrics use all rows; keep_row is only for AUROC and is not used here).
-declare -A EVAL_FILE=([hospB]=${EVAL_DATA_hospB:-$REAL_DIR/small_test_patients.npz})
+declare -A EVAL_FILE=([$SMALL_SITE]=$REAL_DIR/small_test_patients.npz)
 # /retune data per site (default: its training file). hospB: small_val_patients.npz, the set the experiment
 # re-tuned on (HANDOFF.md section 6), so the demo reproduces setups 2 and 4. Decided 2026-10-17.
-declare -A RETUNE_FILE=([hospB]=${RETUNE_DATA_hospB:-$REAL_DIR/small_val_patients.npz})
+declare -A RETUNE_FILE=([$SMALL_SITE]=${RETUNE_DATA_SMALL:-$REAL_DIR/small_val_patients.npz})
+# NEWS2 (partial) scores: one per row of the small site's test file; thresholds documented per budget
+declare -A NEWS2_FILE=([$SMALL_SITE]=$REAL_DIR/news2_scores.npz)
 BORROWED_MODEL=$REAL_DIR/model_big_asis.json
 DEMO_PATIENT=$REAL_DIR/demo_patient.json
 REPRO_CONFIG=$REAL_DIR/repro_config.json
@@ -135,6 +141,12 @@ start_hospital() {  # start_hospital SITE
       [ -f "$f" ] || { echo "MODE=real but $f is missing"; exit 1; }
       lib_mount+=(-v "$f":/data/$(basename "$f"):ro -e ${kind}_DATA_PATH=/data/$(basename "$f"))
     done
+    f=${NEWS2_FILE[$s]:-}
+    if [ -n "$f" ] && [ -f "$f" ] && [ -f "$REAL_DIR/news2_thresholds.json" ]; then
+      lib_mount+=(-v "$f":/data/news2_scores.npz:ro -e NEWS2_PATH=/data/news2_scores.npz
+                  -v "$REAL_DIR/news2_thresholds.json":/models/news2_thresholds.json:ro
+                  -e NEWS2_THRESHOLDS_PATH=/models/news2_thresholds.json)
+    fi
   else
     data_mount="$RUN_DIR/data/$s:/data:ro"
     data_path=/data/site.json

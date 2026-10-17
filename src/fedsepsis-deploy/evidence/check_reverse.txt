@@ -1,0 +1,22 @@
+# outputs/fed/results_long_S1.csv, seed 0, direction B>A (big=B, small=A), fraction 0.1, scenario S1
+# endpoint http://127.0.0.1:8202, health: {"ok": true, "site_id": "hospA", "status": "done", "final_model": true, "mode": "real", "eval_data": "small_test_patients.npz", "retune_data": "small_val_patients.npz"}
+  PASS  borrowed: stored threshold                                 ours     0.388824   experiment     0.388824   |diff| 0.00e+00
+  PASS  borrowed: alerts / 100 patient-days on test                ours    93.547483   experiment    93.547483   |diff| 0.00e+00
+  PASS  retune borrowed @25 on small_val_patients.npz: threshold   ours     0.563626   experiment     0.563626   |diff| 0.00e+00
+  PASS  retuned borrowed: alerts / 100 patient-days on test        ours    27.157763   experiment    27.157763   |diff| 3.55e-15
+  PASS  federated (this deployment's model): stored threshold      ours     0.605076   experiment     0.605076   |diff| 0.00e+00
+  PASS  federated: alerts / 100 patient-days on test               ours    25.188213   experiment    25.188213   |diff| 0.00e+00
+  PASS  news2: stored threshold (points)                           ours     7.000000   experiment     7.000000   |diff| 0.00e+00
+  PASS  news2: alerts / 100 patient-days on test                   ours    30.729865   experiment    30.729865   |diff| 0.00e+00
+  PASS  news2 /retune returns the documented threshold: 7.0 (fixed from experiment; alert when NEWS2 points >= 7 (crossing, then 6 h silence))
+  patient-days on test: 16348.916666666666  patients: 10062
+# replay of demo_patient.json examples (reference: model_federated_best.json / model_big_asis.json)
+  PASS  success_example  patient    271 federated alerts identical True, max |score diff| 5.94e-08, alert hours [22, 34, 68, 97], onset 96.0
+  PASS  success_example  patient    271 borrowed  alerts identical True, max |score diff| 0.00e+00, alert hours [0, 59, 67], onset 96.0
+        success_example  patient    271 retuned   threshold 0.563626, alert hours [37, 68]
+        success_example  patient    271 news2     threshold 7, alert hours [2, 14, 28, 81, 91]
+  PASS  failure_example  patient  13364 federated alerts identical True, max |score diff| 1.33e-08, alert hours [], onset 12.0
+  PASS  failure_example  patient  13364 borrowed  alerts identical True, max |score diff| 0.00e+00, alert hours [0], onset 12.0
+        failure_example  patient  13364 retuned   threshold 0.563626, alert hours []
+        failure_example  patient  13364 news2     threshold 7, alert hours []
+ALL PASS
