@@ -1,33 +1,34 @@
-# secure aggregation, 3 sites  (2026-10-17T11:13:58Z)
+# secure aggregation, 3 sites  (2026-10-17T14:52:50Z)
 ### unit tests (fedsecure + aggregator SECURE mode)
+Ran 10 tests in 0.029s
+OK
     one masked update (hospB, 138 values): KS vs uniform 0.050 (1% critical 0.139), corr with true n*w +0.058, decoding it alone is off by 7.73e+21 x max|n*w|
     aggregator secure vs plain: mean/std rel diff 0.00e+00, final w diff 1.39e-17, done=True
     max |secure - plain FedAvg| over 20 rounds x 139 values: 2.776e-17
-Ran 9 tests in 0.034s
-OK
 
 ### 3-site run, plain
-pre-flight: MemAvailable 5056 MB (need >= 3072); other containers: hospB
-keeping split (random-seed2026)
+pre-flight: MemAvailable 4368 MB (need >= 3072); other containers: hospB,hospA,fedsepsis-aggregator,rev-hospA,rev-hospB,rev-fedsepsis-aggregator; processes >50% CPU: none
+keeping split (map-icu_map)
 rounds completed: 40 / 40   done=True   sites=['hospA1', 'hospA2', 'hospB']
 all sites hold the identical final model: True
-2026-10-17T11:14:04Z event=start site=- round=0 sites=hospA1,hospA2,hospB expected_rounds=40 restored=False done=False secure=False
-secure=0 split=random-seed2026 runtime=39.3s
+2026-10-17T14:52:54Z event=start site=- round=0 sites=hospA1,hospA2,hospB expected_rounds=40 restored=False done=False secure=False
+secure=0 split=map-icu_map runtime=26.2s
 results saved in results/secure3-plain/
 
 ### 3-site run, masked
-pre-flight: MemAvailable 5058 MB (need >= 3072); other containers: hospB
-keeping split (random-seed2026)
-pair seeds in /home/linux1/.fedsepsis/pairs: 3 (0 new)
+pre-flight: MemAvailable 4371 MB (need >= 3072); other containers: hospB,hospA,fedsepsis-aggregator,rev-hospA,rev-hospB,rev-fedsepsis-aggregator; processes >50% CPU: none
+keeping split (map-icu_map)
+pair seeds in /home/linux1/.fedsepsis/pairs: 3 (3 new)
+secure session: new random id (not printed); pair seeds rotated
 rounds completed: 40 / 40   done=True   sites=['hospA1', 'hospA2', 'hospB']
 all sites hold the identical final model: True
-2026-10-17T11:14:47Z event=start site=- round=0 sites=hospA1,hospA2,hospB expected_rounds=40 restored=False done=False secure=True
-secure=1 split=random-seed2026 runtime=38.3s
+2026-10-17T14:53:22Z event=start site=- round=0 sites=hospA1,hospA2,hospB expected_rounds=40 restored=False done=False secure=True
+secure=1 split=map-icu_map runtime=26.6s
 results saved in results/secure3-masked/
 --- what the aggregator stores for hospB's normalisation sums (secure mode): first 4 of 138, as fractions of 2**128
   secure flag in state: True | stored values are integers: True
-   [0.738031, 0.022914, 0.372515, 0.465665] ...
-   KS distance from uniform over all 138: 0.056 (1% critical 0.139)
+   [0.894161, 0.769429, 0.391423, 0.445344] ...
+   KS distance from uniform over all 138: 0.053 (1% critical 0.139)
 --- hospB's real sums for comparison (local only, computed in hospB's container; never sent in the clear)
    [4411498.0, 4414157.7, -478.5, 45371.0] ...
 --- (f) allowed fields, secure run
@@ -40,18 +41,18 @@ ours      : results/secure3-masked/final_model.json
 reference : results/secure3-plain/final_model.json
 weights   : 138 vs 138
 feature_names identical (same order): True
-max |w    diff| = 1.110e-16   (at Calcium_since, ref value -0.163108)
-max |mean diff| = 0.000e+00   (at HR_last, ref value 84.8202)
-max |std  diff| = 6.939e-18   (at pH_delta6, ref value 0.0270457)
-|b diff|        = 0.000e+00   (ours -1.200918010, ref -1.200918010)
-max |w diff| relative to max |w_ref| (0.3445): 3.222e-16
-ASSERT max |masked - plain| <= 1e-9 : True  (1.110e-16)
+max |w    diff| = 6.939e-17   (at Chloride_since, ref value 0.0744104)
+max |mean diff| = 0.000e+00   (at HR_last, ref value 85.401)
+max |std  diff| = 1.388e-17   (at pH_delta6, ref value 0.0286498)
+|b diff|        = 0.000e+00   (ours -1.338012349, ref -1.338012349)
+max |w diff| relative to max |w_ref| (0.3147): 2.205e-16
+ASSERT max |masked - plain| <= 1e-9 : True  (6.939e-17)
 
 ### demo summary (demo/secure_summary.json)
-wrote demo/secure_summary.json: sites ['hospB', 'hospA2', 'hospA1'], max |secure - plain| 1.110e-16, runtimes 38.3s / 39.3s
+wrote demo/secure_summary.json: sites ['hospA1', 'hospA2', 'hospB'], max |secure - plain| 6.939e-17, runtimes 26.6s / 26.2s
 
 ### for reference: 3-site plain vs the 2-site model_global.json (different sites, so NOT expected to match)
-max |w    diff| = 3.440e-04   (at Alkalinephos_delta6, ref value -0.0116705)
-max |mean diff| = 0.000e+00   (at HR_last, ref value 84.8202)
-|b diff|        = 2.755e-04   (ours -1.200918010, ref -1.200642511)
-max |w diff| relative to max |w_ref| (0.3445): 9.986e-04
+max |w    diff| = 5.347e-02   (at Phosphate_delta6, ref value -0.010662)
+max |mean diff| = 1.408e+01   (at AST_mean6, ref value 78.4601)
+|b diff|        = 1.374e-01   (ours -1.338012349, ref -1.200642511)
+max |w diff| relative to max |w_ref| (0.3445): 1.552e-01

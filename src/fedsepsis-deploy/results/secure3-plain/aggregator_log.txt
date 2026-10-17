@@ -1,289 +1,289 @@
-2026-10-17T11:14:04Z event=start site=- round=0 sites=hospA1,hospA2,hospB expected_rounds=40 restored=False done=False secure=False
-2026-10-17T11:14:04Z event=tls_disabled site=- round=- note=plain HTTP inside the docker network
-2026-10-17T11:14:06Z event=request_keys site=hospA1 round=- path=/stats keys=n,site_id,sum,sumsq
-2026-10-17T11:14:06Z event=stats site=hospA1 round=0 sites_stats=1
-2026-10-17T11:14:07Z event=request_keys site=hospA2 round=- path=/stats keys=n,site_id,sum,sumsq
-2026-10-17T11:14:07Z event=stats site=hospA2 round=0 sites_stats=2
-2026-10-17T11:14:08Z event=request_keys site=hospB round=- path=/stats keys=n,site_id,sum,sumsq
-2026-10-17T11:14:08Z event=stats site=hospB round=0 sites_stats=3
-2026-10-17T11:14:08Z event=norm_ready site=- round=0 total_n=679088
-2026-10-17T11:14:08Z event=request_keys site=hospB round=0 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:08Z event=update site=hospB round=0 updated=1
-2026-10-17T11:14:09Z event=request_keys site=hospA2 round=0 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:09Z event=update site=hospA2 round=0 updated=2
-2026-10-17T11:14:09Z event=request_keys site=hospA1 round=0 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:09Z event=update site=hospA1 round=0 updated=3
-2026-10-17T11:14:09Z event=round_complete site=- round=0 new_round=1 done=False
-2026-10-17T11:14:10Z event=request_keys site=hospB round=1 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:10Z event=update site=hospB round=1 updated=1
-2026-10-17T11:14:10Z event=request_keys site=hospA1 round=1 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:10Z event=update site=hospA1 round=1 updated=2
-2026-10-17T11:14:10Z event=request_keys site=hospA2 round=1 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:10Z event=update site=hospA2 round=1 updated=3
-2026-10-17T11:14:10Z event=round_complete site=- round=1 new_round=2 done=False
-2026-10-17T11:14:11Z event=request_keys site=hospB round=2 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:11Z event=update site=hospB round=2 updated=1
-2026-10-17T11:14:11Z event=request_keys site=hospA2 round=2 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:11Z event=update site=hospA2 round=2 updated=2
-2026-10-17T11:14:11Z event=request_keys site=hospA1 round=2 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:11Z event=update site=hospA1 round=2 updated=3
-2026-10-17T11:14:11Z event=round_complete site=- round=2 new_round=3 done=False
-2026-10-17T11:14:11Z event=request_keys site=hospB round=3 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:11Z event=update site=hospB round=3 updated=1
-2026-10-17T11:14:12Z event=request_keys site=hospA1 round=3 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:12Z event=update site=hospA1 round=3 updated=2
-2026-10-17T11:14:12Z event=request_keys site=hospA2 round=3 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:12Z event=update site=hospA2 round=3 updated=3
-2026-10-17T11:14:12Z event=round_complete site=- round=3 new_round=4 done=False
-2026-10-17T11:14:12Z event=request_keys site=hospB round=4 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:12Z event=update site=hospB round=4 updated=1
-2026-10-17T11:14:13Z event=request_keys site=hospA2 round=4 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:13Z event=update site=hospA2 round=4 updated=2
-2026-10-17T11:14:13Z event=request_keys site=hospA1 round=4 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:13Z event=update site=hospA1 round=4 updated=3
-2026-10-17T11:14:13Z event=round_complete site=- round=4 new_round=5 done=False
-2026-10-17T11:14:13Z event=request_keys site=hospB round=5 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:13Z event=update site=hospB round=5 updated=1
-2026-10-17T11:14:13Z event=request_keys site=hospA1 round=5 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:13Z event=update site=hospA1 round=5 updated=2
-2026-10-17T11:14:14Z event=request_keys site=hospA2 round=5 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:14Z event=update site=hospA2 round=5 updated=3
-2026-10-17T11:14:14Z event=round_complete site=- round=5 new_round=6 done=False
-2026-10-17T11:14:14Z event=request_keys site=hospA2 round=6 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:14Z event=update site=hospA2 round=6 updated=1
-2026-10-17T11:14:14Z event=request_keys site=hospB round=6 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:14Z event=update site=hospB round=6 updated=2
-2026-10-17T11:14:14Z event=request_keys site=hospA1 round=6 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:14Z event=update site=hospA1 round=6 updated=3
-2026-10-17T11:14:14Z event=round_complete site=- round=6 new_round=7 done=False
-2026-10-17T11:14:15Z event=request_keys site=hospB round=7 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:15Z event=update site=hospB round=7 updated=1
-2026-10-17T11:14:15Z event=request_keys site=hospA1 round=7 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:15Z event=update site=hospA1 round=7 updated=2
-2026-10-17T11:14:15Z event=request_keys site=hospA2 round=7 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:15Z event=update site=hospA2 round=7 updated=3
-2026-10-17T11:14:15Z event=round_complete site=- round=7 new_round=8 done=False
-2026-10-17T11:14:15Z event=request_keys site=hospB round=8 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:15Z event=update site=hospB round=8 updated=1
-2026-10-17T11:14:16Z event=request_keys site=hospA2 round=8 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:16Z event=update site=hospA2 round=8 updated=2
-2026-10-17T11:14:16Z event=request_keys site=hospA1 round=8 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:16Z event=update site=hospA1 round=8 updated=3
-2026-10-17T11:14:16Z event=round_complete site=- round=8 new_round=9 done=False
-2026-10-17T11:14:17Z event=request_keys site=hospB round=9 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:17Z event=update site=hospB round=9 updated=1
-2026-10-17T11:14:17Z event=request_keys site=hospA1 round=9 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:17Z event=update site=hospA1 round=9 updated=2
-2026-10-17T11:14:17Z event=request_keys site=hospA2 round=9 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:17Z event=update site=hospA2 round=9 updated=3
-2026-10-17T11:14:17Z event=round_complete site=- round=9 new_round=10 done=False
-2026-10-17T11:14:17Z event=request_keys site=hospB round=10 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:17Z event=update site=hospB round=10 updated=1
-2026-10-17T11:14:17Z event=request_keys site=hospA2 round=10 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:17Z event=update site=hospA2 round=10 updated=2
-2026-10-17T11:14:18Z event=request_keys site=hospA1 round=10 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:18Z event=update site=hospA1 round=10 updated=3
-2026-10-17T11:14:18Z event=round_complete site=- round=10 new_round=11 done=False
-2026-10-17T11:14:18Z event=request_keys site=hospB round=11 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:18Z event=update site=hospB round=11 updated=1
-2026-10-17T11:14:18Z event=request_keys site=hospA1 round=11 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:18Z event=update site=hospA1 round=11 updated=2
-2026-10-17T11:14:19Z event=request_keys site=hospA2 round=11 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:19Z event=update site=hospA2 round=11 updated=3
-2026-10-17T11:14:19Z event=round_complete site=- round=11 new_round=12 done=False
-2026-10-17T11:14:19Z event=request_keys site=hospB round=12 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:19Z event=update site=hospB round=12 updated=1
-2026-10-17T11:14:19Z event=request_keys site=hospA2 round=12 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:19Z event=update site=hospA2 round=12 updated=2
-2026-10-17T11:14:19Z event=request_keys site=hospA1 round=12 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:19Z event=update site=hospA1 round=12 updated=3
-2026-10-17T11:14:19Z event=round_complete site=- round=12 new_round=13 done=False
-2026-10-17T11:14:20Z event=request_keys site=hospB round=13 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:20Z event=update site=hospB round=13 updated=1
-2026-10-17T11:14:20Z event=request_keys site=hospA1 round=13 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:20Z event=update site=hospA1 round=13 updated=2
-2026-10-17T11:14:20Z event=request_keys site=hospA2 round=13 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:20Z event=update site=hospA2 round=13 updated=3
-2026-10-17T11:14:20Z event=round_complete site=- round=13 new_round=14 done=False
-2026-10-17T11:14:21Z event=request_keys site=hospB round=14 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:21Z event=update site=hospB round=14 updated=1
-2026-10-17T11:14:21Z event=request_keys site=hospA2 round=14 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:21Z event=update site=hospA2 round=14 updated=2
-2026-10-17T11:14:21Z event=request_keys site=hospA1 round=14 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:21Z event=update site=hospA1 round=14 updated=3
-2026-10-17T11:14:21Z event=round_complete site=- round=14 new_round=15 done=False
-2026-10-17T11:14:21Z event=request_keys site=hospB round=15 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:21Z event=update site=hospB round=15 updated=1
-2026-10-17T11:14:22Z event=request_keys site=hospA1 round=15 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:22Z event=update site=hospA1 round=15 updated=2
-2026-10-17T11:14:22Z event=request_keys site=hospA2 round=15 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:22Z event=update site=hospA2 round=15 updated=3
-2026-10-17T11:14:22Z event=round_complete site=- round=15 new_round=16 done=False
-2026-10-17T11:14:23Z event=request_keys site=hospB round=16 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:23Z event=update site=hospB round=16 updated=1
-2026-10-17T11:14:23Z event=request_keys site=hospA2 round=16 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:23Z event=update site=hospA2 round=16 updated=2
-2026-10-17T11:14:23Z event=request_keys site=hospA1 round=16 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:23Z event=update site=hospA1 round=16 updated=3
-2026-10-17T11:14:23Z event=round_complete site=- round=16 new_round=17 done=False
-2026-10-17T11:14:24Z event=request_keys site=hospB round=17 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:24Z event=update site=hospB round=17 updated=1
-2026-10-17T11:14:24Z event=request_keys site=hospA1 round=17 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:24Z event=update site=hospA1 round=17 updated=2
-2026-10-17T11:14:24Z event=request_keys site=hospA2 round=17 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:24Z event=update site=hospA2 round=17 updated=3
-2026-10-17T11:14:24Z event=round_complete site=- round=17 new_round=18 done=False
-2026-10-17T11:14:24Z event=request_keys site=hospB round=18 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:24Z event=update site=hospB round=18 updated=1
-2026-10-17T11:14:25Z event=request_keys site=hospA2 round=18 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:25Z event=update site=hospA2 round=18 updated=2
-2026-10-17T11:14:25Z event=request_keys site=hospA1 round=18 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:25Z event=update site=hospA1 round=18 updated=3
-2026-10-17T11:14:25Z event=round_complete site=- round=18 new_round=19 done=False
-2026-10-17T11:14:25Z event=request_keys site=hospB round=19 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:25Z event=update site=hospB round=19 updated=1
-2026-10-17T11:14:25Z event=request_keys site=hospA1 round=19 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:25Z event=update site=hospA1 round=19 updated=2
-2026-10-17T11:14:26Z event=request_keys site=hospA2 round=19 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:26Z event=update site=hospA2 round=19 updated=3
-2026-10-17T11:14:26Z event=round_complete site=- round=19 new_round=20 done=False
-2026-10-17T11:14:26Z event=request_keys site=hospB round=20 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:26Z event=update site=hospB round=20 updated=1
-2026-10-17T11:14:26Z event=request_keys site=hospA2 round=20 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:26Z event=update site=hospA2 round=20 updated=2
-2026-10-17T11:14:27Z event=request_keys site=hospA1 round=20 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:27Z event=update site=hospA1 round=20 updated=3
-2026-10-17T11:14:27Z event=round_complete site=- round=20 new_round=21 done=False
-2026-10-17T11:14:27Z event=request_keys site=hospB round=21 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:27Z event=update site=hospB round=21 updated=1
-2026-10-17T11:14:27Z event=request_keys site=hospA1 round=21 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:27Z event=update site=hospA1 round=21 updated=2
-2026-10-17T11:14:28Z event=request_keys site=hospA2 round=21 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:28Z event=update site=hospA2 round=21 updated=3
-2026-10-17T11:14:28Z event=round_complete site=- round=21 new_round=22 done=False
-2026-10-17T11:14:28Z event=request_keys site=hospB round=22 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:28Z event=update site=hospB round=22 updated=1
-2026-10-17T11:14:28Z event=request_keys site=hospA2 round=22 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:28Z event=update site=hospA2 round=22 updated=2
-2026-10-17T11:14:28Z event=request_keys site=hospA1 round=22 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:28Z event=update site=hospA1 round=22 updated=3
-2026-10-17T11:14:28Z event=round_complete site=- round=22 new_round=23 done=False
-2026-10-17T11:14:29Z event=request_keys site=hospB round=23 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:29Z event=update site=hospB round=23 updated=1
-2026-10-17T11:14:29Z event=request_keys site=hospA1 round=23 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:29Z event=update site=hospA1 round=23 updated=2
-2026-10-17T11:14:29Z event=request_keys site=hospA2 round=23 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:29Z event=update site=hospA2 round=23 updated=3
-2026-10-17T11:14:29Z event=round_complete site=- round=23 new_round=24 done=False
-2026-10-17T11:14:30Z event=request_keys site=hospB round=24 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:30Z event=update site=hospB round=24 updated=1
-2026-10-17T11:14:30Z event=request_keys site=hospA2 round=24 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:30Z event=update site=hospA2 round=24 updated=2
-2026-10-17T11:14:30Z event=request_keys site=hospA1 round=24 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:30Z event=update site=hospA1 round=24 updated=3
-2026-10-17T11:14:30Z event=round_complete site=- round=24 new_round=25 done=False
-2026-10-17T11:14:30Z event=request_keys site=hospB round=25 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:30Z event=update site=hospB round=25 updated=1
-2026-10-17T11:14:31Z event=request_keys site=hospA2 round=25 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:31Z event=update site=hospA2 round=25 updated=2
-2026-10-17T11:14:31Z event=request_keys site=hospA1 round=25 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:31Z event=update site=hospA1 round=25 updated=3
-2026-10-17T11:14:31Z event=round_complete site=- round=25 new_round=26 done=False
-2026-10-17T11:14:31Z event=request_keys site=hospB round=26 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:31Z event=update site=hospB round=26 updated=1
-2026-10-17T11:14:31Z event=request_keys site=hospA1 round=26 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:31Z event=update site=hospA1 round=26 updated=2
-2026-10-17T11:14:32Z event=request_keys site=hospA2 round=26 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:32Z event=update site=hospA2 round=26 updated=3
-2026-10-17T11:14:32Z event=round_complete site=- round=26 new_round=27 done=False
-2026-10-17T11:14:32Z event=request_keys site=hospB round=27 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:32Z event=update site=hospB round=27 updated=1
-2026-10-17T11:14:32Z event=request_keys site=hospA2 round=27 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:32Z event=update site=hospA2 round=27 updated=2
-2026-10-17T11:14:33Z event=request_keys site=hospA1 round=27 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:33Z event=update site=hospA1 round=27 updated=3
-2026-10-17T11:14:33Z event=round_complete site=- round=27 new_round=28 done=False
-2026-10-17T11:14:33Z event=request_keys site=hospB round=28 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:33Z event=update site=hospB round=28 updated=1
-2026-10-17T11:14:33Z event=request_keys site=hospA1 round=28 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:33Z event=update site=hospA1 round=28 updated=2
-2026-10-17T11:14:34Z event=request_keys site=hospA2 round=28 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:34Z event=update site=hospA2 round=28 updated=3
-2026-10-17T11:14:34Z event=round_complete site=- round=28 new_round=29 done=False
-2026-10-17T11:14:34Z event=request_keys site=hospB round=29 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:34Z event=update site=hospB round=29 updated=1
-2026-10-17T11:14:34Z event=request_keys site=hospA2 round=29 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:34Z event=update site=hospA2 round=29 updated=2
-2026-10-17T11:14:35Z event=request_keys site=hospA1 round=29 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:35Z event=update site=hospA1 round=29 updated=3
-2026-10-17T11:14:35Z event=round_complete site=- round=29 new_round=30 done=False
-2026-10-17T11:14:35Z event=request_keys site=hospB round=30 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:35Z event=update site=hospB round=30 updated=1
-2026-10-17T11:14:35Z event=request_keys site=hospA1 round=30 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:35Z event=update site=hospA1 round=30 updated=2
-2026-10-17T11:14:35Z event=request_keys site=hospA2 round=30 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:35Z event=update site=hospA2 round=30 updated=3
-2026-10-17T11:14:35Z event=round_complete site=- round=30 new_round=31 done=False
-2026-10-17T11:14:36Z event=request_keys site=hospA2 round=31 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:36Z event=update site=hospA2 round=31 updated=1
-2026-10-17T11:14:36Z event=request_keys site=hospB round=31 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:36Z event=update site=hospB round=31 updated=2
-2026-10-17T11:14:36Z event=request_keys site=hospA1 round=31 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:36Z event=update site=hospA1 round=31 updated=3
-2026-10-17T11:14:36Z event=round_complete site=- round=31 new_round=32 done=False
-2026-10-17T11:14:36Z event=request_keys site=hospB round=32 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:36Z event=update site=hospB round=32 updated=1
-2026-10-17T11:14:37Z event=request_keys site=hospA1 round=32 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:37Z event=update site=hospA1 round=32 updated=2
-2026-10-17T11:14:37Z event=request_keys site=hospA2 round=32 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:37Z event=update site=hospA2 round=32 updated=3
-2026-10-17T11:14:37Z event=round_complete site=- round=32 new_round=33 done=False
-2026-10-17T11:14:37Z event=request_keys site=hospB round=33 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:37Z event=update site=hospB round=33 updated=1
-2026-10-17T11:14:38Z event=request_keys site=hospA2 round=33 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:38Z event=update site=hospA2 round=33 updated=2
-2026-10-17T11:14:38Z event=request_keys site=hospA1 round=33 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:38Z event=update site=hospA1 round=33 updated=3
-2026-10-17T11:14:38Z event=round_complete site=- round=33 new_round=34 done=False
-2026-10-17T11:14:38Z event=request_keys site=hospB round=34 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:38Z event=update site=hospB round=34 updated=1
-2026-10-17T11:14:39Z event=request_keys site=hospA1 round=34 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:39Z event=update site=hospA1 round=34 updated=2
-2026-10-17T11:14:39Z event=request_keys site=hospA2 round=34 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:39Z event=update site=hospA2 round=34 updated=3
-2026-10-17T11:14:39Z event=round_complete site=- round=34 new_round=35 done=False
-2026-10-17T11:14:39Z event=request_keys site=hospB round=35 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:39Z event=update site=hospB round=35 updated=1
-2026-10-17T11:14:39Z event=request_keys site=hospA2 round=35 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:39Z event=update site=hospA2 round=35 updated=2
-2026-10-17T11:14:40Z event=request_keys site=hospA1 round=35 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:40Z event=update site=hospA1 round=35 updated=3
-2026-10-17T11:14:40Z event=round_complete site=- round=35 new_round=36 done=False
-2026-10-17T11:14:40Z event=request_keys site=hospB round=36 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:40Z event=update site=hospB round=36 updated=1
-2026-10-17T11:14:40Z event=request_keys site=hospA1 round=36 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:40Z event=update site=hospA1 round=36 updated=2
-2026-10-17T11:14:40Z event=request_keys site=hospA2 round=36 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:40Z event=update site=hospA2 round=36 updated=3
-2026-10-17T11:14:40Z event=round_complete site=- round=36 new_round=37 done=False
-2026-10-17T11:14:41Z event=request_keys site=hospB round=37 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:41Z event=update site=hospB round=37 updated=1
-2026-10-17T11:14:41Z event=request_keys site=hospA2 round=37 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:41Z event=update site=hospA2 round=37 updated=2
-2026-10-17T11:14:41Z event=request_keys site=hospA1 round=37 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:41Z event=update site=hospA1 round=37 updated=3
-2026-10-17T11:14:41Z event=round_complete site=- round=37 new_round=38 done=False
-2026-10-17T11:14:42Z event=request_keys site=hospB round=38 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:42Z event=update site=hospB round=38 updated=1
-2026-10-17T11:14:42Z event=request_keys site=hospA1 round=38 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:42Z event=update site=hospA1 round=38 updated=2
-2026-10-17T11:14:42Z event=request_keys site=hospA2 round=38 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:42Z event=update site=hospA2 round=38 updated=3
-2026-10-17T11:14:42Z event=round_complete site=- round=38 new_round=39 done=False
-2026-10-17T11:14:42Z event=request_keys site=hospB round=39 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:42Z event=update site=hospB round=39 updated=1
-2026-10-17T11:14:42Z event=request_keys site=hospA2 round=39 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:42Z event=update site=hospA2 round=39 updated=2
-2026-10-17T11:14:43Z event=request_keys site=hospA1 round=39 path=/update keys=b,n,round,site_id,w
-2026-10-17T11:14:43Z event=update site=hospA1 round=39 updated=3
-2026-10-17T11:14:43Z event=round_complete site=- round=39 new_round=40 done=True
+2026-10-17T14:52:54Z event=start site=- round=0 sites=hospA1,hospA2,hospB expected_rounds=40 restored=False done=False secure=False
+2026-10-17T14:52:54Z event=tls_disabled site=- round=- note=plain HTTP inside the docker network
+2026-10-17T14:52:55Z event=request_keys site=hospA1 round=- path=/stats keys=n,site_id,sum,sumsq
+2026-10-17T14:52:55Z event=stats site=hospA1 round=0 sites_stats=1
+2026-10-17T14:52:55Z event=request_keys site=hospA2 round=- path=/stats keys=n,site_id,sum,sumsq
+2026-10-17T14:52:55Z event=stats site=hospA2 round=0 sites_stats=2
+2026-10-17T14:52:56Z event=request_keys site=hospB round=- path=/stats keys=n,site_id,sum,sumsq
+2026-10-17T14:52:56Z event=stats site=hospB round=0 sites_stats=3
+2026-10-17T14:52:56Z event=norm_ready site=- round=0 total_n=373333
+2026-10-17T14:52:56Z event=request_keys site=hospB round=0 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:52:56Z event=update site=hospB round=0 updated=1
+2026-10-17T14:52:57Z event=request_keys site=hospA2 round=0 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:52:57Z event=update site=hospA2 round=0 updated=2
+2026-10-17T14:52:57Z event=request_keys site=hospA1 round=0 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:52:57Z event=update site=hospA1 round=0 updated=3
+2026-10-17T14:52:57Z event=round_complete site=- round=0 new_round=1 done=False
+2026-10-17T14:52:57Z event=request_keys site=hospB round=1 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:52:57Z event=update site=hospB round=1 updated=1
+2026-10-17T14:52:57Z event=request_keys site=hospA1 round=1 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:52:57Z event=update site=hospA1 round=1 updated=2
+2026-10-17T14:52:57Z event=request_keys site=hospA2 round=1 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:52:57Z event=update site=hospA2 round=1 updated=3
+2026-10-17T14:52:57Z event=round_complete site=- round=1 new_round=2 done=False
+2026-10-17T14:52:58Z event=request_keys site=hospB round=2 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:52:58Z event=update site=hospB round=2 updated=1
+2026-10-17T14:52:58Z event=request_keys site=hospA2 round=2 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:52:58Z event=update site=hospA2 round=2 updated=2
+2026-10-17T14:52:58Z event=request_keys site=hospA1 round=2 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:52:58Z event=update site=hospA1 round=2 updated=3
+2026-10-17T14:52:58Z event=round_complete site=- round=2 new_round=3 done=False
+2026-10-17T14:52:58Z event=request_keys site=hospB round=3 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:52:58Z event=update site=hospB round=3 updated=1
+2026-10-17T14:52:58Z event=request_keys site=hospA1 round=3 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:52:58Z event=update site=hospA1 round=3 updated=2
+2026-10-17T14:52:58Z event=request_keys site=hospA2 round=3 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:52:58Z event=update site=hospA2 round=3 updated=3
+2026-10-17T14:52:58Z event=round_complete site=- round=3 new_round=4 done=False
+2026-10-17T14:52:59Z event=request_keys site=hospA2 round=4 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:52:59Z event=update site=hospA2 round=4 updated=1
+2026-10-17T14:52:59Z event=request_keys site=hospB round=4 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:52:59Z event=update site=hospB round=4 updated=2
+2026-10-17T14:52:59Z event=request_keys site=hospA1 round=4 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:52:59Z event=update site=hospA1 round=4 updated=3
+2026-10-17T14:52:59Z event=round_complete site=- round=4 new_round=5 done=False
+2026-10-17T14:52:59Z event=request_keys site=hospA1 round=5 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:52:59Z event=update site=hospA1 round=5 updated=1
+2026-10-17T14:52:59Z event=request_keys site=hospB round=5 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:52:59Z event=update site=hospB round=5 updated=2
+2026-10-17T14:52:59Z event=request_keys site=hospA2 round=5 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:52:59Z event=update site=hospA2 round=5 updated=3
+2026-10-17T14:52:59Z event=round_complete site=- round=5 new_round=6 done=False
+2026-10-17T14:53:00Z event=request_keys site=hospA2 round=6 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:00Z event=update site=hospA2 round=6 updated=1
+2026-10-17T14:53:00Z event=request_keys site=hospB round=6 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:00Z event=update site=hospB round=6 updated=2
+2026-10-17T14:53:00Z event=request_keys site=hospA1 round=6 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:00Z event=update site=hospA1 round=6 updated=3
+2026-10-17T14:53:00Z event=round_complete site=- round=6 new_round=7 done=False
+2026-10-17T14:53:00Z event=request_keys site=hospA1 round=7 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:00Z event=update site=hospA1 round=7 updated=1
+2026-10-17T14:53:00Z event=request_keys site=hospA2 round=7 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:00Z event=update site=hospA2 round=7 updated=2
+2026-10-17T14:53:01Z event=request_keys site=hospB round=7 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:01Z event=update site=hospB round=7 updated=3
+2026-10-17T14:53:01Z event=round_complete site=- round=7 new_round=8 done=False
+2026-10-17T14:53:01Z event=request_keys site=hospB round=8 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:01Z event=update site=hospB round=8 updated=1
+2026-10-17T14:53:01Z event=request_keys site=hospA1 round=8 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:01Z event=update site=hospA1 round=8 updated=2
+2026-10-17T14:53:01Z event=request_keys site=hospA2 round=8 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:01Z event=update site=hospA2 round=8 updated=3
+2026-10-17T14:53:01Z event=round_complete site=- round=8 new_round=9 done=False
+2026-10-17T14:53:01Z event=request_keys site=hospA2 round=9 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:01Z event=update site=hospA2 round=9 updated=1
+2026-10-17T14:53:02Z event=request_keys site=hospB round=9 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:02Z event=update site=hospB round=9 updated=2
+2026-10-17T14:53:02Z event=request_keys site=hospA1 round=9 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:02Z event=update site=hospA1 round=9 updated=3
+2026-10-17T14:53:02Z event=round_complete site=- round=9 new_round=10 done=False
+2026-10-17T14:53:02Z event=request_keys site=hospA1 round=10 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:02Z event=update site=hospA1 round=10 updated=1
+2026-10-17T14:53:02Z event=request_keys site=hospA2 round=10 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:02Z event=update site=hospA2 round=10 updated=2
+2026-10-17T14:53:02Z event=request_keys site=hospB round=10 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:02Z event=update site=hospB round=10 updated=3
+2026-10-17T14:53:02Z event=round_complete site=- round=10 new_round=11 done=False
+2026-10-17T14:53:02Z event=request_keys site=hospB round=11 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:02Z event=update site=hospB round=11 updated=1
+2026-10-17T14:53:03Z event=request_keys site=hospA1 round=11 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:03Z event=update site=hospA1 round=11 updated=2
+2026-10-17T14:53:03Z event=request_keys site=hospA2 round=11 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:03Z event=update site=hospA2 round=11 updated=3
+2026-10-17T14:53:03Z event=round_complete site=- round=11 new_round=12 done=False
+2026-10-17T14:53:03Z event=request_keys site=hospA2 round=12 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:03Z event=update site=hospA2 round=12 updated=1
+2026-10-17T14:53:04Z event=request_keys site=hospB round=12 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:04Z event=update site=hospB round=12 updated=2
+2026-10-17T14:53:04Z event=request_keys site=hospA1 round=12 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:04Z event=update site=hospA1 round=12 updated=3
+2026-10-17T14:53:04Z event=round_complete site=- round=12 new_round=13 done=False
+2026-10-17T14:53:04Z event=request_keys site=hospA1 round=13 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:04Z event=update site=hospA1 round=13 updated=1
+2026-10-17T14:53:04Z event=request_keys site=hospA2 round=13 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:04Z event=update site=hospA2 round=13 updated=2
+2026-10-17T14:53:04Z event=request_keys site=hospB round=13 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:04Z event=update site=hospB round=13 updated=3
+2026-10-17T14:53:04Z event=round_complete site=- round=13 new_round=14 done=False
+2026-10-17T14:53:04Z event=request_keys site=hospB round=14 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:04Z event=update site=hospB round=14 updated=1
+2026-10-17T14:53:05Z event=request_keys site=hospA1 round=14 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:05Z event=update site=hospA1 round=14 updated=2
+2026-10-17T14:53:05Z event=request_keys site=hospA2 round=14 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:05Z event=update site=hospA2 round=14 updated=3
+2026-10-17T14:53:05Z event=round_complete site=- round=14 new_round=15 done=False
+2026-10-17T14:53:05Z event=request_keys site=hospA2 round=15 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:05Z event=update site=hospA2 round=15 updated=1
+2026-10-17T14:53:05Z event=request_keys site=hospB round=15 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:05Z event=update site=hospB round=15 updated=2
+2026-10-17T14:53:06Z event=request_keys site=hospA1 round=15 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:06Z event=update site=hospA1 round=15 updated=3
+2026-10-17T14:53:06Z event=round_complete site=- round=15 new_round=16 done=False
+2026-10-17T14:53:06Z event=request_keys site=hospA1 round=16 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:06Z event=update site=hospA1 round=16 updated=1
+2026-10-17T14:53:06Z event=request_keys site=hospA2 round=16 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:06Z event=update site=hospA2 round=16 updated=2
+2026-10-17T14:53:06Z event=request_keys site=hospB round=16 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:06Z event=update site=hospB round=16 updated=3
+2026-10-17T14:53:06Z event=round_complete site=- round=16 new_round=17 done=False
+2026-10-17T14:53:06Z event=request_keys site=hospB round=17 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:06Z event=update site=hospB round=17 updated=1
+2026-10-17T14:53:07Z event=request_keys site=hospA2 round=17 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:07Z event=update site=hospA2 round=17 updated=2
+2026-10-17T14:53:07Z event=request_keys site=hospA1 round=17 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:07Z event=update site=hospA1 round=17 updated=3
+2026-10-17T14:53:07Z event=round_complete site=- round=17 new_round=18 done=False
+2026-10-17T14:53:07Z event=request_keys site=hospA1 round=18 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:07Z event=update site=hospA1 round=18 updated=1
+2026-10-17T14:53:07Z event=request_keys site=hospB round=18 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:07Z event=update site=hospB round=18 updated=2
+2026-10-17T14:53:07Z event=request_keys site=hospA2 round=18 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:07Z event=update site=hospA2 round=18 updated=3
+2026-10-17T14:53:07Z event=round_complete site=- round=18 new_round=19 done=False
+2026-10-17T14:53:08Z event=request_keys site=hospA2 round=19 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:08Z event=update site=hospA2 round=19 updated=1
+2026-10-17T14:53:08Z event=request_keys site=hospA1 round=19 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:08Z event=update site=hospA1 round=19 updated=2
+2026-10-17T14:53:08Z event=request_keys site=hospB round=19 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:08Z event=update site=hospB round=19 updated=3
+2026-10-17T14:53:08Z event=round_complete site=- round=19 new_round=20 done=False
+2026-10-17T14:53:08Z event=request_keys site=hospB round=20 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:08Z event=update site=hospB round=20 updated=1
+2026-10-17T14:53:08Z event=request_keys site=hospA2 round=20 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:08Z event=update site=hospA2 round=20 updated=2
+2026-10-17T14:53:09Z event=request_keys site=hospA1 round=20 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:09Z event=update site=hospA1 round=20 updated=3
+2026-10-17T14:53:09Z event=round_complete site=- round=20 new_round=21 done=False
+2026-10-17T14:53:09Z event=request_keys site=hospA1 round=21 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:09Z event=update site=hospA1 round=21 updated=1
+2026-10-17T14:53:09Z event=request_keys site=hospB round=21 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:09Z event=update site=hospB round=21 updated=2
+2026-10-17T14:53:09Z event=request_keys site=hospA2 round=21 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:09Z event=update site=hospA2 round=21 updated=3
+2026-10-17T14:53:09Z event=round_complete site=- round=21 new_round=22 done=False
+2026-10-17T14:53:09Z event=request_keys site=hospA2 round=22 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:09Z event=update site=hospA2 round=22 updated=1
+2026-10-17T14:53:10Z event=request_keys site=hospB round=22 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:10Z event=update site=hospB round=22 updated=2
+2026-10-17T14:53:10Z event=request_keys site=hospA1 round=22 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:10Z event=update site=hospA1 round=22 updated=3
+2026-10-17T14:53:10Z event=round_complete site=- round=22 new_round=23 done=False
+2026-10-17T14:53:10Z event=request_keys site=hospB round=23 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:10Z event=update site=hospB round=23 updated=1
+2026-10-17T14:53:10Z event=request_keys site=hospA1 round=23 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:10Z event=update site=hospA1 round=23 updated=2
+2026-10-17T14:53:10Z event=request_keys site=hospA2 round=23 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:10Z event=update site=hospA2 round=23 updated=3
+2026-10-17T14:53:10Z event=round_complete site=- round=23 new_round=24 done=False
+2026-10-17T14:53:10Z event=request_keys site=hospA2 round=24 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:10Z event=update site=hospA2 round=24 updated=1
+2026-10-17T14:53:11Z event=request_keys site=hospA1 round=24 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:11Z event=update site=hospA1 round=24 updated=2
+2026-10-17T14:53:11Z event=request_keys site=hospB round=24 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:11Z event=update site=hospB round=24 updated=3
+2026-10-17T14:53:11Z event=round_complete site=- round=24 new_round=25 done=False
+2026-10-17T14:53:11Z event=request_keys site=hospB round=25 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:11Z event=update site=hospB round=25 updated=1
+2026-10-17T14:53:11Z event=request_keys site=hospA2 round=25 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:11Z event=update site=hospA2 round=25 updated=2
+2026-10-17T14:53:11Z event=request_keys site=hospA1 round=25 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:11Z event=update site=hospA1 round=25 updated=3
+2026-10-17T14:53:11Z event=round_complete site=- round=25 new_round=26 done=False
+2026-10-17T14:53:12Z event=request_keys site=hospA1 round=26 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:12Z event=update site=hospA1 round=26 updated=1
+2026-10-17T14:53:12Z event=request_keys site=hospB round=26 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:12Z event=update site=hospB round=26 updated=2
+2026-10-17T14:53:12Z event=request_keys site=hospA2 round=26 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:12Z event=update site=hospA2 round=26 updated=3
+2026-10-17T14:53:12Z event=round_complete site=- round=26 new_round=27 done=False
+2026-10-17T14:53:12Z event=request_keys site=hospA2 round=27 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:12Z event=update site=hospA2 round=27 updated=1
+2026-10-17T14:53:12Z event=request_keys site=hospA1 round=27 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:12Z event=update site=hospA1 round=27 updated=2
+2026-10-17T14:53:13Z event=request_keys site=hospB round=27 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:13Z event=update site=hospB round=27 updated=3
+2026-10-17T14:53:13Z event=round_complete site=- round=27 new_round=28 done=False
+2026-10-17T14:53:13Z event=request_keys site=hospB round=28 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:13Z event=update site=hospB round=28 updated=1
+2026-10-17T14:53:13Z event=request_keys site=hospA2 round=28 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:13Z event=update site=hospA2 round=28 updated=2
+2026-10-17T14:53:13Z event=request_keys site=hospA1 round=28 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:13Z event=update site=hospA1 round=28 updated=3
+2026-10-17T14:53:13Z event=round_complete site=- round=28 new_round=29 done=False
+2026-10-17T14:53:13Z event=request_keys site=hospA1 round=29 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:13Z event=update site=hospA1 round=29 updated=1
+2026-10-17T14:53:14Z event=request_keys site=hospB round=29 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:14Z event=update site=hospB round=29 updated=2
+2026-10-17T14:53:14Z event=request_keys site=hospA2 round=29 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:14Z event=update site=hospA2 round=29 updated=3
+2026-10-17T14:53:14Z event=round_complete site=- round=29 new_round=30 done=False
+2026-10-17T14:53:14Z event=request_keys site=hospB round=30 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:14Z event=update site=hospB round=30 updated=1
+2026-10-17T14:53:14Z event=request_keys site=hospA2 round=30 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:14Z event=update site=hospA2 round=30 updated=2
+2026-10-17T14:53:14Z event=request_keys site=hospA1 round=30 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:14Z event=update site=hospA1 round=30 updated=3
+2026-10-17T14:53:14Z event=round_complete site=- round=30 new_round=31 done=False
+2026-10-17T14:53:14Z event=request_keys site=hospB round=31 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:14Z event=update site=hospB round=31 updated=1
+2026-10-17T14:53:14Z event=request_keys site=hospA1 round=31 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:14Z event=update site=hospA1 round=31 updated=2
+2026-10-17T14:53:15Z event=request_keys site=hospA2 round=31 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:15Z event=update site=hospA2 round=31 updated=3
+2026-10-17T14:53:15Z event=round_complete site=- round=31 new_round=32 done=False
+2026-10-17T14:53:15Z event=request_keys site=hospA2 round=32 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:15Z event=update site=hospA2 round=32 updated=1
+2026-10-17T14:53:15Z event=request_keys site=hospB round=32 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:15Z event=update site=hospB round=32 updated=2
+2026-10-17T14:53:15Z event=request_keys site=hospA1 round=32 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:15Z event=update site=hospA1 round=32 updated=3
+2026-10-17T14:53:15Z event=round_complete site=- round=32 new_round=33 done=False
+2026-10-17T14:53:15Z event=request_keys site=hospA1 round=33 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:15Z event=update site=hospA1 round=33 updated=1
+2026-10-17T14:53:16Z event=request_keys site=hospB round=33 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:16Z event=update site=hospB round=33 updated=2
+2026-10-17T14:53:16Z event=request_keys site=hospA2 round=33 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:16Z event=update site=hospA2 round=33 updated=3
+2026-10-17T14:53:16Z event=round_complete site=- round=33 new_round=34 done=False
+2026-10-17T14:53:16Z event=request_keys site=hospA2 round=34 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:16Z event=update site=hospA2 round=34 updated=1
+2026-10-17T14:53:16Z event=request_keys site=hospB round=34 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:16Z event=update site=hospB round=34 updated=2
+2026-10-17T14:53:16Z event=request_keys site=hospA1 round=34 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:16Z event=update site=hospA1 round=34 updated=3
+2026-10-17T14:53:16Z event=round_complete site=- round=34 new_round=35 done=False
+2026-10-17T14:53:17Z event=request_keys site=hospA1 round=35 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:17Z event=update site=hospA1 round=35 updated=1
+2026-10-17T14:53:17Z event=request_keys site=hospA2 round=35 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:17Z event=update site=hospA2 round=35 updated=2
+2026-10-17T14:53:17Z event=request_keys site=hospB round=35 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:17Z event=update site=hospB round=35 updated=3
+2026-10-17T14:53:17Z event=round_complete site=- round=35 new_round=36 done=False
+2026-10-17T14:53:17Z event=request_keys site=hospB round=36 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:17Z event=update site=hospB round=36 updated=1
+2026-10-17T14:53:17Z event=request_keys site=hospA1 round=36 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:17Z event=update site=hospA1 round=36 updated=2
+2026-10-17T14:53:18Z event=request_keys site=hospA2 round=36 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:18Z event=update site=hospA2 round=36 updated=3
+2026-10-17T14:53:18Z event=round_complete site=- round=36 new_round=37 done=False
+2026-10-17T14:53:18Z event=request_keys site=hospA2 round=37 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:18Z event=update site=hospA2 round=37 updated=1
+2026-10-17T14:53:18Z event=request_keys site=hospB round=37 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:18Z event=update site=hospB round=37 updated=2
+2026-10-17T14:53:18Z event=request_keys site=hospA1 round=37 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:18Z event=update site=hospA1 round=37 updated=3
+2026-10-17T14:53:18Z event=round_complete site=- round=37 new_round=38 done=False
+2026-10-17T14:53:19Z event=request_keys site=hospA1 round=38 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:19Z event=update site=hospA1 round=38 updated=1
+2026-10-17T14:53:19Z event=request_keys site=hospA2 round=38 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:19Z event=update site=hospA2 round=38 updated=2
+2026-10-17T14:53:19Z event=request_keys site=hospB round=38 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:19Z event=update site=hospB round=38 updated=3
+2026-10-17T14:53:19Z event=round_complete site=- round=38 new_round=39 done=False
+2026-10-17T14:53:19Z event=request_keys site=hospB round=39 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:19Z event=update site=hospB round=39 updated=1
+2026-10-17T14:53:19Z event=request_keys site=hospA1 round=39 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:19Z event=update site=hospA1 round=39 updated=2
+2026-10-17T14:53:19Z event=request_keys site=hospA2 round=39 path=/update keys=b,n,round,site_id,w
+2026-10-17T14:53:19Z event=update site=hospA2 round=39 updated=3
+2026-10-17T14:53:19Z event=round_complete site=- round=39 new_round=40 done=True

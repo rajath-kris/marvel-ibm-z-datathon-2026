@@ -1,50 +1,50 @@
-2026-10-17T11:14:48Z event=start site=hospA1 round=- mode=real lib=/app/lib lib_version=? has_rate_fns=True secure=True sites=hospA1,hospA2,hospB expected_rounds=40 port=8100
-2026-10-17T11:14:48Z event=aggregator_healthy site=hospA1 round=-
-2026-10-17T11:14:48Z event=data_loaded site=hospA1 round=- rows=310792 features=138 mode=real stub=False nan_free=True seconds=0.1
-2026-10-17T11:14:48Z event=eval_data_loaded site=hospA1 round=- eval=hospA1.npz eval_patients=8134 eval_rows=310792 retune=hospA1.npz retune_patients=8134 retune_rows=310792
-2026-10-17T11:14:48Z event=borrowed_model_loaded site=hospA1 round=- features=138 feature_names_match=True
-2026-10-17T11:14:48Z event=stored_thresholds site=hospA1 round=- borrowed=0.5168503567531072 federated=0.428311566223493 budget=25
-2026-10-17T11:14:48Z event=train_cfg site=hospA1 round=- lr=0.1 epochs=3 l2=0.001 class_weight=30.0
-2026-10-17T11:14:48Z event=stats_posted site=hospA1 round=- secure=True
-2026-10-17T11:14:50Z event=norm_ready site=hospA1 round=-
-2026-10-17T11:14:51Z event=update_posted site=hospA1 round=0 duplicate=False train_seconds=0.54
-2026-10-17T11:14:51Z event=update_posted site=hospA1 round=1 duplicate=False train_seconds=0.69
-2026-10-17T11:14:52Z event=update_posted site=hospA1 round=2 duplicate=False train_seconds=0.53
-2026-10-17T11:14:53Z event=update_posted site=hospA1 round=3 duplicate=False train_seconds=0.55
-2026-10-17T11:14:54Z event=update_posted site=hospA1 round=4 duplicate=False train_seconds=0.58
-2026-10-17T11:14:55Z event=update_posted site=hospA1 round=5 duplicate=False train_seconds=0.62
-2026-10-17T11:14:56Z event=update_posted site=hospA1 round=6 duplicate=False train_seconds=0.58
-2026-10-17T11:14:56Z event=update_posted site=hospA1 round=7 duplicate=False train_seconds=0.51
-2026-10-17T11:14:58Z event=update_posted site=hospA1 round=8 duplicate=False train_seconds=0.61
-2026-10-17T11:14:58Z event=update_posted site=hospA1 round=9 duplicate=False train_seconds=0.59
-2026-10-17T11:14:59Z event=update_posted site=hospA1 round=10 duplicate=False train_seconds=0.58
-2026-10-17T11:15:00Z event=update_posted site=hospA1 round=11 duplicate=False train_seconds=0.56
-2026-10-17T11:15:01Z event=update_posted site=hospA1 round=12 duplicate=False train_seconds=0.55
-2026-10-17T11:15:02Z event=update_posted site=hospA1 round=13 duplicate=False train_seconds=0.65
-2026-10-17T11:15:03Z event=update_posted site=hospA1 round=14 duplicate=False train_seconds=0.54
-2026-10-17T11:15:03Z event=update_posted site=hospA1 round=15 duplicate=False train_seconds=0.59
-2026-10-17T11:15:04Z event=update_posted site=hospA1 round=16 duplicate=False train_seconds=0.54
-2026-10-17T11:15:05Z event=update_posted site=hospA1 round=17 duplicate=False train_seconds=0.53
-2026-10-17T11:15:06Z event=update_posted site=hospA1 round=18 duplicate=False train_seconds=0.64
-2026-10-17T11:15:07Z event=update_posted site=hospA1 round=19 duplicate=False train_seconds=0.57
-2026-10-17T11:15:08Z event=update_posted site=hospA1 round=20 duplicate=False train_seconds=0.58
-2026-10-17T11:15:09Z event=update_posted site=hospA1 round=21 duplicate=False train_seconds=0.57
-2026-10-17T11:15:10Z event=update_posted site=hospA1 round=22 duplicate=False train_seconds=0.73
-2026-10-17T11:15:11Z event=update_posted site=hospA1 round=23 duplicate=False train_seconds=0.62
-2026-10-17T11:15:11Z event=update_posted site=hospA1 round=24 duplicate=False train_seconds=0.77
-2026-10-17T11:15:12Z event=update_posted site=hospA1 round=25 duplicate=False train_seconds=0.57
-2026-10-17T11:15:13Z event=update_posted site=hospA1 round=26 duplicate=False train_seconds=0.55
-2026-10-17T11:15:14Z event=update_posted site=hospA1 round=27 duplicate=False train_seconds=0.56
-2026-10-17T11:15:15Z event=update_posted site=hospA1 round=28 duplicate=False train_seconds=0.54
-2026-10-17T11:15:15Z event=update_posted site=hospA1 round=29 duplicate=False train_seconds=0.56
-2026-10-17T11:15:17Z event=update_posted site=hospA1 round=30 duplicate=False train_seconds=0.58
-2026-10-17T11:15:17Z event=update_posted site=hospA1 round=31 duplicate=False train_seconds=0.53
-2026-10-17T11:15:18Z event=update_posted site=hospA1 round=32 duplicate=False train_seconds=0.59
-2026-10-17T11:15:19Z event=update_posted site=hospA1 round=33 duplicate=False train_seconds=0.58
-2026-10-17T11:15:20Z event=update_posted site=hospA1 round=34 duplicate=False train_seconds=0.56
-2026-10-17T11:15:21Z event=update_posted site=hospA1 round=35 duplicate=False train_seconds=0.53
-2026-10-17T11:15:22Z event=update_posted site=hospA1 round=36 duplicate=False train_seconds=0.54
-2026-10-17T11:15:22Z event=update_posted site=hospA1 round=37 duplicate=False train_seconds=0.54
-2026-10-17T11:15:23Z event=update_posted site=hospA1 round=38 duplicate=False train_seconds=0.56
-2026-10-17T11:15:24Z event=update_posted site=hospA1 round=39 duplicate=False train_seconds=0.55
-2026-10-17T11:15:25Z event=final_model_written site=hospA1 round=40 path=/out/final_model.json
+2026-10-17T14:53:23Z event=start site=hospA1 round=- mode=real lib=/app/lib lib_version=? has_rate_fns=True secure=True sites=hospA1,hospA2,hospB expected_rounds=40 port=8100
+2026-10-17T14:53:23Z event=aggregator_healthy site=hospA1 round=-
+2026-10-17T14:53:23Z event=data_loaded site=hospA1 round=- rows=163077 features=138 mode=real stub=False nan_free=True seconds=0.1
+2026-10-17T14:53:23Z event=eval_data_loaded site=hospA1 round=- eval=hospA1.npz eval_patients=4296 eval_rows=163077 retune=hospA1.npz retune_patients=4296 retune_rows=163077
+2026-10-17T14:53:23Z event=borrowed_model_loaded site=hospA1 round=- features=138 feature_names_match=True
+2026-10-17T14:53:23Z event=stored_thresholds site=hospA1 round=- borrowed=0.5168503567531072 federated=0.428311566223493 budget=25
+2026-10-17T14:53:23Z event=train_cfg site=hospA1 round=- lr=0.1 epochs=3 l2=0.001 class_weight=30.0
+2026-10-17T14:53:23Z event=stats_posted site=hospA1 round=- secure=True
+2026-10-17T14:53:25Z event=norm_ready site=hospA1 round=-
+2026-10-17T14:53:25Z event=update_posted site=hospA1 round=0 duplicate=False train_seconds=0.26
+2026-10-17T14:53:26Z event=update_posted site=hospA1 round=1 duplicate=False train_seconds=0.28
+2026-10-17T14:53:26Z event=update_posted site=hospA1 round=2 duplicate=False train_seconds=0.26
+2026-10-17T14:53:27Z event=update_posted site=hospA1 round=3 duplicate=False train_seconds=0.26
+2026-10-17T14:53:28Z event=update_posted site=hospA1 round=4 duplicate=False train_seconds=0.26
+2026-10-17T14:53:28Z event=update_posted site=hospA1 round=5 duplicate=False train_seconds=0.24
+2026-10-17T14:53:29Z event=update_posted site=hospA1 round=6 duplicate=False train_seconds=0.30
+2026-10-17T14:53:29Z event=update_posted site=hospA1 round=7 duplicate=False train_seconds=0.28
+2026-10-17T14:53:30Z event=update_posted site=hospA1 round=8 duplicate=False train_seconds=0.25
+2026-10-17T14:53:30Z event=update_posted site=hospA1 round=9 duplicate=False train_seconds=0.27
+2026-10-17T14:53:31Z event=update_posted site=hospA1 round=10 duplicate=False train_seconds=0.30
+2026-10-17T14:53:31Z event=update_posted site=hospA1 round=11 duplicate=False train_seconds=0.25
+2026-10-17T14:53:32Z event=update_posted site=hospA1 round=12 duplicate=False train_seconds=0.28
+2026-10-17T14:53:33Z event=update_posted site=hospA1 round=13 duplicate=False train_seconds=0.26
+2026-10-17T14:53:33Z event=update_posted site=hospA1 round=14 duplicate=False train_seconds=0.22
+2026-10-17T14:53:34Z event=update_posted site=hospA1 round=15 duplicate=False train_seconds=0.25
+2026-10-17T14:53:35Z event=update_posted site=hospA1 round=16 duplicate=False train_seconds=0.26
+2026-10-17T14:53:35Z event=update_posted site=hospA1 round=17 duplicate=False train_seconds=0.24
+2026-10-17T14:53:36Z event=update_posted site=hospA1 round=18 duplicate=False train_seconds=0.26
+2026-10-17T14:53:36Z event=update_posted site=hospA1 round=19 duplicate=False train_seconds=0.27
+2026-10-17T14:53:37Z event=update_posted site=hospA1 round=20 duplicate=False train_seconds=0.25
+2026-10-17T14:53:37Z event=update_posted site=hospA1 round=21 duplicate=False train_seconds=0.25
+2026-10-17T14:53:38Z event=update_posted site=hospA1 round=22 duplicate=False train_seconds=0.30
+2026-10-17T14:53:39Z event=update_posted site=hospA1 round=23 duplicate=False train_seconds=0.26
+2026-10-17T14:53:39Z event=update_posted site=hospA1 round=24 duplicate=False train_seconds=0.26
+2026-10-17T14:53:40Z event=update_posted site=hospA1 round=25 duplicate=False train_seconds=0.29
+2026-10-17T14:53:41Z event=update_posted site=hospA1 round=26 duplicate=False train_seconds=0.25
+2026-10-17T14:53:41Z event=update_posted site=hospA1 round=27 duplicate=False train_seconds=0.25
+2026-10-17T14:53:42Z event=update_posted site=hospA1 round=28 duplicate=False train_seconds=0.29
+2026-10-17T14:53:42Z event=update_posted site=hospA1 round=29 duplicate=False train_seconds=0.25
+2026-10-17T14:53:43Z event=update_posted site=hospA1 round=30 duplicate=False train_seconds=0.27
+2026-10-17T14:53:43Z event=update_posted site=hospA1 round=31 duplicate=False train_seconds=0.28
+2026-10-17T14:53:44Z event=update_posted site=hospA1 round=32 duplicate=False train_seconds=0.24
+2026-10-17T14:53:44Z event=update_posted site=hospA1 round=33 duplicate=False train_seconds=0.28
+2026-10-17T14:53:45Z event=update_posted site=hospA1 round=34 duplicate=False train_seconds=0.28
+2026-10-17T14:53:46Z event=update_posted site=hospA1 round=35 duplicate=False train_seconds=0.26
+2026-10-17T14:53:46Z event=update_posted site=hospA1 round=36 duplicate=False train_seconds=0.26
+2026-10-17T14:53:47Z event=update_posted site=hospA1 round=37 duplicate=False train_seconds=0.27
+2026-10-17T14:53:47Z event=update_posted site=hospA1 round=38 duplicate=False train_seconds=0.25
+2026-10-17T14:53:48Z event=update_posted site=hospA1 round=39 duplicate=False train_seconds=0.27
+2026-10-17T14:53:48Z event=final_model_written site=hospA1 round=40 path=/out/final_model.json

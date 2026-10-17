@@ -119,6 +119,19 @@ class MaskedUpdateLooksRandom(unittest.TestCase):
         self.assertEqual(sum(x == y for x, y in zip(a, b)), 0)
 
 
+    def test_masks_never_repeat_across_runs(self):
+        """Same seeds, same round, same values, different session id -> no masked value repeats, so two runs'
+        messages cannot be subtracted to cancel the masks (this leaked the update difference before the fix)."""
+        rng = random.Random(17)
+        seeds = make_seeds(SITES, rng)
+        vals = [rng.gauss(0, 1) * 1e5 for _ in range(D)]
+        a = fs.mask_vector("hospB", SITES, seeds["hospB"], "sessionA0000000|round-39", vals)
+        b = fs.mask_vector("hospB", SITES, seeds["hospB"], "sessionB0000000|round-39", vals)
+        diff = [fs.decode((x - y) % fs.MOD) for x, y in zip(a, b)]
+        self.assertEqual(sum(x == y for x, y in zip(a, b)), 0)
+        self.assertGreater(min(abs(d) for d in diff), 1e9)   # the difference is mask noise, not 0 (= vals - vals)
+
+
 class Limits(unittest.TestCase):
     def test_missing_site_gives_garbage(self):
         """No dropout recovery: if one site's update is missing the masks do not cancel."""

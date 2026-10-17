@@ -15,7 +15,7 @@ NETWORK=fedsecure-net
 source ./demo_lib.sh
 HOST_PORT[hospB]=8113
 # the main demo and Reju's sweep may run alongside; the memory floor still applies
-ALLOW_JOBS="${ALLOW_JOBS:+$ALLOW_JOBS,}fedsepsis-aggregator,hospA,hospB,fedcurve,fedseed_[0-9]+"
+ALLOW_JOBS="${ALLOW_JOBS:+$ALLOW_JOBS,}fedsepsis-aggregator,hospA,hospB,rev-fedsepsis-aggregator,rev-hospA,rev-hospB,hard-.*,fedcurve,fedseed_[0-9]+"
 
 require_token
 load_train_config
@@ -31,14 +31,17 @@ if [ "$(cat "$RUN_DIR/split/TAG" 2>/dev/null)" != "$SPLIT_TAG" ]; then
   mkdir -p "$RUN_DIR/split"
   docker run --rm --cpus 1 --memory 2g -v "$REAL_DIR/site_big.npz":/in/site_big.npz:ro -v "$RUN_DIR/split":/out \
     -v "$PWD/tools":/tools:ro ${SPLIT_MAP:+-v "$SPLIT_MAP":/map.json:ro} --entrypoint /opt/venv/bin/python "$BASE_IMAGE" \
-    -I /tools/split_site.py /in/site_big.npz /out hospA1 hospA2 ${SPLIT_MAP:+--map /map.json}
+    -I /tools/split_site.py /in/site_big.npz /out hospA1 hospA2 ${SPLIT_MAP:+--map /map.json --drop-unmapped}
   echo "$SPLIT_TAG" > "$RUN_DIR/split/TAG"
 else
   echo "keeping split ($SPLIT_TAG)"
 fi
 
 if [ "$SECURE" = 1 ]; then
-  ./setup_pairs.sh "${SITES[@]}"
+  # fresh pair seeds AND a fresh session id for every secure run, so masks never repeat across runs
+  ./setup_pairs.sh --rotate "${SITES[@]}"
+  export SECURE_SESSION=$(python3 -c 'import secrets; print(secrets.token_hex(16))')
+  echo "secure session: new random id (not printed); pair seeds rotated"
 fi
 
 T0=$(date +%s.%N)

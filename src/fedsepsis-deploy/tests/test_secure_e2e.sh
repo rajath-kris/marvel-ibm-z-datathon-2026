@@ -54,8 +54,21 @@ print(f"ASSERT max |masked - plain| <= 1e-9 : {d <= 1e-9}  ({d:.3e})")
 PY
   echo; echo "### demo summary (demo/secure_summary.json)"
   mkdir -p demo
+  # patient count per site, read inside each site's own container from its own training file
+  python3 - run/secure/split/split_counts.json "$(docker exec sec-hospB /opt/venv/bin/python -c "import numpy as np; print(len(np.unique(np.load('/data/site_small.npz', allow_pickle=False)['patient_id'])))")" "${SPLIT_MAP:-}" > run/secure/site_counts.json <<'PY'
+import json, sys
+c = json.load(open(sys.argv[1])); mapped = bool(sys.argv[3])
+out = {s: c[s] for s in ("hospA1", "hospA2")}
+out["hospB"] = {"patients": int(sys.argv[2])}
+out["_description"] = {"hospA1": "hospital A, medical ICU" if mapped else "hospital A, random half",
+                       "hospA2": "hospital A, surgical ICU" if mapped else "hospital A, random half",
+                       "hospB": "hospital B, the small hospital (10% subset, training part)",
+                       "left_out": f"{c['left_out_patients']} hospital A patients with unknown ICU unit" if mapped else "none"}
+print(json.dumps(out))
+PY
   python3 tools/secure_summary.py results/secure3-masked results/secure3-plain run/secure/state/secure_seen.json \
-    "$(cat run/secure/split/TAG)" demo/secure_summary.json
+    "$(cat run/secure/split/TAG)" demo/secure_summary.json run/secure/site_counts.json \
+    "sec-* containers on the LinuxONE VM, commit $(cat run/secure/COMMIT 2>/dev/null || echo unknown), fedsepsis 0.2.0"
   echo; echo "### for reference: 3-site plain vs the 2-site model_global.json (different sites, so NOT expected to match)"
   python3 tools/compare_models.py results/secure3-plain/final_model.json ~/handoff/outputs/demo/model_global.json | grep -E "max .w |b diff|mean diff"
 } 2>&1 | tee "$OUT"

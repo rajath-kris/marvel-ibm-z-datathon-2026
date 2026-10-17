@@ -74,9 +74,16 @@ if SECURE:
         sys.exit(f"SECURE=1: need one pair seed per peer of {SITE_ID} in {ALL_SITES}, found {sorted(PAIR_SEEDS)}")
 
 
+# Per-run session id, mixed into every mask tag: masks never repeat across runs even if seeds were reused
+# (otherwise two runs' masked messages could be subtracted to cancel the masks and leak the difference).
+SECURE_SESSION = os.environ.get("SECURE_SESSION", "")
+if SECURE and len(SECURE_SESSION) < 16:
+    sys.exit("SECURE=1 needs SECURE_SESSION (a fresh random id per run, >= 16 chars)")
+
+
 def secure_payload(tag, values):
     """Masked fixed-point integers; masks cancel only when every site's vector is summed."""
-    return fedsecure.mask_vector(SITE_ID, ALL_SITES, PAIR_SEEDS, tag, values)
+    return fedsecure.mask_vector(SITE_ID, ALL_SITES, PAIR_SEEDS, f"{SECURE_SESSION}|{tag}", values)
 
 
 def log(event, rnd="-", **extra):

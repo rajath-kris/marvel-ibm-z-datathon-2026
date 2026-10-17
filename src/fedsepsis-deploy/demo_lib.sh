@@ -156,7 +156,7 @@ start_hospital() {  # start_hospital SITE
                          -v "$TLS_DIR/aggregator.crt":/tls/aggregator.crt:ro)
   local sec=()
   if [ "$SECURE" = 1 ]; then
-    sec=(-e SECURE=1 -e ALL_SITES="$(IFS=,; echo "${SITES[*]}")" -e PAIR_SEED_DIR=/pairs)
+    sec=(-e SECURE=1 -e ALL_SITES="$(IFS=,; echo "${SITES[*]}")" -e PAIR_SEED_DIR=/pairs -e SECURE_SESSION="$SECURE_SESSION")
     for f in "$PAIR_DIR"/*.seed; do                 # mount ONLY the seeds this site is part of
       case "$(basename "$f" .seed)" in "$s"__*|*__"$s") sec+=(-v "$f":/pairs/$(basename "$f"):ro) ;; esac
     done

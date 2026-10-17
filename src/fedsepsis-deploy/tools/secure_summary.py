@@ -1,12 +1,14 @@
 """Build demo/secure_summary.json from a masked + a plain 3-site run. Standard library only.
 Contains only: site names, row counts n (sent in the clear anyway), masked values the aggregator received,
 first model weights, differences, round count and runtimes. No tokens, no seeds, no patient data.
-Usage: python3 tools/secure_summary.py MASKED_RESULTS_DIR PLAIN_RESULTS_DIR SECURE_SEEN_JSON SPLIT_TAG OUT_JSON"""
+Usage: python3 tools/secure_summary.py MASKED_RESULTS_DIR PLAIN_RESULTS_DIR SECURE_SEEN_JSON SPLIT_TAG OUT_JSON [SITE_COUNTS_JSON] [DEPLOYMENT]"""
 import json
 import sys
 from datetime import datetime, timezone
 
-masked_dir, plain_dir, seen_path, split_tag, out = sys.argv[1:]
+masked_dir, plain_dir, seen_path, split_tag, out = sys.argv[1:6]
+counts = json.load(open(sys.argv[6])) if len(sys.argv) > 6 else {}
+deployment = sys.argv[7] if len(sys.argv) > 7 else None
 load = lambda p: json.load(open(p))
 ms, ps = load(f"{masked_dir}/final_model.json"), load(f"{plain_dir}/final_model.json")
 mi, pi = load(f"{masked_dir}/run_info.json"), load(f"{plain_dir}/run_info.json")
@@ -19,8 +21,10 @@ summary = {
     "title": "SepsisBridge: 3-site secure aggregation (pairwise masks) vs plain FedAvg",
     "generated_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     "sites": sites,
-    "simulation_note": ("hospA1 and hospA2 are hospital A split in two by patient (" + split_tag +
-                        "): a simulation of two sites; hospB is the small hospital."),
+    "site_patients": {s: counts[s]["patients"] for s in sorted(seen) if s in counts},
+    "site_description": counts.get("_description") or {},
+    "simulation_note": ("hospA1 and hospA2 are hospital A's patients split in two (" + split_tag +
+                        ") and run as two sites: a simulation of two hospitals; hospB is the small hospital."),
     "rounds": int(mi["rounds"]),
     "local_epochs": ms.get("train_cfg", {}).get("epochs"),
     "what_the_aggregator_saw": {
@@ -42,5 +46,7 @@ summary = {
     "max_abs_difference_scope": "all 138 weights and the bias of the final model",
     "runtime_seconds": {"secure_run": mi["runtime_seconds"], "plain_run": pi["runtime_seconds"]},
 }
+if deployment:
+    summary["deployment"] = deployment
 json.dump(summary, open(out, "w"), indent=1)
 print(f"wrote {out}: sites {sites}, max |secure - plain| {diff:.3e}, runtimes {mi['runtime_seconds']}s / {pi['runtime_seconds']}s")
