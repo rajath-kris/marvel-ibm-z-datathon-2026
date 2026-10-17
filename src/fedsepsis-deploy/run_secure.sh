@@ -9,6 +9,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 export FED_SITES="hospA1 hospA2 hospB" NAME_PREFIX=sec- AGG_NAME=sec-aggregator RUN_DIR=$PWD/run/secure MODE=real
+export SECURE_SAMPLE=${SECURE_SAMPLE:-3}   # keep the first 3 masked values each site sent (demo page)
 source ./config.sh
 NETWORK=fedsecure-net
 source ./demo_lib.sh

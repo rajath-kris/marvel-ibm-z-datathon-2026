@@ -1,0 +1,84 @@
+{
+ "title": "SepsisBridge: 3-site secure aggregation (pairwise masks) vs plain FedAvg",
+ "generated_utc": "2026-10-17T11:16:13Z",
+ "sites": [
+  "hospA1",
+  "hospA2",
+  "hospB"
+ ],
+ "simulation_note": "hospA1 and hospA2 are hospital A split in two by patient (random-seed2026): a simulation of two sites; hospB is the small hospital.",
+ "rounds": 40,
+ "local_epochs": 3,
+ "what_the_aggregator_saw": {
+  "round": 39,
+  "description": "first 3 of 138 masked n*w values each site sent in that round. Integers mod 2**128, given as decimal STRINGS because they exceed JavaScript's safe integer range; *_fraction is value / 2**128 for display. On its own each value is uniform random; the masks cancel only in the 3-site sum.",
+  "per_site": {
+   "hospA1": {
+    "n_rows_sent_in_clear": 310792,
+    "masked_first3": [
+     "267352678515008527533197696734984670859",
+     "93237114673859811752958188001925988940",
+     "21712318926088546842598626472951148420"
+    ],
+    "masked_first3_fraction": [
+     0.7856789081789992,
+     0.27399925396523006,
+     0.06380677060217231
+    ]
+   },
+   "hospA2": {
+    "n_rows_sent_in_clear": 316089,
+    "masked_first3": [
+     "96603069818879453888036969536932619490",
+     "255605747235955499228312938616806263681",
+     "248237002421780259091945021972471352579"
+    ],
+    "masked_first3_fraction": [
+     0.28389090711045956,
+     0.751157779783938,
+     0.7295029850296529
+    ]
+   },
+   "hospB": {
+    "n_rows_sent_in_clear": 52207,
+    "masked_first3": [
+     "316608985507988945505569679952775369304",
+     "331721871932061615945515100953441852839",
+     "70333045573069657528879230039088158727"
+    ],
+    "masked_first3_fraction": [
+     0.9304301847105413,
+     0.9748429662508319,
+     0.2066902443681747
+    ]
+   }
+  }
+ },
+ "final_model_first3": {
+  "feature_names": [
+   "HR_last",
+   "HR_mean6",
+   "HR_delta6"
+  ],
+  "secure_run": [
+   0.0738367941608851,
+   0.0495706924643601,
+   0.0646488624718126
+  ],
+  "plain_run": [
+   0.07383679416088508,
+   0.049570692464360105,
+   0.0646488624718126
+  ]
+ },
+ "final_bias": {
+  "secure_run": -1.2009180102687202,
+  "plain_run": -1.2009180102687202
+ },
+ "max_abs_difference_secure_vs_plain": 1.1102230246251565e-16,
+ "max_abs_difference_scope": "all 138 weights and the bias of the final model",
+ "runtime_seconds": {
+  "secure_run": 38.3,
+  "plain_run": 39.3
+ }
+}

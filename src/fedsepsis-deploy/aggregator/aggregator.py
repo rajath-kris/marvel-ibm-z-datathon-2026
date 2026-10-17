@@ -85,6 +85,10 @@ class AggregatorState:
         self.lock = threading.Lock()
         self.state_path = state_path
         self.sec = load_fedsecure() if secure else None
+        # SECURE_SAMPLE=k (demo only): keep the first k MASKED w values each site sent in its latest round, i.e.
+        # exactly what the aggregator saw. Masked values reveal nothing on their own; plain values are never kept.
+        self.sample_k = int(os.environ.get("SECURE_SAMPLE", "0")) if secure else 0
+        self.seen = {}
         self.s = {
             "expected_sites": sorted(expected_sites),
             "expected_rounds": expected_rounds,
@@ -123,6 +127,14 @@ class AggregatorState:
             f.flush()
             os.fsync(f.fileno())
         os.replace(tmp, self.state_path)
+
+    def _save_seen(self):
+        if not self.state_path:
+            return
+        p = os.path.join(os.path.dirname(self.state_path), "secure_seen.json")
+        with open(p + ".tmp", "w") as f:
+            json.dump(self.seen, f, indent=1)
+        os.replace(p + ".tmp", p)
 
     # ---- helpers -----------------------------------------------------------
     def _check_site(self, site_id):
@@ -217,6 +229,9 @@ class AggregatorState:
                 return {"ok": True, "duplicate": True}
             self.s["updates"][site_id] = {"w": w, "b": b, "n": n}
             log("update", site_id, rnd, updated=len(self.s["updates"]))
+            if self.sample_k:
+                self.seen[site_id] = {"round": rnd, "n": n, "w_first_masked": [str(x) for x in w[:self.sample_k]]}
+                self._save_seen()
             if set(self.s["updates"]) == set(self.s["expected_sites"]):
                 ups = [self.s["updates"][k] for k in self.s["expected_sites"]]
                 if self.sec:

@@ -52,6 +52,10 @@ a, b = (json.load(open(p))["model"] for p in sys.argv[1:])
 d = max([abs(x - y) for x, y in zip(a["w"], b["w"])] + [abs(a["b"] - b["b"])])
 print(f"ASSERT max |masked - plain| <= 1e-9 : {d <= 1e-9}  ({d:.3e})")
 PY
+  echo; echo "### demo summary (demo/secure_summary.json)"
+  mkdir -p demo
+  python3 tools/secure_summary.py results/secure3-masked results/secure3-plain run/secure/state/secure_seen.json \
+    "$(cat run/secure/split/TAG)" demo/secure_summary.json
   echo; echo "### for reference: 3-site plain vs the 2-site model_global.json (different sites, so NOT expected to match)"
   python3 tools/compare_models.py results/secure3-plain/final_model.json ~/handoff/outputs/demo/model_global.json | grep -E "max .w |b diff|mean diff"
 } 2>&1 | tee "$OUT"

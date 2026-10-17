@@ -49,13 +49,13 @@ EOF
 preflight() {
   local avail others busy
   avail=$(awk '/^MemAvailable:/ {print int($2/1024)}' /proc/meminfo)
-  others=$(docker ps --format '{{.Names}}' | grep -v -x -E "notebook|$AGG_NAME|$(container_names | paste -sd'|' -)" || true)
+  others=$(docker ps --format '{{.Names}}' | grep -v -x -E "notebook|$AGG_NAME|$(container_names | paste -sd'|' -)" | paste -sd, - || true)
   busy=$(ps -eo pcpu=,user=,comm= --sort=-pcpu | awk '$1 > 50' | tr '\n' ';' || true)
   echo "pre-flight: MemAvailable ${avail} MB (need >= $MIN_AVAILABLE_MB); other containers: ${others:-none}; processes >50% CPU: ${busy:-none}"
   # ALLOW_JOBS=name1,name2: containers the team agreed may run alongside (CPU check is then skipped; memory is not)
   local unexpected=$others
   if [ -n "${ALLOW_JOBS:-}" ]; then
-    unexpected=$(echo "$others" | grep -v -x -E "$(echo "$ALLOW_JOBS" | tr , '|')" || true)
+    unexpected=$(echo "$others" | tr , "\n" | grep -v -x -E "$(echo "$ALLOW_JOBS" | tr , '|')" || true)
     echo "pre-flight: allowed to run alongside: $ALLOW_JOBS"
     busy=""
   fi
@@ -111,7 +111,7 @@ start_aggregator() {
   TOKEN="$(cat "$TOKEN_FILE")" docker run -d --name "$AGG_NAME" $CPUS --memory "$AGG_MEMORY" \
     --network "$NETWORK" --network-alias aggregator \
     -e TOKEN -e EXPECTED_SITES="$(IFS=,; echo "${SITES[*]}")" -e EXPECTED_ROUNDS="$EXPECTED_ROUNDS" -e INIT_BIAS="$INIT_BIAS" \
-    -e STATE_DIR=/state -v "$RUN_DIR/state":/state -e SECURE="$SECURE" "${tls[@]}" \
+    -e STATE_DIR=/state -v "$RUN_DIR/state":/state -e SECURE="$SECURE" -e SECURE_SAMPLE="${SECURE_SAMPLE:-0}" "${tls[@]}" \
     "$AGG_IMAGE" >/dev/null
   wait_until 60 "aggregator healthy" 'agg_get /health | grep -q "\"ok\": true"'
 }
