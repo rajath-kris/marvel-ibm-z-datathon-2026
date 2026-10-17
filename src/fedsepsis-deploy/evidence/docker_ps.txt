@@ -1,14 +1,11 @@
 # docker ps
-# captured 2026-10-17T15:01:51Z on datathon-test
+# captured 2026-10-17T15:30:31Z on datathon-test
 
-NAMES                      IMAGE                                                                   STATUS              PORTS
-hard-hospB                 fedsepsis-hospital:hard                                                 Up About a minute   3000/tcp, 5000/tcp, 8888/tcp, 38888/tcp, 127.0.0.1:18102->8100/tcp
-hard-hospA                 fedsepsis-hospital:hard                                                 Up About a minute   3000/tcp, 5000/tcp, 8100/tcp, 8888/tcp, 38888/tcp
-hard-aggregator            fedsepsis-aggregator:hard                                               Up About a minute   3000/tcp, 5000/tcp, 8000/tcp, 8888/tcp, 38888/tcp
-hospB                      08241cb7a20d                                                            Up 17 minutes       3000/tcp, 5000/tcp, 8888/tcp, 38888/tcp, 127.0.0.1:8102->8100/tcp
-hospA                      08241cb7a20d                                                            Up 17 minutes       3000/tcp, 5000/tcp, 8888/tcp, 38888/tcp, 127.0.0.1:8101->8100/tcp
-fedsepsis-aggregator       265328153505                                                            Up 17 minutes       3000/tcp, 5000/tcp, 8000/tcp, 8888/tcp, 38888/tcp
-rev-hospA                  9dda30897aa6                                                            Up 19 minutes       3000/tcp, 5000/tcp, 8888/tcp, 38888/tcp, 127.0.0.1:8202->8100/tcp
-rev-hospB                  9dda30897aa6                                                            Up 19 minutes       3000/tcp, 5000/tcp, 8888/tcp, 38888/tcp, 127.0.0.1:8201->8100/tcp
-rev-fedsepsis-aggregator   b196064473d2                                                            Up 19 minutes       3000/tcp, 5000/tcp, 8000/tcp, 8888/tcp, 38888/tcp
-notebook                   registry.linuxone.cloud.marist.edu/l1cc/jupyterlab-image-s390x:latest   Up 11 hours         3000/tcp, 5000/tcp, 38888/tcp, 0.0.0.0:38888->8888/tcp, [::]:38888->8888/tcp
+NAMES                      IMAGE                                                                   STATUS         PORTS
+rev-hospA                  510246b00df6                                                            Up 2 minutes   3000/tcp, 5000/tcp, 8888/tcp, 38888/tcp, 127.0.0.1:8202->8100/tcp
+rev-hospB                  510246b00df6                                                            Up 2 minutes   3000/tcp, 5000/tcp, 8888/tcp, 38888/tcp, 127.0.0.1:8201->8100/tcp
+rev-fedsepsis-aggregator   9ca653d4f6bd                                                            Up 2 minutes   3000/tcp, 5000/tcp, 8000/tcp, 8888/tcp, 38888/tcp
+hospB                      3dd2ba93c2ac                                                            Up 3 minutes   3000/tcp, 5000/tcp, 8888/tcp, 38888/tcp, 127.0.0.1:8102->8100/tcp
+hospA                      3dd2ba93c2ac                                                            Up 3 minutes   3000/tcp, 5000/tcp, 8888/tcp, 38888/tcp, 127.0.0.1:8101->8100/tcp
+fedsepsis-aggregator       7ae0f89df5b0                                                            Up 3 minutes   3000/tcp, 5000/tcp, 8000/tcp, 8888/tcp, 38888/tcp
+notebook                   registry.linuxone.cloud.marist.edu/l1cc/jupyterlab-image-s390x:latest   Up 12 hours    3000/tcp, 5000/tcp, 38888/tcp, 0.0.0.0:38888->8888/tcp, [::]:38888->8888/tcp

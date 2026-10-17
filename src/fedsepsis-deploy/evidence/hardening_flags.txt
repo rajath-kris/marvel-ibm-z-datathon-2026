@@ -1,0 +1,19 @@
+# hardening flags (docker inspect: User, ReadonlyRootfs, CapDrop, SecurityOpt, PidsLimit, published ports)
+# captured 2026-10-17T15:30:31Z on datathon-test
+
+fedsepsis-aggregator       User=1000:1000  ReadonlyRootfs=true  CapDrop=[ALL]  SecurityOpt=[no-new-privileges:true]    Pids=256  Ports=none
+hospA                      User=1000:1000  ReadonlyRootfs=true  CapDrop=[ALL]  SecurityOpt=[no-new-privileges:true]    Pids=256  Ports=127.0.0.1:8101 
+hospB                      User=1000:1000  ReadonlyRootfs=true  CapDrop=[ALL]  SecurityOpt=[no-new-privileges:true]    Pids=256  Ports=127.0.0.1:8102 
+rev-fedsepsis-aggregator   User=1000:1000  ReadonlyRootfs=true  CapDrop=[ALL]  SecurityOpt=[no-new-privileges:true]    Pids=256  Ports=none
+rev-hospA                  User=1000:1000  ReadonlyRootfs=true  CapDrop=[ALL]  SecurityOpt=[no-new-privileges:true]    Pids=256  Ports=127.0.0.1:8202 
+rev-hospB                  User=1000:1000  ReadonlyRootfs=true  CapDrop=[ALL]  SecurityOpt=[no-new-privileges:true]    Pids=256  Ports=127.0.0.1:8201 
+
+mutual TLS (aggregator log):
+  fedsepsis-aggregator  2026-10-17T15:27:20Z event=tls_enabled site=- round=- min_version=TLSv1.3 client_cert_required=True
+  fedsepsis-aggregator  2026-10-17T15:27:20Z event=tls_session site=- round=- client_cn=monitor version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384
+  fedsepsis-aggregator  2026-10-17T15:27:20Z event=tls_session site=- round=- client_cn=hospA version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384
+  fedsepsis-aggregator  2026-10-17T15:27:21Z event=tls_session site=- round=- client_cn=hospB version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384
+  rev-fedsepsis-aggregator  2026-10-17T15:28:05Z event=tls_enabled site=- round=- min_version=TLSv1.3 client_cert_required=True
+  rev-fedsepsis-aggregator  2026-10-17T15:28:05Z event=tls_session site=- round=- client_cn=monitor version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384
+  rev-fedsepsis-aggregator  2026-10-17T15:28:06Z event=tls_session site=- round=- client_cn=hospB version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384
+  rev-fedsepsis-aggregator  2026-10-17T15:28:07Z event=tls_session site=- round=- client_cn=hospA version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384

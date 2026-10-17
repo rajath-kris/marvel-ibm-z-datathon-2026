@@ -1,5 +1,5 @@
 # torch NNPA availability (reported as is)
-# captured 2026-10-17T15:01:54Z on datathon-test
+# captured 2026-10-17T15:30:34Z on datathon-test
 
 $ docker run --rm --entrypoint /opt/venv/bin/python registry.linuxone.cloud.marist.edu/l1cc/jupyterlab-image-s390x:latest -c "import torch; print(torch.nnpa.is_available(), torch.nnpa.is_telum2_available())"
 True True

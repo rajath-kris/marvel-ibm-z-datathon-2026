@@ -1,5 +1,5 @@
 # base image Python probe
-# captured 2026-10-17T15:01:53Z on datathon-test
+# captured 2026-10-17T15:30:34Z on datathon-test
 
 $ docker run --rm --entrypoint sh registry.linuxone.cloud.marist.edu/l1cc/jupyterlab-image-s390x:latest -c "which python3; ls /opt/venv/bin | head; /opt/venv/bin/python -c 'import numpy,sys; print(numpy.__version__, sys.byteorder)'"
 /opt/venv/bin/python3

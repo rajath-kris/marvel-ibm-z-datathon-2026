@@ -1,5 +1,5 @@
 # docker network inspect fedsepsis-net
-# captured 2026-10-17T15:01:51Z on datathon-test
+# captured 2026-10-17T15:30:31Z on datathon-test
 
 [
     {
@@ -30,25 +30,25 @@
         "Options": {},
         "Labels": {},
         "Containers": {
-            "3980f23c32c5ae1780cb64684ef0603d4becf139f431377a269730e2e274293a": {
-                "Name": "fedsepsis-aggregator",
-                "EndpointID": "a58a6f306d2ea06fec2e5601bad1640ae659058f3acef3e987489ef9191c4af8",
-                "MacAddress": "fe:a7:0e:c7:e1:01",
-                "IPv4Address": "172.18.0.2/16",
-                "IPv6Address": ""
-            },
-            "58702d6147ae02890a81396434c312ce7d757dd15ff25addbcacbac6185b625d": {
+            "1a52dd288aaf70b241bc73d6ace356397fc9dea5d830ec38bded37382aa6945e": {
                 "Name": "hospB",
-                "EndpointID": "8b74eddd8e29ec35b3ea42570a6c9aeeb546f1d27ae10385ba111ea7f451c083",
-                "MacAddress": "4a:54:f4:c5:44:c8",
+                "EndpointID": "89da40e3a3925d8995db19b8b47c4ba25eac40493caa3d1ffc2da4020239fabc",
+                "MacAddress": "86:11:f9:fb:19:c1",
                 "IPv4Address": "172.18.0.4/16",
                 "IPv6Address": ""
             },
-            "b34fe6754a38616c7e30c98f09c6ff1a49b60bb4ca57d41455f130d4fc438d98": {
+            "34abef124aceca387e772831e1b68fb3c47469d08f4c145f13381afb4b425c5e": {
                 "Name": "hospA",
-                "EndpointID": "1e664eba64a6cfebdc1bc390b1b536fe7253e3b52fec27182a48f4f8c167467f",
-                "MacAddress": "62:05:e8:5a:3d:dc",
+                "EndpointID": "6cd4eb35cc23598e9d29083d37fe92b5bcb53881755f6a0ef9a0f6408a14a15b",
+                "MacAddress": "0a:21:7a:ec:74:7c",
                 "IPv4Address": "172.18.0.3/16",
+                "IPv6Address": ""
+            },
+            "82422dd8dbeee7970e1326e02138d034b0581de42436006e51df8e55b06aedf4": {
+                "Name": "fedsepsis-aggregator",
+                "EndpointID": "979a42bf19bde404b3281335290381202ad1ba4be53465e78f0770e511c19c1b",
+                "MacAddress": "6a:05:7d:f9:dc:36",
+                "IPv4Address": "172.18.0.2/16",
                 "IPv6Address": ""
             }
         },
