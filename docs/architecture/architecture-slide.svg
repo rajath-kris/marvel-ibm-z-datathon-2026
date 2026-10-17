@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <title>Dr Sepsis on IBM LinuxONE (slide version)</title>
+  <desc>Two hospitals keep their patient data and send only counts, sums and model weights over mutual TLS 1.3 to an aggregator. The stack runs in hardened containers on IBM LinuxONE.</desc>
+  <defs>
+    <marker id="aT" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0F766E"/></marker>
+    <marker id="aG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6B7280"/></marker>
+  </defs>
+  <rect width="1600" height="900" fill="#FFFFFF"/>
+
+  <text x="60" y="76" font-size="44" font-weight="700" fill="#111827">Dr Sepsis on IBM LinuxONE</text>
+  <text x="60" y="118" font-size="24" fill="#4B5563">Hospitals share what the model learned, never patient rows.</text>
+
+  <!-- hospitals -->
+  <rect x="60" y="160" width="380" height="170" rx="16" fill="#EAF2FB" stroke="#2B6CB0" stroke-width="3"/>
+  <text x="90" y="226" font-size="34" font-weight="700" fill="#1E3A8A">Hospital A</text>
+  <text x="90" y="272" font-size="24" fill="#374151">ICU data stays here</text>
+  <rect x="60" y="360" width="380" height="170" rx="16" fill="#EAF2FB" stroke="#2B6CB0" stroke-width="3"/>
+  <text x="90" y="426" font-size="34" font-weight="700" fill="#1E3A8A">Hospital B</text>
+  <text x="90" y="472" font-size="24" fill="#374151">ICU data stays here</text>
+
+  <!-- aggregator -->
+  <rect x="760" y="250" width="300" height="190" rx="16" fill="#E6F4F1" stroke="#0F766E" stroke-width="3"/>
+  <text x="790" y="316" font-size="34" font-weight="700" fill="#115E59">Aggregator</text>
+  <text x="790" y="362" font-size="24" fill="#374151">FedAvg</text>
+  <text x="790" y="396" font-size="24" fill="#374151">no patient data</text>
+
+  <!-- optional -->
+  <rect x="760" y="456" width="300" height="40" rx="20" fill="#F5F0FF" stroke="#7C3AED" stroke-width="2" stroke-dasharray="7 5"/>
+  <text x="910" y="483" font-size="19" fill="#5B21B6" text-anchor="middle">optional: secure aggregation</text>
+
+  <!-- mutual TLS arrows -->
+  <line x1="440" y1="245" x2="760" y2="320" stroke="#0F766E" stroke-width="4" marker-start="url(#aT)" marker-end="url(#aT)"/>
+  <line x1="440" y1="445" x2="760" y2="370" stroke="#0F766E" stroke-width="4" marker-start="url(#aT)" marker-end="url(#aT)"/>
+  <rect x="490" y="314" width="220" height="62" rx="31" fill="#0F766E"/>
+  <text x="600" y="342" font-size="20" font-weight="700" fill="#FFFFFF" text-anchor="middle">mutual TLS 1.3</text>
+  <text x="600" y="365" font-size="16" fill="#D1FAE5" text-anchor="middle">counts, sums, weights</text>
+
+  <!-- demo link -->
+  <line x1="440" y1="200" x2="1150" y2="200" stroke="#6B7280" stroke-width="3" stroke-dasharray="9 7" marker-end="url(#aG)"/>
+  <text x="795" y="188" font-size="18" fill="#4B5563" text-anchor="middle">demo API via SSH tunnel</text>
+
+  <!-- result -->
+  <rect x="1150" y="160" width="390" height="370" rx="16" fill="#F3F4F6" stroke="#6B7280" stroke-width="3"/>
+  <text x="1180" y="212" font-size="22" font-weight="700" fill="#374151">Small hospital, borrowed model</text>
+  <text x="1180" y="330" font-size="62" font-weight="700" fill="#B91C1C">93.5</text>
+  <text x="1316" y="322" font-size="40" fill="#4B5563">&#8594;</text>
+  <text x="1366" y="330" font-size="62" font-weight="700" fill="#15803D">27.2</text>
+  <text x="1180" y="378" font-size="24" fill="#1F2937">alerts per 100 patient-days</text>
+  <text x="1180" y="414" font-size="24" fill="#1F2937">target 25</text>
+  <text x="1180" y="470" font-size="19" fill="#6B7280">re-tuned locally, no labels</text>
+
+  <!-- LinuxONE band -->
+  <rect x="60" y="590" width="1480" height="260" rx="18" fill="#F4F7FF" stroke="#0F62FE" stroke-width="3.5"/>
+  <text x="90" y="640" font-size="28" font-weight="700" fill="#0043CE">Running on IBM LinuxONE <tspan font-size="22" font-weight="500" fill="#4B5563">(z/VM guest, s390x)</tspan></text>
+  <rect x="90" y="672" width="453" height="150" rx="14" fill="#FFFFFF" stroke="#BFD0F5" stroke-width="2"/>
+  <text x="116" y="728" font-size="28" font-weight="700" fill="#1F2937">Hardened containers</text>
+  <text x="116" y="768" font-size="22" fill="#4B5563">non-root, read-only</text>
+  <rect x="573" y="672" width="453" height="150" rx="14" fill="#FFFFFF" stroke="#BFD0F5" stroke-width="2"/>
+  <text x="599" y="728" font-size="28" font-weight="700" fill="#1F2937">CPACF crypto assist</text>
+  <text x="599" y="768" font-size="22" fill="#4B5563">benchmark: TLS 11&#215; faster</text>
+  <rect x="1056" y="672" width="453" height="150" rx="14" fill="#FFFFFF" stroke="#BFD0F5" stroke-width="2"/>
+  <text x="1082" y="728" font-size="28" font-weight="700" fill="#1F2937">NNPA accelerator</text>
+  <text x="1082" y="768" font-size="22" fill="#4B5563">optional scoring path</text>
+</svg>

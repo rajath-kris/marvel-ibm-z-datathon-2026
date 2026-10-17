@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Scene a: this really runs on IBM LinuxONE.
 source "$(dirname "$0")/common.sh"
-title "SepsisBridge on IBM LinuxONE"
+title "Dr Sepsis on IBM LinuxONE"
 step "Processor architecture"
 say "$(uname -m)"
 pause

@@ -4,7 +4,7 @@ import os
 import sys
 
 d = sys.argv[1]
-lines = ["SepsisBridge demo fixtures v2: exact JSON responses recorded from the live deployments on the LinuxONE VM",
+lines = ["Dr Sepsis demo fixtures v2: exact JSON responses recorded from the live deployments on the LinuxONE VM",
          "(no token, no seeds, no feature rows; patient files hold one model score or NEWS2 score per hour).",
          "Files with no suffix: original direction, hospital B small, borrowing hospital A's model (outputs/demo/).",
          "Suffix _reverse: hospital A small, borrowing hospital B's model (outputs/demo_reverse/).",

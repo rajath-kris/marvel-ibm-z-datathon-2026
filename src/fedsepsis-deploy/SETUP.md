@@ -1,4 +1,4 @@
-# Set up SepsisBridge from scratch (for a new person or a new machine)
+# Set up Dr Sepsis from scratch (for a new person or a new machine)
 
 This walks through everything needed to run the whole thing yourself: both directions, NEWS2, the secure 3-site demo,
 hardening with mutual TLS, the tests and the video scenes.
@@ -41,12 +41,12 @@ Run `chmod 600 <path-to-your-own-key>`. Test it with `ssh l1cc "uname -m"`, whic
 
 **A2. Code and data onto the VM.**
 ```bash
-ssh l1cc "git clone -b feat/fedsepsis-deploy https://github.com/rajath-kris/marvel-ibm-z-datathon-2026.git ~/sepsisbridge \
-          && ln -sfn ~/sepsisbridge/src/fedsepsis-deploy ~/fedsepsis-deploy"
+ssh l1cc "git clone -b feat/fedsepsis-deploy https://github.com/rajath-kris/marvel-ibm-z-datathon-2026.git ~/dr-sepsis \
+          && ln -sfn ~/dr-sepsis/src/fedsepsis-deploy ~/fedsepsis-deploy"
 scp -r handoff l1cc:~/                                  # the bundle from Reju, if it isn't on the VM already
 ```
 The link assumes `~/fedsepsis-deploy` doesn't exist yet. If it does (like on the team VM), use that folder, or clone
-somewhere else and run the scripts from `~/sepsisbridge/src/fedsepsis-deploy`. The scripts work from any folder.
+somewhere else and run the scripts from `~/dr-sepsis/src/fedsepsis-deploy`. The scripts work from any folder.
 
 **A3. Check the data.** Every file must say OK:
 ```bash

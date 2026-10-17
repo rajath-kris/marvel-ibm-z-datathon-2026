@@ -103,6 +103,20 @@ What is certain:
 
   The bare value `off` had no effect on this OpenSSL (`cpacf_indirect_off_switch_no_effect.txt`), so it was discarded.
 
+**Measured on our own mutual-TLS settings** (`tests/cpacf_bench.sh` -> `evidence-hardening/cpacf_tls_bench.txt`). The same
+TLS settings as the aggregator (TLS 1.3 only, client certificate required, `TLS_AES_256_GCM_SHA384`) inside the hardened
+hospital image, run once as detected and once with every CPACF capability mask zeroed:
+
+| | CPACF on | CPACF masked | speed-up |
+|---|---|---|---|
+| mutual-TLS bulk transfer (MB/s, median of 3) | 1,350 | 122 | 11.1x |
+| new mutual-TLS connections per second | 805 | 182 | 4.4x |
+| SHAKE-256 hashing (MB/s) | 3,869 | 334 | 11.6x |
+| SHAKE-256 mask stream (MB/s) | 1,133 | 291 | 3.9x |
+
+This shows the TLS stack our containers use is much faster with CPACF. It still does **not** show that a federated round
+used it (only the `cpacfstats` counters could, and they stay unreadable here).
+
 What was not confirmed, and why. The rule was fixed before running (`tests/test_cpacf.sh`): **CPACF USED** only if
 `cpacfstats` can be read before and after one full mTLS round **and** at least one counter increases. Otherwise the
 verdict is **NOT CONFIRMED**.
@@ -114,8 +128,9 @@ verdict is **NOT CONFIRMED**.
 - Verdict, as recorded: **`VERDICT: CPACF NOT CONFIRMED`** (`cpacf_verdict.txt`).
 
 **Wording for the deck:**
-- Allowed: "The platform provides CPACF, and a benchmark on our VM shows OpenSSL runs 20 to 100x faster with it enabled. We
-  did not measure whether our training traffic used it."
+- Allowed: "The platform provides CPACF. With the same mutual-TLS settings as our aggregator, our hardened container's TLS runs
+  about 11x faster with CPACF than with it masked (bulk transfer), and its handshakes about 4x. We did not measure whether our
+  training traffic itself used it (the hardware counters need an admin daemon)."
 - Not allowed: "our system uses on-chip crypto" or "our TLS is hardware-accelerated".
 
 **How to turn this into a real claim** (needs someone with root on the VM, such as the organisers):

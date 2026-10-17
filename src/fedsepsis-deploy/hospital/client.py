@@ -122,6 +122,18 @@ TRAIN_KEYS = ("X", "y", "patient_id", "hour", "feature_names")
 EVAL_KEYS = ("X", "patient_id", "hour", "feature_names")
 
 
+# Optional NNPA scoring (IBM Z accelerator), off unless NNPA_SCORE=1. Only the scoring product z @ w moves; training and
+# the library are untouched; any problem falls back to the CPU (see hospital/nnpa_scoring.py, NNPA.md).
+NNPA_ON = False
+if os.environ.get("NNPA_SCORE", "0") == "1":
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    try:
+        import nnpa_scoring
+        NNPA_ON = nnpa_scoring.install(fedsepsis, log)
+    except Exception as e:
+        log("nnpa_fallback", reason=f"{type(e).__name__}: {e}", scoring="cpu")
+
+
 def load_npz(path, keys, optional=()):
     import numpy as np
     with np.load(path, allow_pickle=False) as z:
@@ -517,7 +529,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, {"ok": True, "site_id": SITE_ID, "status": Shared.status,
                                     "final_model": Shared.final, "mode": MODE,
                                     "eval_data": Shared.eval.name if Shared.eval else None,
-                                    "retune_data": Shared.retune.name if Shared.retune else None})
+                                    "retune_data": Shared.retune.name if Shared.retune else None,
+                                    "nnpa": nnpa_scoring.stats() if NNPA_ON else None})
         if url.path == "/patient":
             q = dict(urllib.parse.parse_qsl(url.query))
             return self._patient(q)

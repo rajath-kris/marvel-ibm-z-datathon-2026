@@ -18,7 +18,7 @@ diff = max([abs(a - b) for a, b in zip(m["w"], p["w"])] + [abs(m["b"] - p["b"])]
 sites = sorted(seen)
 assert sorted(sites) == sorted(["hospA1", "hospA2", "hospB"]), sites
 summary = {
-    "title": "SepsisBridge: 3-site secure aggregation (pairwise masks) vs plain FedAvg",
+    "title": "Dr Sepsis: 3-site secure aggregation (pairwise masks) vs plain FedAvg",
     "generated_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     "sites": sites,
     "site_patients": {s: counts[s]["patients"] for s in sorted(seen) if s in counts},

@@ -1,0 +1,165 @@
+{
+ "format": 1,
+ "recorded_at_utc": "2026-10-17T18:58:55Z",
+ "kind": "one real live run of the pipeline demo",
+ "run_sha256": "bced8f0b7b72bd67ae08f593da054563ff4b6629a5d4dc766b8b34214eacc27c",
+ "steps": [
+  {
+   "ok": true,
+   "step": 1,
+   "data": {
+    "rate": 93.54748275879646,
+    "patients": 10062,
+    "patient_days": 16348.916666666666,
+    "threshold": 0.3888239406584751,
+    "budget": 25
+   },
+   "seconds": 0.3
+  },
+  {
+   "ok": true,
+   "step": 2,
+   "data": {
+    "rate_before": 93.54748275879646,
+    "threshold_before": 0.3888239406584751,
+    "threshold_after": 0.5636257399141397,
+    "tune_rate": 25.106508626144176,
+    "tune_patients": 600,
+    "rate_after": 27.157762746767116,
+    "test_patients": 10062,
+    "budget": 25
+   },
+   "seconds": 0.3
+  },
+  {
+   "ok": true,
+   "step": 3,
+   "data": {
+    "seconds": 2.6,
+    "rounds_completed": 1,
+    "done": true,
+    "sites": [
+     {
+      "site": "hospA",
+      "messages": [
+       {
+        "path": "/stats",
+        "count": 1,
+        "fields": [
+         "n",
+         "site_id",
+         "sum",
+         "sumsq"
+        ],
+        "types": [
+         "counts",
+         "hospital id",
+         "sums"
+        ]
+       },
+       {
+        "path": "/update",
+        "count": 1,
+        "fields": [
+         "b",
+         "n",
+         "round",
+         "site_id",
+         "w"
+        ],
+        "types": [
+         "counts",
+         "hospital id",
+         "round number",
+         "weights"
+        ]
+       }
+      ]
+     },
+     {
+      "site": "hospB",
+      "messages": [
+       {
+        "path": "/stats",
+        "count": 1,
+        "fields": [
+         "n",
+         "site_id",
+         "sum",
+         "sumsq"
+        ],
+        "types": [
+         "counts",
+         "hospital id",
+         "sums"
+        ]
+       },
+       {
+        "path": "/update",
+        "count": 1,
+        "fields": [
+         "b",
+         "n",
+         "round",
+         "site_id",
+         "w"
+        ],
+        "types": [
+         "counts",
+         "hospital id",
+         "round number",
+         "weights"
+        ]
+       }
+      ]
+     }
+    ],
+    "check": {
+     "pass": true,
+     "patient_rows": 0,
+     "reason": null,
+     "unexpected": []
+    }
+   },
+   "seconds": 2.6
+  },
+  {
+   "ok": true,
+   "step": 4,
+   "data": {
+    "scenario": "S1 (all 138 features)",
+    "budget": 25,
+    "direction": "big hospital B, small hospital A",
+    "smallest": {
+     "runs": 6,
+     "alone": 0.2522179974651457,
+     "together": 0.31453316434305023,
+     "gap_per_100": 6.23151668779045,
+     "ahead_in": 4,
+     "pool_patients": 202
+    },
+    "smallest_both_directions": {
+     "runs": 12,
+     "alone": 0.27888677651035065,
+     "together": 0.34970079269784093,
+     "gap_per_100": 7.081401618749025,
+     "ahead_in": 8,
+     "pool_patients": 201
+    },
+    "larger": {
+     "runs": 6,
+     "alone": 0.3705111956062526,
+     "together": 0.35783692437684833,
+     "gap_per_100": -1.2674271229404308,
+     "ahead_in": 1,
+     "pool_patients": 2028
+    },
+    "source": {
+     "files": 6,
+     "sha256": "21f33e98f961e2aa"
+    }
+   },
+   "seconds": 0.0
+  }
+ ]
+}

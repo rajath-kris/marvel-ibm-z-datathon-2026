@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dr Sepsis Pipeline</title>
+<style>
+:root{
+  --bg:#0B1622; --panel:#12233A; --panel2:#0F1D30; --line:#24405F;
+  --text:#EAF0F6; --text2:#A9B8C9; --cap:#7F93AA;
+  --amber:#F5A524; --slate:#6C7F96; --teal:#4FC3B0; --red:#E5484D; --white:#FFFFFF;
+  --head:"Oswald","Arial Narrow","Helvetica Neue",Arial,sans-serif;
+  --body:"DM Sans",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body)}
+body{min-height:100vh;overflow-x:hidden}
+.bar{display:flex;align-items:center;gap:20px;padding:12px 24px;border-bottom:1px solid var(--line);background:var(--panel2)}
+.brand{font:600 20px var(--head);letter-spacing:.04em;text-transform:uppercase}
+.brand span{color:var(--teal)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{font:12px var(--mono);color:var(--cap);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+.chip.on{color:var(--text);border-color:var(--teal)}
+.chip.ok{color:var(--teal)}
+.chip.bad{color:var(--red);border-color:var(--red)}
+main{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:20px 24px;max-width:1500px;margin:0 auto}
+@media(max-width:900px){main{grid-template-columns:1fr;padding:16px}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 24px;min-height:330px;display:flex;flex-direction:column;transition:border-color .3s,opacity .3s}
+.card.idle{opacity:.55}
+.card.run{border-color:var(--teal);opacity:1}
+.card.done{opacity:1}
+.card.err{border-color:var(--red);opacity:1}
+.kick{font:12px var(--mono);color:var(--amber);letter-spacing:.06em;text-transform:uppercase}
+h2{font:600 30px/1.1 var(--head);margin:6px 0 4px;letter-spacing:.01em}
+.sub{color:var(--text2);font-size:15px;margin:0 0 14px;line-height:1.35}
+.body{flex:1;display:flex;flex-direction:column;gap:12px;justify-content:center}
+.ph{color:var(--cap);font:13px var(--mono)}
+.big{font:600 56px/1 var(--head)}
+.big small{font:500 18px var(--body);color:var(--text2);margin-left:10px}
+.mono{font:12px var(--mono);color:var(--cap)}
+.row{display:grid;grid-template-columns:130px 1fr;gap:12px;align-items:center}
+.lab{font:12px var(--mono);color:var(--text2)}
+.dots{display:flex;flex-wrap:wrap;gap:6px;min-height:16px}
+.dot{width:14px;height:14px;border-radius:50%;background:var(--amber);animation:pop .35s ease-out both}
+.dot.teal{background:var(--teal)}
+.dot.hollow{background:transparent;border:2px solid var(--teal)}
+@keyframes pop{0%{transform:scale(0);opacity:0}70%{transform:scale(1.25)}100%{transform:scale(1);opacity:1}}
+.note{font-size:14px;color:var(--text2);line-height:1.4}
+.note b{color:var(--text)}
+.keep{color:var(--teal);font-size:14px}
+.pair{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.arrow{color:var(--cap);font:500 36px var(--head)}
+.hops{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center}
+.sites{display:flex;flex-direction:column;gap:10px}
+.site{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.site h3{margin:0 0 6px;font:600 16px var(--head);letter-spacing:.02em}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font:12px var(--mono);border:1px solid var(--teal);color:var(--teal);border-radius:999px;padding:2px 9px}
+.tag.dim{border-color:var(--line);color:var(--cap)}
+.hub{width:92px;height:92px;border-radius:20px;background:var(--white);color:#0B1622;display:flex;align-items:center;justify-content:center;font:600 20px var(--head);letter-spacing:.06em;position:relative}
+.hub::before{content:"";position:absolute;left:-16px;top:50%;width:16px;border-top:2px dashed var(--cap)}
+.check{border-radius:10px;padding:10px 14px;font:600 14px var(--mono)}
+.check.pass{background:rgba(79,195,176,.12);border:1px solid var(--teal);color:var(--teal)}
+.check.fail{background:rgba(229,72,77,.12);border:1px solid var(--red);color:var(--red)}
+.bars{display:flex;flex-direction:column;gap:10px}
+.bar2{display:grid;grid-template-columns:150px 1fr 60px;gap:10px;align-items:center}
+.track{height:20px;border-radius:6px;background:var(--panel2);overflow:hidden}
+.fill{height:100%;width:0;border-radius:6px;transition:width .9s ease-out}
+.fill.slate{background:var(--slate)} .fill.teal{background:var(--teal)}
+.val{font:600 14px var(--mono);text-align:right}
+.err-msg{color:var(--red);font:600 14px/1.4 var(--mono);border:1px solid var(--red);border-radius:10px;padding:10px 14px;background:rgba(229,72,77,.1)}
+.foot{margin-top:10px;font:12px var(--mono);color:var(--cap);min-height:16px}
+.top-err{display:none;margin:12px 24px 0;max-width:1452px}
+@media(prefers-reduced-motion:reduce){.dot{animation:none}.fill{transition:none}.card{transition:none}}
+.still .dot{animation:none}.still .fill{transition:none}.still .card{transition:none}
+</style>
+</head>
+<body>
+<div class="bar">
+  <div class="brand">Dr <span>Sepsis</span></div>
+  <div class="chips" id="chips"></div>
+</div>
+<div id="topErr" class="top-err err-msg"></div>
+<main>
+  <section class="card idle" id="c1">
+    <div class="kick">Step 1 · Shadow mode</div>
+    <h2>Watch silently</h2>
+    <p class="sub">The borrowed model scores our own patients. It alerts nobody and needs no sepsis cases.</p>
+    <div class="body" id="b1"><div class="ph">waiting</div></div>
+    <div class="foot" id="f1"></div>
+  </section>
+  <section class="card idle" id="c2">
+    <div class="kick">Step 2 · Re-tune</div>
+    <h2>Set our own dial</h2>
+    <p class="sub">Pick the cutoff that gives us the alarm count we chose: 25 per 100 patient-days.</p>
+    <div class="body" id="b2"><div class="ph">waiting</div></div>
+    <div class="foot" id="f2"></div>
+  </section>
+  <section class="card idle" id="c3">
+    <div class="kick">Step 3 · Federated round</div>
+    <h2>Learn together</h2>
+    <p class="sub">Hospitals send numbers to the hub. The hub averages them and sends back a better model.</p>
+    <div class="body" id="b3"><div class="ph">waiting</div></div>
+    <div class="foot" id="f3"></div>
+  </section>
+  <section class="card idle" id="c4">
+    <div class="kick">Results · Saved experiment</div>
+    <h2>Does it help the smallest hospital?</h2>
+    <p class="sub" id="s4">Sepsis patients caught per 100, at the same alarm budget of 25.</p>
+    <div class="body" id="b4"><div class="ph">waiting</div></div>
+    <div class="foot" id="f4"></div>
+  </section>
+</main>
+
+<script>
+"use strict";
+const $ = (s) => document.querySelector(s);
+const Q = new URLSearchParams(location.search);
+const REPLAY = Q.get("replay");          // "1": keys play the saved steps, "auto": plays them all
+const UPTO = parseInt(Q.get("upto") || "0", 10);   // render the first N steps at once (for screenshots)
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches || !!UPTO;   // upto = still frames for screenshots
+if (REDUCED) document.documentElement.classList.add("still");
+const TITLES = ["1 Shadow mode", "2 Re-tune", "3 Federated round", "4 Results"];
+const NAMES = { hospA: "Hospital A · small", hospB: "Hospital B · big" };
+const PER_DAY = (rate) => rate / 5;      // 20 beds = 20 patient-days a day, so per 100 patient-days / 5
+const f1 = (x) => x.toFixed(1);
+const fmt = (n) => n.toLocaleString("en-US");
+
+let replay = null, busy = false, failed = false;
+const done = {};
+const chips = TITLES.map((t, i) => { const c = document.createElement("div"); c.className = "chip"; c.textContent = t; $("#chips").appendChild(c); return c; });
+
+function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; }
+function setCard(n, state) { $("#c" + n).className = "card " + state; chips[n - 1].className = "chip " + ({ run: "on", done: "ok", err: "bad" }[state] || ""); }
+function count(node, to, suffix) {
+  if (REDUCED) { node.textContent = f1(to) + (suffix || ""); return; }
+  const t0 = performance.now();
+  (function tick(t) { const k = Math.max(0, Math.min(1, (t - t0) / 700)); node.textContent = f1(to * (1 - Math.pow(1 - k, 3))) + (suffix || ""); if (k < 1) requestAnimationFrame(tick); })(t0);
+}
+function dots(parent, label, n, cls, delay) {
+  const r = el("div", "row"); r.appendChild(el("div", "lab", label));
+  const d = el("div", "dots"); r.appendChild(d); parent.appendChild(r);
+  for (let i = 0; i < n; i++) { const x = el("div", "dot " + (cls || "")); x.style.animationDelay = (REDUCED ? 0 : delay + i * 45) + "ms"; d.appendChild(x); }
+}
+function bigNumber(parent, value, unit, color) {
+  const b = el("div", "big"); const v = el("span"); b.appendChild(v); b.appendChild(el("small", "", unit)); if (color) v.style.color = color;
+  parent.appendChild(b); count(v, value); return b;
+}
+function sec(s) { return f1(s) + " s"; }
+
+// ---- one render function per step. Live and replay both call these with the same data shape ------------------------
+const RENDER = {
+  1(d, res) {
+    const b = $("#b1"); b.replaceChildren();
+    const day = PER_DAY(d.rate);
+    bigNumber(b, day, "alarms a day on a 20-bed ward", "var(--amber)");
+    dots(b, "borrowed model", Math.round(day), "", 100);
+    dots(b, "our target", Math.round(PER_DAY(d.budget)), "hollow", 100);
+    b.appendChild(el("div", "mono", `${f1(d.rate)} alerts per 100 patient-days · target ${d.budget} (${f1(PER_DAY(d.budget))} a day) · ${fmt(d.patients)} patients`));
+    b.appendChild(el("div", "keep", "Nothing is sent to staff. No sepsis cases needed."));
+    $("#f1").textContent = `answered in ${sec(res.seconds)} · one dot is one alarm in a day`;
+  },
+  2(d, res) {
+    const b = $("#b2"); b.replaceChildren();
+    const p = el("div", "pair");
+    const a = el("div", "big"); const av = el("span"); a.appendChild(av); av.style.color = "var(--amber)"; p.appendChild(a);
+    p.appendChild(el("div", "arrow", "→"));
+    const c = el("div", "big"); const cv = el("span"); c.appendChild(cv); cv.style.color = "var(--teal)"; c.appendChild(el("small", "", "per 100 patient-days")); p.appendChild(c);
+    b.appendChild(p); count(av, d.rate_before); count(cv, d.rate_after);
+    dots(b, "before", Math.round(PER_DAY(d.rate_before)), "", 100);
+    dots(b, "after re-tune", Math.round(PER_DAY(d.rate_after)), "teal", 600);
+    dots(b, "our target", Math.round(PER_DAY(d.budget)), "hollow", 100);
+    b.appendChild(el("div", "note", `That is ${f1(PER_DAY(d.rate_after))} alarms a day on a 20-bed ward, close to the ${f1(PER_DAY(d.budget))} we asked for. Cutoff ${d.threshold_before.toFixed(3)} → ${d.threshold_after.toFixed(3)}.`));
+    $("#f2").textContent = `cutoff tuned on ${fmt(d.tune_patients)} patients (${f1(d.tune_rate)} there), measured on ${fmt(d.test_patients)} other patients (${f1(d.rate_after)}) · answered in ${sec(res.seconds)}`;
+  },
+  3(d, res) {
+    const b = $("#b3"); b.replaceChildren();
+    const hops = el("div", "hops"); const sites = el("div", "sites");
+    for (const s of d.sites) {
+      const box = el("div", "site"); box.appendChild(el("h3", "", NAMES[s.site] || s.site));
+      const tags = el("div", "tags"); const types = [];
+      for (const m of s.messages) for (const t of m.types) if (!types.includes(t)) types.push(t);
+      const order = ["counts", "sums", "weights", "round number", "hospital id"];
+      types.sort((x, y) => order.indexOf(x) - order.indexOf(y));
+      for (const t of types) tags.appendChild(el("span", "tag" + (t === "hospital id" ? " dim" : ""), t));
+      box.appendChild(tags);
+      const n = s.messages.reduce((a, m) => a + m.count, 0);
+      box.appendChild(el("div", "mono", `${n} messages sent · patient data stays inside`));
+      sites.appendChild(box);
+    }
+    hops.appendChild(sites); hops.appendChild(el("div", "hub", "HUB")); b.appendChild(hops);
+    const ck = el("div", "check " + (d.check.pass ? "pass" : "fail"));
+    ck.textContent = d.check.pass ? "PASS · 0 patient rows crossed the network" : "FAIL · " + (d.check.reason || "unexpected fields");
+    b.appendChild(ck);
+    $("#f3").textContent = `round ${d.rounds_completed} complete · ${d.sites.length} hospitals reported · took ${sec(d.seconds)}`;
+    if (!d.check.pass) throw new Error("network check failed: " + (d.check.reason || "unexpected fields"));
+  },
+  4(d, res) {
+    const b = $("#b4"); b.replaceChildren();
+    const s = d.smallest, L = d.larger, gap = s.gap_per_100;
+    $("#s4").textContent = `Smallest simulated hospital: about ${s.pool_patients} patients. Sepsis patients caught per 100, at the same alarm budget of ${d.budget}.`;
+    const big = el("div", "big"); const bv = el("span"); big.appendChild(bv);
+    big.appendChild(el("small", "", "more sepsis patients caught per 100")); b.appendChild(big);
+    bv.style.color = gap >= 0 ? "var(--teal)" : "var(--amber)";
+    if (REDUCED) bv.textContent = (gap >= 0 ? "+" : "") + f1(gap); else { const t0 = performance.now(); (function tick(t) { const k = Math.max(0, Math.min(1, (t - t0) / 700)); bv.textContent = (gap >= 0 ? "+" : "") + f1(gap * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(tick); })(t0); }
+    const max = Math.max(s.alone, s.together) * 100 * 1.25;
+    const bars = el("div", "bars");
+    for (const [label, v, cls] of [["training alone", s.alone, "slate"], ["learning together", s.together, "teal"]]) {
+      const r = el("div", "bar2"); r.appendChild(el("div", "lab", label));
+      const t = el("div", "track"), f = el("div", "fill " + cls); t.appendChild(f); r.appendChild(t);
+      r.appendChild(el("div", "val", f1(v * 100))); bars.appendChild(r);
+      if (REDUCED) f.style.width = (v * 100 / max * 100) + "%"; else setTimeout(() => { f.style.width = (v * 100 / max * 100) + "%"; }, 50);
+    }
+    b.appendChild(bars);
+    const lg = L.gap_per_100;
+    b.appendChild(el("div", "note", `Learning together was ahead in ${s.ahead_in} of ${s.runs} runs. At a bigger hospital (about ${fmt(L.pool_patients)} patients) ` +
+      (lg < 0 ? `training alone did better: ${f1(L.alone * 100)} vs ${f1(L.together * 100)}.` : `the gap shrinks to ${(lg >= 0 ? "+" : "") + f1(lg)}.`)));
+    $("#f4").textContent = `${d.scenario} · ${d.direction} · ${d.source.files} saved result files`;
+  },
+};
+
+// ---- running a step ------------------------------------------------------------------------------------------------
+function fail(n, msg) {
+  failed = true; setCard(n, "err");
+  const c = $("#b" + n); c.replaceChildren(); c.appendChild(el("div", "err-msg", "FAILED: " + msg));
+  const t = $("#topErr"); t.style.display = "block"; t.textContent = "FAILED in step " + n + ": " + msg + "   (nothing was faked; press R to reset)";
+}
+async function fetchStep(n) {
+  if (REPLAY) {
+    if (!replay) {
+      const r = await (await fetch("/api/replay")).json();
+      if (!r.ok) throw new Error(r.error);
+      replay = r.replay;
+    }
+    const s = replay.steps.find((x) => x.step === n);
+    if (!s) throw new Error("the saved replay has no step " + n);
+    await new Promise((r) => setTimeout(r, Math.min(1200, Math.max(500, s.seconds * 1000))));
+    return s;
+  }
+  const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 420000);
+  try {
+    const r = await fetch("/api/step/" + n, { method: "POST", signal: ctl.signal });
+    return await r.json();
+  } finally { clearTimeout(to); }
+}
+async function run(n) {
+  if (busy || failed) return false;
+  if ((n === 2 && !done[1]) || (n === 3 && !done[2])) { fail(n, "run step " + (n - 1) + " first"); return false; }
+  busy = true; setCard(n, "run");
+  const body = $("#b" + n); body.replaceChildren(el("div", "ph", n === 3 ? "running one federated round ..." : "running ..."));
+  let ok = false;
+  try {
+    const res = await fetchStep(n);
+    if (!res.ok) throw new Error(res.error || "the call failed");
+    RENDER[n](res.data, res); done[n] = true; setCard(n, "done"); ok = true;
+  } catch (e) { fail(n, e.message || String(e)); }
+  busy = false; return ok;
+}
+async function reset() {
+  for (const k of Object.keys(done)) delete done[k];
+  failed = false; busy = false; $("#topErr").style.display = "none";
+  for (let n = 1; n <= 4; n++) { setCard(n, "idle"); $("#b" + n).replaceChildren(el("div", "ph", "waiting")); $("#f" + n).textContent = ""; }
+  $("#s4").textContent = "Sepsis patients caught per 100, at the same alarm budget of 25.";
+  if (!REPLAY) { try { await fetch("/api/reset", { method: "POST" }); } catch (e) { fail(1, "could not reset the server"); } }
+}
+addEventListener("keydown", (e) => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key >= "1" && e.key <= "4") run(parseInt(e.key, 10));
+  else if (e.key === "r" || e.key === "R") reset();
+});
+(async function start() {
+  if (REPLAY === "auto" || UPTO) {
+    const last = UPTO || 4;
+    if (!UPTO) await new Promise((r) => setTimeout(r, 1500));
+    for (let n = 1; n <= last; n++) {
+      if (!(await run(n))) break;
+      if (!UPTO && n < last) await new Promise((r) => setTimeout(r, 2500));
+    }
+  }
+})();
+</script>
+</body>
+</html>

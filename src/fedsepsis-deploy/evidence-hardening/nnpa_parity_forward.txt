@@ -1,0 +1,14 @@
+data: test 9885 patients / 376665 rows; val 591 patients / 23421 rows
+install -> True [('nnpa_enabled', {'scope': 'all', 'min_rows': 0, 'torch': '2.11.0+cpu', 'telum2': True, 'selftest_max_err': '8.72e-03'})]
+
+== model_big_asis.json (borrowed model, threshold 0.516850)
+scores: max |diff| 2.04e-03, mean |diff| 1.52e-04, rows with |diff|>1e-3: 681 of 376665
+alert rate on test @ stored threshold: cpu 11.666600 (expected 11.666600) | nnpa 11.698459 | alerts cpu 1831 nnpa 1836
+retuned threshold (budget 25, val): cpu 0.425315 | nnpa 0.425481 | realized on val: cpu 25.0032 nnpa 25.0032
+retuned model on test: cpu 23.995858 | nnpa 24.021345 per 100 patient-days
+time, scoring all test rows: cpu 0.202s | nnpa 0.238s (median of 3)  | retune: cpu 0.04s nnpa 0.05s
+PARITY: |rate diff| 0.0319, |retuned-on-test rate diff| 0.0255 (limit 0.1 alerts per 100 patient-days)
+
+per-patient alert sequences (first 2000 test patients) that differ cpu vs nnpa: 2
+nnpa_scoring.stats(): {'enabled': True, 'scope': 'all', 'min_rows': 0, 'nnpa_calls': 2117, 'nnpa_rows': 1982053, 'nnpa_seconds': 0.3624, 'cpu_calls': 0, 'fallbacks': 0, 'last_error': None}
+RESULT: PASS

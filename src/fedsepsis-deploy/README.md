@@ -1,6 +1,6 @@
 # fedsepsis-deploy
 
-Deployment of the SepsisBridge / FedSepsis federated-learning demo on the IBM LinuxONE VM `datathon-test` (s390x).
+Deployment of the Dr Sepsis / FedSepsis federated-learning demo on the IBM LinuxONE VM `datathon-test` (s390x).
 One **aggregator** and one container per **hospital** exchange JSON over a private docker network. Hospital-to-aggregator
 traffic uses **mutual TLS 1.3**, every container is **hardened** (`HARDENING.md`), and only counts, sums and model weights
 leave a hospital. It runs Reju's real `fedsepsis` library (`MODE=real`). A pure-Python stub (`MODE=stub`) remains for
@@ -137,7 +137,7 @@ No data, patient-level output, key or token is committed (see `.gitignore`). To 
 1. Download the public **PhysioNet/CinC Challenge 2019** training data (hospital systems A and B, hourly `.psv` files):
    <https://physionet.org/content/challenge-2019/1.0.0/>. Put `training_setA/` and `training_setB/` under the project's
    `data/` folder (`config.py: DATA_DIR`).
-2. In the SepsisBridge project (Reju's folder, `src/`):
+2. In the Dr Sepsis project (Reju's folder, `src/`):
    - `src/load_data.py` parses the `.psv` files into one table per hospital.
    - `src/fed_data.py: build_fed_features` builds the 138 causal features: `_last`, `_mean6`, `_delta6` and `_since` for
      34 variables, plus Age and Gender. Each site fills missing values with its own training median.
@@ -292,3 +292,10 @@ A new person or machine generates its own; nothing needs to be copied from this 
 - **`docker inspect <container>` shows `TOKEN` in its Env**, so never paste that output anywhere. `collect_evidence.sh`
   captures only selected inspect fields and finishes with a token-leak scan.
 - **The SSH key for the VM is personal**: access comes from the organisers. It is not part of this project.
+
+## Optional extras: CPACF benchmark and NNPA scoring
+
+- `tests/cpacf_bench.sh`: CPACF on vs masked on our own mutual-TLS settings -> `evidence-hardening/cpacf_tls_bench.txt`; summary in `HARDENING.md` B3.
+- `NNPA.md`: optional scoring on the IBM Z accelerator (`NNPA_SCORE=1`, off by default; `hospital/nnpa_scoring.py`,
+  `hospital/Dockerfile.nnpa`, image tag `fedsepsis-hospital:nnpa`, `tests/test_nnpa_parity.py`). Measured: it works and stays within the
+  agreed 0.1 alerts per 100 patient-days of the CPU path, but it is not faster for this model.

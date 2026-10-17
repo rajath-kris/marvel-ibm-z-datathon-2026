@@ -1,4 +1,4 @@
-# SepsisBridge demo API (hospital containers on LinuxONE)
+# Dr Sepsis demo API (hospital containers on LinuxONE)
 
 For the demo page. All responses are JSON. Examples below are real responses from the VM (2026-10-17, MODE=real,
 40-round federated model, library fedsepsis 0.2.0).

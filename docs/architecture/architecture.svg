@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1020" width="1600" height="1020" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <title>Dr Sepsis architecture on IBM LinuxONE</title>
+  <desc>Two hospital containers train a logistic-regression sepsis model locally and send only counts, sums and model weights over mutual TLS 1.3 to an aggregator. A laptop reaches each hospital's demo API through an SSH tunnel. The whole stack runs in hardened containers on an IBM LinuxONE z/VM guest.</desc>
+  <defs>
+    <marker id="arrTeal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0F766E"/></marker>
+    <marker id="arrGrey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6B7280"/></marker>
+    <marker id="arrPurple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7C3AED"/></marker>
+  </defs>
+
+  <rect width="1600" height="1020" fill="#FFFFFF"/>
+
+  <!-- title -->
+  <text x="30" y="58" font-size="36" font-weight="700" fill="#111827">Dr Sepsis: federated sepsis early warning on IBM LinuxONE</text>
+  <text x="30" y="96" font-size="20" fill="#4B5563">Patient rows never leave a hospital. Only counts, sums and model weights cross the network, and every run checks it.</text>
+
+  <!-- ===== Hospital A ===== -->
+  <rect x="30" y="150" width="440" height="240" rx="14" fill="#EAF2FB" stroke="#2B6CB0" stroke-width="2.5"/>
+  <text x="50" y="186" font-size="24" font-weight="700" fill="#1E3A8A">Hospital A</text>
+  <text x="450" y="186" font-size="16" fill="#1E40AF" text-anchor="end" font-family="ui-monospace, Menlo, Consolas, monospace">container hospA</text>
+  <line x1="50" y1="200" x2="450" y2="200" stroke="#BFD4EE"/>
+  <text x="50" y="232" font-size="18" font-weight="600" fill="#1F2937">ICU data stays here</text>
+  <text x="50" y="254" font-size="16" fill="#4B5563">read-only mount, never sent anywhere</text>
+  <text x="50" y="292" font-size="18" font-weight="600" fill="#1F2937">Trains locally</text>
+  <text x="50" y="314" font-size="16" fill="#4B5563">logistic regression, 138 hourly features, 3 local epochs</text>
+  <text x="50" y="352" font-size="18" font-weight="600" fill="#1F2937">Scores its own patients</text>
+  <text x="50" y="374" font-size="16" fill="#4B5563">demo API on 127.0.0.1 only: /audit /retune /score /patient</text>
+
+  <!-- ===== Hospital B ===== -->
+  <rect x="30" y="420" width="440" height="240" rx="14" fill="#EAF2FB" stroke="#2B6CB0" stroke-width="2.5"/>
+  <text x="50" y="456" font-size="24" font-weight="700" fill="#1E3A8A">Hospital B</text>
+  <text x="450" y="456" font-size="16" fill="#1E40AF" text-anchor="end" font-family="ui-monospace, Menlo, Consolas, monospace">container hospB</text>
+  <line x1="50" y1="470" x2="450" y2="470" stroke="#BFD4EE"/>
+  <text x="50" y="502" font-size="18" font-weight="600" fill="#1F2937">ICU data stays here</text>
+  <text x="50" y="524" font-size="16" fill="#4B5563">read-only mount, never sent anywhere</text>
+  <text x="50" y="562" font-size="18" font-weight="600" fill="#1F2937">Trains locally</text>
+  <text x="50" y="584" font-size="16" fill="#4B5563">same code, same settings, its own patients</text>
+  <text x="50" y="622" font-size="18" font-weight="600" fill="#1F2937">Scores its own patients</text>
+  <text x="50" y="644" font-size="16" fill="#4B5563">either hospital can be the small one; both directions run</text>
+
+  <!-- ===== Aggregator ===== -->
+  <rect x="760" y="290" width="370" height="210" rx="14" fill="#E6F4F1" stroke="#0F766E" stroke-width="2.5"/>
+  <text x="780" y="326" font-size="24" font-weight="700" fill="#115E59">Aggregator</text>
+  <text x="1110" y="326" font-size="16" fill="#0F766E" text-anchor="end" font-family="ui-monospace, Menlo, Consolas, monospace">no host port</text>
+  <line x1="780" y1="340" x2="1110" y2="340" stroke="#B7DDD6"/>
+  <text x="780" y="372" font-size="17" fill="#1F2937"><tspan font-weight="700" fill="#0F766E">1</tspan>  Pools mean and std from n, sum, sumsq</text>
+  <text x="780" y="404" font-size="17" fill="#1F2937"><tspan font-weight="700" fill="#0F766E">2</tspan>  FedAvg, weighted by row count</text>
+  <text x="780" y="436" font-size="17" fill="#1F2937"><tspan font-weight="700" fill="#0F766E">3</tspan>  40 rounds, then the global model</text>
+  <text x="780" y="478" font-size="16" fill="#4B5563">token and client certificate on every call</text>
+
+  <!-- optional secure aggregation -->
+  <line x1="945" y1="500" x2="945" y2="520" stroke="#7C3AED" stroke-width="2" stroke-dasharray="5 4"/>
+  <rect x="760" y="520" width="370" height="112" rx="12" fill="#F5F0FF" stroke="#7C3AED" stroke-width="2" stroke-dasharray="7 5"/>
+  <text x="780" y="548" font-size="17" font-weight="700" fill="#5B21B6">Optional: secure aggregation</text>
+  <text x="780" y="572" font-size="15" fill="#374151">Sites add pairwise SHAKE-256 masks that cancel</text>
+  <text x="780" y="592" font-size="15" fill="#374151">in the sum, so the aggregator sees only the total.</text>
+  <text x="780" y="612" font-size="15" fill="#374151">3-site test: secure = plain, max difference 6.9e-17</text>
+
+  <!-- mutual TLS links -->
+  <line x1="470" y1="330" x2="760" y2="365" stroke="#0F766E" stroke-width="3.5" marker-start="url(#arrTeal)" marker-end="url(#arrTeal)"/>
+  <rect x="505" y="275" width="225" height="30" rx="15" fill="#0F766E"/>
+  <text x="617" y="296" font-size="16" font-weight="700" fill="#FFFFFF" text-anchor="middle">mutual TLS 1.3</text>
+  <text x="490" y="392" font-size="15" fill="#374151">up: n, sum, sumsq, w, b</text>
+  <text x="490" y="412" font-size="15" fill="#374151">down: pooled stats, global model</text>
+
+  <line x1="470" y1="545" x2="760" y2="450" stroke="#0F766E" stroke-width="3.5" marker-start="url(#arrTeal)" marker-end="url(#arrTeal)"/>
+  <rect x="505" y="558" width="225" height="30" rx="15" fill="#0F766E"/>
+  <text x="617" y="579" font-size="16" font-weight="700" fill="#FFFFFF" text-anchor="middle">mutual TLS 1.3</text>
+  <text x="490" y="614" font-size="15" fill="#374151">same fields, same rule</text>
+
+  <!-- demo API lines (via SSH tunnel) -->
+  <line x1="470" y1="185" x2="1190" y2="185" stroke="#6B7280" stroke-width="2.5" stroke-dasharray="8 6" marker-end="url(#arrGrey)"/>
+  <text x="830" y="174" font-size="15" fill="#4B5563" text-anchor="middle">hospital A demo API: plain HTTP on 127.0.0.1, reached by SSH tunnel</text>
+  <line x1="470" y1="645" x2="1190" y2="645" stroke="#6B7280" stroke-width="2.5" stroke-dasharray="8 6" marker-end="url(#arrGrey)"/>
+  <text x="830" y="670" font-size="15" fill="#4B5563" text-anchor="middle">hospital B demo API, same tunnel</text>
+
+  <!-- ===== Laptop / demo ===== -->
+  <rect x="1190" y="150" width="380" height="510" rx="14" fill="#F3F4F6" stroke="#6B7280" stroke-width="2.5"/>
+  <text x="1210" y="186" font-size="24" font-weight="700" fill="#374151">Laptop and demo</text>
+  <text x="1550" y="186" font-size="16" fill="#4B5563" text-anchor="end">outside the VM</text>
+  <line x1="1210" y1="200" x2="1550" y2="200" stroke="#D1D5DB"/>
+  <text x="1210" y="232" font-size="18" font-weight="600" fill="#1F2937">SSH tunnel (port 22)</text>
+  <text x="1210" y="254" font-size="16" fill="#4B5563">only 22 and 38888 (Jupyter) reach the VM</text>
+  <text x="1210" y="296" font-size="18" font-weight="600" fill="#1F2937">What a hospital can ask</text>
+  <text x="1210" y="322" font-size="16" fill="#374151"><tspan font-family="ui-monospace, Menlo, Consolas, monospace" font-weight="700">/audit</tspan>   alert rate, no labels</text>
+  <text x="1210" y="346" font-size="16" fill="#374151"><tspan font-family="ui-monospace, Menlo, Consolas, monospace" font-weight="700">/retune</tspan>  own threshold for a budget</text>
+  <text x="1210" y="370" font-size="16" fill="#374151"><tspan font-family="ui-monospace, Menlo, Consolas, monospace" font-weight="700">/score</tspan>   risk, hour by hour</text>
+  <text x="1210" y="394" font-size="16" fill="#374151"><tspan font-family="ui-monospace, Menlo, Consolas, monospace" font-weight="700">/patient</tspan> replay with alert hours</text>
+  <line x1="1210" y1="418" x2="1550" y2="418" stroke="#D1D5DB"/>
+  <text x="1210" y="450" font-size="18" font-weight="600" fill="#1F2937">Result on the small hospital</text>
+  <text x="1210" y="474" font-size="16" fill="#4B5563">borrowed model, then re-tuned locally</text>
+  <text x="1210" y="528" font-size="40" font-weight="700" fill="#B91C1C">93.5</text>
+  <text x="1316" y="526" font-size="30" fill="#4B5563">&#8594;</text>
+  <text x="1362" y="528" font-size="40" font-weight="700" fill="#15803D">27.2</text>
+  <text x="1210" y="556" font-size="16" fill="#374151">alerts per 100 patient-days (target 25)</text>
+  <text x="1210" y="580" font-size="16" fill="#374151">= 18.7 &#8594; 5.4 alarms a day on a 20-bed ward</text>
+  <text x="1210" y="620" font-size="14" fill="#6B7280">measured on 10,062 held-out patients, reverse run</text>
+  <text x="1210" y="640" font-size="14" fill="#6B7280">no labels used to re-tune</text>
+
+  <!-- legend -->
+  <line x1="30" y1="695" x2="80" y2="695" stroke="#0F766E" stroke-width="3.5"/>
+  <text x="90" y="700" font-size="15" fill="#374151">mutual TLS 1.3, aggregates only</text>
+  <line x1="380" y1="695" x2="430" y2="695" stroke="#6B7280" stroke-width="2.5" stroke-dasharray="8 6"/>
+  <text x="440" y="700" font-size="15" fill="#374151">demo API through the SSH tunnel</text>
+  <line x1="740" y1="695" x2="790" y2="695" stroke="#7C3AED" stroke-width="2" stroke-dasharray="7 5"/>
+  <text x="800" y="700" font-size="15" fill="#374151">optional feature</text>
+
+  <!-- ===== LinuxONE band ===== -->
+  <rect x="30" y="716" width="1540" height="276" rx="16" fill="#F4F7FF" stroke="#0F62FE" stroke-width="3"/>
+  <text x="50" y="752" font-size="22" font-weight="700" fill="#0043CE">Everything above runs on IBM LinuxONE</text>
+  <text x="50" y="778" font-size="17" fill="#374151">machine type 9175 (model 702 ME1), z/VM 7.3 guest, s390x big-endian, 3 vCPUs, Ubuntu 24.04 with Docker</text>
+
+  <rect x="50" y="796" width="470" height="180" rx="12" fill="#FFFFFF" stroke="#BFD0F5" stroke-width="2"/>
+  <text x="68" y="826" font-size="19" font-weight="700" fill="#1F2937">Hardened containers</text>
+  <text x="68" y="856" font-size="16" fill="#374151">Non-root (uid 1000), read-only root file system,</text>
+  <text x="68" y="878" font-size="16" fill="#374151">all capabilities dropped, no-new-privileges,</text>
+  <text x="68" y="900" font-size="16" fill="#374151">process limit 256. Demo ports bound to 127.0.0.1.</text>
+  <text x="68" y="922" font-size="16" fill="#374151">Hospital to aggregator: mutual TLS 1.3 only,</text>
+  <text x="68" y="944" font-size="16" fill="#374151">client certificate required.</text>
+
+  <rect x="565" y="796" width="470" height="180" rx="12" fill="#FFFFFF" stroke="#BFD0F5" stroke-width="2"/>
+  <text x="583" y="826" font-size="19" font-weight="700" fill="#1F2937">CPACF on-chip crypto assist <tspan font-size="14" font-weight="600" fill="#15803D">MEASURED</tspan></text>
+  <text x="583" y="856" font-size="16" fill="#374151">OpenSSL uses it for our TLS 1.3 link. Our own mTLS</text>
+  <text x="583" y="878" font-size="16" fill="#374151">settings, CPACF on vs masked:</text>
+  <text x="583" y="900" font-size="16" font-weight="600" fill="#1F2937">bulk transfer 1,350 vs 122 MB/s (11.1x)</text>
+  <text x="583" y="922" font-size="16" font-weight="600" fill="#1F2937">new connections 805 vs 182 per second (4.4x)</text>
+  <text x="583" y="948" font-size="14" fill="#6B7280">Benchmark only: hardware counters were not readable,</text>
+  <text x="583" y="966" font-size="14" fill="#6B7280">so we do not claim our own run used CPACF.</text>
+
+  <rect x="1080" y="796" width="470" height="180" rx="12" fill="#FFFFFF" stroke="#BFD0F5" stroke-width="2"/>
+  <text x="1098" y="826" font-size="19" font-weight="700" fill="#1F2937">NNPA AI accelerator <tspan font-size="14" font-weight="600" fill="#15803D">MEASURED</tspan></text>
+  <text x="1098" y="856" font-size="16" fill="#374151">Optional scoring path, off by default (NNPA_SCORE=1).</text>
+  <text x="1098" y="878" font-size="16" fill="#374151">Only the scoring product runs on the accelerator.</text>
+  <text x="1098" y="900" font-size="16" fill="#374151">Matches the CPU within 0.1 alerts per 100</text>
+  <text x="1098" y="922" font-size="16" fill="#374151">patient-days in both demo directions.</text>
+  <text x="1098" y="948" font-size="14" fill="#6B7280">Not faster for this small model, so we claim</text>
+  <text x="1098" y="966" font-size="14" fill="#6B7280">availability and parity, not a speed-up.</text>
+</svg>

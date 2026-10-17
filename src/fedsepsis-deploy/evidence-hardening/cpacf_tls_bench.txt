@@ -1,0 +1,15 @@
+# 2026-10-17T18:12:03Z  image fedsepsis-hospital:hard, hardened flags (non-root, read-only root, caps dropped), 2 cpus
+## default
+negotiated: TLSv1.3 TLS_AES_256_GCM_SHA384 | peer cert verified, client cert presented (mutual TLS)
+openssl: OpenSSL 3.5.5 27 Jan 2026 | OPENSSL_s390xcap = (unset, CPACF as detected)
+mTLS bulk 400 MB x3: 1196, 1350, 1368 MB/s  median 1350 MB/s
+mTLS handshakes: 805/s (60 new connections)
+SHAKE-256 absorb: 3869 MB/s
+SHAKE-256 squeeze (mask stream): 1133 MB/s
+## masked
+negotiated: TLSv1.3 TLS_AES_256_GCM_SHA384 | peer cert verified, client cert presented (mutual TLS)
+openssl: OpenSSL 3.5.5 27 Jan 2026 | OPENSSL_s390xcap = stfle:0:0:0:0:kimd:0:0:klmd:0:0:km:0:0:kmc:0:0:kmac:0:0:kmctr:0:0:kmo:0:0:kmf:0:0:prno:0:0:kma:0:0:pcc:0:0:kdsa:0:0
+mTLS bulk 400 MB x3: 122, 122, 123 MB/s  median 122 MB/s
+mTLS handshakes: 182/s (60 new connections)
+SHAKE-256 absorb: 334 MB/s
+SHAKE-256 squeeze (mask stream): 291 MB/s
