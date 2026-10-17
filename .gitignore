@@ -1,0 +1,35 @@
+# Event material (has private Zoom links; keep it out of the public repo)
+*Guidebook*.pdf
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Secrets
+.env
+*.pem
+*.key
+
+# Data and model artifacts
+data/raw/
+data/processed/
+models/*
+!models/.gitkeep
+*.pkl
+*.joblib
+*.onnx
+*.h5
+*.pt
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
