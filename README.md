@@ -144,4 +144,6 @@ The patient data is not in this repository (see Data), so the live stack needs t
 
 ## Demo video
 
-_Link coming: 3 minutes maximum._
+[![Dr Sepsis demo video (3 minutes)](https://img.youtube.com/vi/rPO3kQknFQg/hqdefault.jpg)](https://youtu.be/rPO3kQknFQg)
+
+Watch on YouTube: <https://youtu.be/rPO3kQknFQg>
