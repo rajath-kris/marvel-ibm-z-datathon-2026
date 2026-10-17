@@ -1,0 +1,107 @@
+# verify merged hardened + mTLS code on test stacks  (2026-10-17T15:22:51Z)
+# memory before: MemAvailable 4450 MB
+mTLS test CA + certificates in ~/.fedsepsis-mtest/mtls (5 client certs)
+
+=== forward direction (mtest-*, 127.0.0.1:9102)
+PASS  forward: end-to-end training round on the hardened mTLS stack
+  train config (repro_config.json setup4): rounds=40 lr=0.1 local_epochs=3 l2=0.001 class_weight=30.0 b0=-1.0
+  pre-flight: MemAvailable 4434 MB (need >= 3072); other containers: hospB,hospA,fedsepsis-aggregator,rev-hospA,rev-hospB,rev-fedsepsis-aggregator; processes >50% CPU: none
+  rounds completed: 40 / 40   done=True   sites=['hospA', 'hospB']
+  all sites hold the identical final model: True
+  runtime (aggregator start -> all final models written): 44.3s
+  PASS  mtest-aggregator         User=1000:1000 ReadonlyRootfs=True CapDrop=['ALL'] SecurityOpt=['no-new-privileges:true'] Pids=256 Ports=[]
+  PASS  mtest-hospA              User=1000:1000 ReadonlyRootfs=True CapDrop=['ALL'] SecurityOpt=['no-new-privileges:true'] Pids=256 Ports=['127.0.0.1:9101']
+  PASS  mtest-hospB              User=1000:1000 ReadonlyRootfs=True CapDrop=['ALL'] SecurityOpt=['no-new-privileges:true'] Pids=256 Ports=['127.0.0.1:9102']
+PASS  forward: hardening flags on every mtest-* container (docker inspect)
+PASS  mtest-aggregator: TLS 1.3 server requires a client certificate
+PASS  mtest-aggregator: mutual-TLS session with client_cn=hospA (TLSv1.3)
+PASS  mtest-aggregator: mutual-TLS session with client_cn=hospB (TLSv1.3)
+        2026-10-17T15:22:53Z event=tls_session site=- round=- client_cn=monitor version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384
+        2026-10-17T15:22:53Z event=tls_session site=- round=- client_cn=hospA version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384
+        2026-10-17T15:22:54Z event=tls_session site=- round=- client_cn=hospB version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384
+  # outputs/fed/results_long_S1.csv, seed 0, direction A>B (big=A, small=B), fraction 0.1, scenario S1
+  # endpoint http://127.0.0.1:9102, health: {"ok": true, "site_id": "hospB", "status": "done", "final_model": true, "mode": "real", "eval_data": "small_test_patients.npz", "retune_data": "small_val_patients.npz"}
+    PASS  borrowed: stored threshold                                 ours     0.516850   experiment     0.516850   |diff| 0.00e+00
+    PASS  borrowed: alerts / 100 patient-days on test                ours    11.666600   experiment    11.666600   |diff| 0.00e+00
+    PASS  retune borrowed @25 on small_val_patients.npz: threshold   ours     0.425315   experiment     0.425315   |diff| 5.55e-17
+    PASS  retuned borrowed: alerts / 100 patient-days on test        ours    23.995858   experiment    23.995858   |diff| 3.55e-15
+    PASS  federated (this deployment's model): stored threshold      ours     0.428312   experiment     0.428312   |diff| 0.00e+00
+    PASS  federated: alerts / 100 patient-days on test               ours    22.453905   experiment    22.453905   |diff| 0.00e+00
+    PASS  news2: stored threshold (points)                           ours     6.800491   experiment     6.800491   |diff| 0.00e+00
+    PASS  news2: alerts / 100 patient-days on test                   ours    24.531082   experiment    24.531082   |diff| 0.00e+00
+    PASS  news2 /retune returns the documented threshold: 6.80049126236554 (fixed from experiment; alert when NEWS2 points >= 7 (crossing, then 6 h silence))
+    patient-days on test: 15694.375  patients: 9885
+  # replay of demo_patient.json examples (reference: model_federated_best.json / model_big_asis.json)
+    PASS  success_example  patient     71 federated alerts identical True, max |score diff| 2.43e-08, alert hours [29], onset 31.0
+    PASS  success_example  patient     71 borrowed  alerts identical True, max |score diff| 1.11e-16, alert hours [], onset 31.0
+          success_example  patient     71 retuned   threshold 0.425315, alert hours []
+          success_example  patient     71 news2     threshold 6.80049, alert hours [2, 20]
+    PASS  failure_example  patient  13561 federated alerts identical True, max |score diff| 1.62e-08, alert hours [], onset 25.0
+    PASS  failure_example  patient  13561 borrowed  alerts identical True, max |score diff| 0.00e+00, alert hours [], onset 25.0
+          failure_example  patient  13561 retuned   threshold 0.425315, alert hours []
+          failure_example  patient  13561 news2     threshold 6.80049, alert hours [25]
+  ALL PASS
+PASS  forward: /audit, /retune, /patient vs the experiment (tests/check_direction.py)
+  82 requests, keys ['b', 'n', 'round', 'site_id', 'sum', 'sumsq', 'w']
+PASS  mtest-aggregator: allowed fields only (site_id, n, sum, sumsq, round, w, b)
+  removed mtest-* and mtest-net
+
+=== reverse direction (mtest-rev-*, 127.0.0.1:9202)
+PASS  reverse: end-to-end training round on the hardened mTLS stack
+  train config (repro_config.json setup4): rounds=28 lr=0.1 local_epochs=3 l2=0.001 class_weight=30.0 b0=-1.0
+  pre-flight: MemAvailable 4430 MB (need >= 3072); other containers: hospB,hospA,fedsepsis-aggregator,rev-hospA,rev-hospB,rev-fedsepsis-aggregator; processes >50% CPU: none
+  rounds completed: 28 / 28   done=True   sites=['hospA', 'hospB']
+  all sites hold the identical final model: True
+  runtime (aggregator start -> all final models written): 31.7s
+  PASS  mtest-rev-aggregator     User=1000:1000 ReadonlyRootfs=True CapDrop=['ALL'] SecurityOpt=['no-new-privileges:true'] Pids=256 Ports=[]
+  PASS  mtest-rev-hospA          User=1000:1000 ReadonlyRootfs=True CapDrop=['ALL'] SecurityOpt=['no-new-privileges:true'] Pids=256 Ports=['127.0.0.1:9202']
+  PASS  mtest-rev-hospB          User=1000:1000 ReadonlyRootfs=True CapDrop=['ALL'] SecurityOpt=['no-new-privileges:true'] Pids=256 Ports=['127.0.0.1:9201']
+PASS  reverse: hardening flags on every mtest-rev-* container (docker inspect)
+PASS  mtest-rev-aggregator: TLS 1.3 server requires a client certificate
+PASS  mtest-rev-aggregator: mutual-TLS session with client_cn=hospB (TLSv1.3)
+PASS  mtest-rev-aggregator: mutual-TLS session with client_cn=hospA (TLSv1.3)
+        2026-10-17T15:23:42Z event=tls_session site=- round=- client_cn=monitor version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384
+        2026-10-17T15:23:43Z event=tls_session site=- round=- client_cn=hospB version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384
+        2026-10-17T15:23:43Z event=tls_session site=- round=- client_cn=hospA version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384
+  # outputs/fed/results_long_S1.csv, seed 0, direction B>A (big=B, small=A), fraction 0.1, scenario S1
+  # endpoint http://127.0.0.1:9202, health: {"ok": true, "site_id": "hospA", "status": "done", "final_model": true, "mode": "real", "eval_data": "small_test_patients.npz", "retune_data": "small_val_patients.npz"}
+    PASS  borrowed: stored threshold                                 ours     0.388824   experiment     0.388824   |diff| 0.00e+00
+    PASS  borrowed: alerts / 100 patient-days on test                ours    93.547483   experiment    93.547483   |diff| 0.00e+00
+    PASS  retune borrowed @25 on small_val_patients.npz: threshold   ours     0.563626   experiment     0.563626   |diff| 0.00e+00
+    PASS  retuned borrowed: alerts / 100 patient-days on test        ours    27.157763   experiment    27.157763   |diff| 3.55e-15
+    PASS  federated (this deployment's model): stored threshold      ours     0.605076   experiment     0.605076   |diff| 0.00e+00
+    PASS  federated: alerts / 100 patient-days on test               ours    25.188213   experiment    25.188213   |diff| 0.00e+00
+    PASS  news2: stored threshold (points)                           ours     7.000000   experiment     7.000000   |diff| 0.00e+00
+    PASS  news2: alerts / 100 patient-days on test                   ours    30.729865   experiment    30.729865   |diff| 0.00e+00
+    PASS  news2 /retune returns the documented threshold: 7.0 (fixed from experiment; alert when NEWS2 points >= 7 (crossing, then 6 h silence))
+    patient-days on test: 16348.916666666666  patients: 10062
+  # replay of demo_patient.json examples (reference: model_federated_best.json / model_big_asis.json)
+    PASS  success_example  patient    271 federated alerts identical True, max |score diff| 5.94e-08, alert hours [22, 34, 68, 97], onset 96.0
+    PASS  success_example  patient    271 borrowed  alerts identical True, max |score diff| 0.00e+00, alert hours [0, 59, 67], onset 96.0
+          success_example  patient    271 retuned   threshold 0.563626, alert hours [37, 68]
+          success_example  patient    271 news2     threshold 7, alert hours [2, 14, 28, 81, 91]
+    PASS  failure_example  patient  13364 federated alerts identical True, max |score diff| 1.33e-08, alert hours [], onset 12.0
+    PASS  failure_example  patient  13364 borrowed  alerts identical True, max |score diff| 0.00e+00, alert hours [0], onset 12.0
+          failure_example  patient  13364 retuned   threshold 0.563626, alert hours []
+          failure_example  patient  13364 news2     threshold 7, alert hours []
+  ALL PASS
+PASS  reverse: /audit, /retune, /patient vs the experiment (tests/check_direction.py)
+  58 requests, keys ['b', 'n', 'round', 'site_id', 'sum', 'sumsq', 'w']
+PASS  mtest-rev-aggregator: allowed fields only (site_id, n, sum, sumsq, round, w, b)
+  removed mtest-rev-* and mtest-rev-net
+
+=== secure 3-site run (mtest-sec-*, ICU-map split, plain vs masked, hardened + mTLS)
+  Ran 10 tests in 0.030s
+  OK
+  RUN FAILED
+FAIL  secure: masked = plain within 1e-9
+FAIL  secure: allowed fields only
+FAIL  secure: hardening flags on every mtest-sec-* container
+FAIL  mtest-sec-aggregator: TLS 1.3 server requires a client certificate
+FAIL  mtest-sec-aggregator: mutual-TLS session with client_cn=hospA1 (TLSv1.3)
+FAIL  mtest-sec-aggregator: mutual-TLS session with client_cn=hospA2 (TLSv1.3)
+FAIL  mtest-sec-aggregator: mutual-TLS session with client_cn=hospB (TLSv1.3)
+  removed mtest-sec-* and mtest-sec-net
+
+# memory after: MemAvailable 4421 MB
+SOME CHECKS FAILED

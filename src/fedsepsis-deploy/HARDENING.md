@@ -88,24 +88,43 @@ The rates are identical to the live (unhardened) deployment's saved evidence. Ru
 | Aggregator log | one `tls_session` line per client: `client_cn=hospA` / `hospB` / `monitor`, `TLSv1.3`, `TLS_AES_256_GCM_SHA384`; refused connections logged |
 | Hospitals | present their certificates (`client_cert=True`) |
 
-## B3: CPACF (on-chip crypto assist): NOT CONFIRMED
+## B3: CPACF (on-chip crypto assist): NOT CONFIRMED for our traffic
 
-The rule was fixed before running (`tests/test_cpacf.sh`): **CPACF USED** only if `cpacfstats` can be read before and
-after one full mTLS round **and** at least one counter increases. Otherwise the verdict is **NOT CONFIRMED**.
+**In one line:** the processor has on-chip crypto (CPACF), and a benchmark shows OpenSSL on this VM uses it. We could not
+measure whether **our training traffic** used it, so we do not claim it.
 
-What happened (`evidence-hardening/cpacf_verdict.txt`, `cpacfstats_before.txt`, `cpacfstats_after.txt`,
-`cpacf_environment.txt`):
+What is certain:
+- **The hardware has it.** Every IBM Z / LinuxONE processor includes CPACF. This VM's CPU flags include `msa`, the
+  message-security-assist instructions that expose it (`evidence/cpu_features.txt`).
+- **OpenSSL here very likely uses it** (`evidence-hardening/cpacf_indirect_hint.txt`). With OpenSSL's s390x
+  CPU-capability masks zeroed (`OPENSSL_s390xcap`):
+  - AES-256-GCM drops from about 15.1 GB/s to 0.14 GB/s.
+  - SHA-256 inside the hardened hospital image drops from 3965 to 258 MB/s.
+
+  The bare value `off` had no effect on this OpenSSL (`cpacf_indirect_off_switch_no_effect.txt`), so it was discarded.
+
+What was not confirmed, and why. The rule was fixed before running (`tests/test_cpacf.sh`): **CPACF USED** only if
+`cpacfstats` can be read before and after one full mTLS round **and** at least one counter increases. Otherwise the
+verdict is **NOT CONFIRMED**.
 - `cpacfstats` could not read any counter before or after the round: "Can't access domain socket file
-  '/run/cpacfstatsd_socket' ... Maybe cpacfstatsd daemon is not running". `linux1` is in the `cpacfstats` group, but the
-  daemon is **inactive**, and starting it needs root (no sudo here).
-- Unprivileged `perf` is off (`kernel.perf_event_paranoid=4`), so the PAI crypto counters can't be read that way either.
-- Verdict, as recorded: **`VERDICT: CPACF NOT CONFIRMED`**.
+  '/run/cpacfstatsd_socket' ... Maybe cpacfstatsd daemon is not running" (`cpacfstats_before.txt`, `cpacfstats_after.txt`).
+  `linux1` is in the `cpacfstats` group, but the daemon is **inactive**, and starting it needs root (no sudo here).
+- Unprivileged `perf` is off (`kernel.perf_event_paranoid=4`), so the PAI crypto counters can't be read that way either
+  (`cpacf_environment.txt`).
+- Verdict, as recorded: **`VERDICT: CPACF NOT CONFIRMED`** (`cpacf_verdict.txt`).
 
-A supplementary observation, which is **not** the verdict (`cpacf_indirect_hint.txt`): with OpenSSL's s390x CPU-capability
-masks zeroed (`OPENSSL_s390xcap`), AES-256-GCM drops from about 15.1 GB/s to 0.14 GB/s, and SHA-256 inside the hardened
-hospital image drops from 3965 to 258 MB/s. That suggests OpenSSL **can** use CPACF on this machine. It does **not** show
-that a federated round did. The bare value `off` had no effect on this OpenSSL (`cpacf_indirect_off_switch_no_effect.txt`),
-so it was discarded. **We do not claim on-chip crypto.**
+**Wording for the deck:**
+- Allowed: "The platform provides CPACF, and a benchmark on our VM shows OpenSSL runs 20 to 100x faster with it enabled. We
+  did not measure whether our training traffic used it."
+- Not allowed: "our system uses on-chip crypto" or "our TLS is hardware-accelerated".
+
+**How to turn this into a real claim** (needs someone with root on the VM, such as the organisers):
+```bash
+sudo systemctl start cpacfstatsd          # admin, once
+./tests/test_cpacf.sh                     # us: reads the counters before and after one mTLS round, writes the verdict
+```
+If at least one counter increases during the round, the verdict becomes **CPACF USED** and the claim can be made with that
+evidence.
 
 ## What this does not protect
 
@@ -117,11 +136,19 @@ so it was discarded. **We do not claim on-chip crypto.**
 - **Hardening is not tamper-proof.** It limits what a compromised process inside a container can do; it doesn't stop a
   privileged user on the host.
 
-## B4: hygiene (this commit)
+## Merge into the live deployment (2026-10-18)
+
+The merge happened on `feat/fedsepsis-deploy` (merge commit `adf4808`; rollback tag `pre-hardening-merge`).
+- **Run it:** `./run_live.sh` starts both live directions with `HARDEN=1 MTLS=1`.
+- **Test stack:** `tests/verify_merge.sh` checks the merged code on a separate one (names `mtest-*`, ports 9101 to 9202,
+  its own CA). The forward, reverse and secure 3-site runs all passed (`evidence/verify_merge*.txt`) before the live
+  stacks were swapped.
+
+## B4: hygiene
 
 - **Scan before committing:** no PEM blocks, and no `.pem`/`.key`/`.crt`/`.csr`/`.srl`/`.seed` files in the worktree.
   None of the 2 tokens, 3 pair seeds or 8 private keys on the VM appears in any file or in the git history (matched by
   content and listed by name, never printed).
-- **Certificates and the CA** stay in `~/.fedsepsis-hardening/mtls/` (and `~/.fedsepsis/mtls/` for the live stack after
-  the merge), outside the repository and git-ignored.
+- **Certificates and the CA** stay outside the repository and are git-ignored: the test stack in
+  `~/.fedsepsis-hardening/mtls/`, the live stacks (since the merge on 2026-10-18) in `~/.fedsepsis/mtls/`.
 - **Test stack removed:** the `hard-*` containers and `hard-net` are gone (`./stop_hardened.sh`).

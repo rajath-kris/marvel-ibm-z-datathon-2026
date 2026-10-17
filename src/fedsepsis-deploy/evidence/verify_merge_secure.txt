@@ -1,0 +1,36 @@
+# verify merged hardened + mTLS code on test stacks  (2026-10-17T15:25:16Z)
+# memory before: MemAvailable 4435 MB
+mTLS test CA + certificates in ~/.fedsepsis-mtest/mtls (5 client certs)
+
+=== secure 3-site run (mtest-sec-*, ICU-map split, plain vs masked, hardened + mTLS)
+  Ran 10 tests in 0.029s
+  OK
+  split: map map.json, 7612 unmapped patients left out; source site_big.npz 626881 rows, 16269 patients, left out 7612
+  rounds completed: 40 / 40   done=True   sites=['hospA1', 'hospA2', 'hospB']
+  2026-10-17T15:25:21Z event=start site=- round=0 sites=hospA1,hospA2,hospB expected_rounds=40 restored=False done=False secure=False
+  secure=0 split=map-icu_map runtime=27.2s
+  rounds completed: 40 / 40   done=True   sites=['hospA1', 'hospA2', 'hospB']
+  2026-10-17T15:25:50Z event=start site=- round=0 sites=hospA1,hospA2,hospB expected_rounds=40 restored=False done=False secure=True
+  secure=1 split=map-icu_map runtime=25.4s
+    union of keys: ['b', 'n', 'round', 'site_id', 'sum', 'sumsq', 'w'] | ASSERT subset of allowed : True
+  ASSERT max |masked - plain| <= 1e-9 : True  (6.939e-17)
+  wrote demo/secure_summary.json: sites ['hospA1', 'hospA2', 'hospB'], max |secure - plain| 6.939e-17, runtimes 25.4s / 27.2s
+PASS  secure: masked = plain within 1e-9
+PASS  secure: allowed fields only
+  PASS  mtest-sec-aggregator     User=1000:1000 ReadonlyRootfs=True CapDrop=['ALL'] SecurityOpt=['no-new-privileges:true'] Pids=256 Ports=[]
+  PASS  mtest-sec-hospA1         User=1000:1000 ReadonlyRootfs=True CapDrop=['ALL'] SecurityOpt=['no-new-privileges:true'] Pids=256 Ports=['127.0.0.1:9111']
+  PASS  mtest-sec-hospA2         User=1000:1000 ReadonlyRootfs=True CapDrop=['ALL'] SecurityOpt=['no-new-privileges:true'] Pids=256 Ports=['127.0.0.1:9112']
+  PASS  mtest-sec-hospB          User=1000:1000 ReadonlyRootfs=True CapDrop=['ALL'] SecurityOpt=['no-new-privileges:true'] Pids=256 Ports=['127.0.0.1:9113']
+PASS  secure: hardening flags on every mtest-sec-* container
+PASS  mtest-sec-aggregator: TLS 1.3 server requires a client certificate
+PASS  mtest-sec-aggregator: mutual-TLS session with client_cn=hospA1 (TLSv1.3)
+PASS  mtest-sec-aggregator: mutual-TLS session with client_cn=hospA2 (TLSv1.3)
+PASS  mtest-sec-aggregator: mutual-TLS session with client_cn=hospB (TLSv1.3)
+        2026-10-17T15:25:50Z event=tls_session site=- round=- client_cn=monitor version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384
+        2026-10-17T15:25:51Z event=tls_session site=- round=- client_cn=hospA1 version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384
+        2026-10-17T15:25:52Z event=tls_session site=- round=- client_cn=hospA2 version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384
+        2026-10-17T15:25:52Z event=tls_session site=- round=- client_cn=hospB version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384
+  removed mtest-sec-* and mtest-sec-net
+
+# memory after: MemAvailable 4389 MB
+ALL CHECKS PASSED

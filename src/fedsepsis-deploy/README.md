@@ -1,9 +1,12 @@
 # fedsepsis-deploy
 
-Deployment skeleton for the FedSepsis federated-learning demo on the LinuxONE VM `datathon-test` (s390x).
-It runs one **aggregator** and two **hospital** containers (`hospA`, `hospB`) that talk JSON over HTTP on a private
-docker network. The ML library is not ready yet, so the hospitals run against a **pure-Python stub** (`MODE=stub`).
-`MODE=real` switches to the real `fedsepsis` package once it arrives.
+Deployment of the SepsisBridge / FedSepsis federated-learning demo on the IBM LinuxONE VM `datathon-test` (s390x).
+One **aggregator** and one container per **hospital** exchange JSON over a private docker network. Hospital-to-aggregator
+traffic uses **mutual TLS 1.3**, every container is **hardened** (`HARDENING.md`), and only counts, sums and model weights
+leave a hospital. It runs Reju's real `fedsepsis` library (`MODE=real`). A pure-Python stub (`MODE=stub`) remains for
+tests that don't need data.
+
+**New to this project or setting it up elsewhere?** Start with [`SETUP.md`](SETUP.md).
 
 ```
               docker network fedsepsis-net (bridge)
@@ -20,6 +23,33 @@ docker network. The ML library is not ready yet, so the hospitals run against a 
 
 Only aggregates cross the network: per-feature `n/sum/sumsq` once, then `w/b/n` per round. Patient rows stay in each
 hospital's read-only `/data` mount. Test (f) checks this against the aggregator's key log.
+
+## Current live deployment (2026-10-18)
+
+| Stack | Containers | Demo port (plain HTTP, 127.0.0.1) | Data |
+|---|---|---|---|
+| forward: hospital B small, borrows A's model | `fedsepsis-aggregator`, `hospA`, `hospB` | 8101 / **8102** | `~/handoff/outputs/demo/` |
+| reverse: hospital A small, borrows B's model | `rev-fedsepsis-aggregator`, `rev-hospB`, `rev-hospA` | 8201 / **8202** | `~/handoff/outputs/demo_reverse/` |
+| secure 3-site demo (started on demand) | `sec-aggregator`, `sec-hospA1` (medical ICU), `sec-hospA2` (surgical ICU), `sec-hospB` | 8111-8113 | ICU-map split of hospital A + B |
+
+```bash
+./run_live.sh                         # (re)start both directions: HARDEN=1 MTLS=1, settings from each bundle's repro_config.json
+./run_live.sh reverse                 # one direction
+python3 tests/check_direction.py http://127.0.0.1:8102 ~/handoff/outputs/demo           # numbers vs the experiment
+python3 tests/check_direction.py http://127.0.0.1:8202 ~/handoff/outputs/demo_reverse
+SPLIT_MAP=~/handoff/icu_map.json ./tests/test_secure_e2e.sh                               # secure vs plain, 3 sites
+video/scene_a_linuxone.sh   # ... scene_d_fields.sh: the video scenes (video/README.md)
+~/rollback_pre_merge.sh               # roll the live stacks back to before the hardening merge (tag pre-hardening-merge)
+```
+
+Verified on 2026-10-18 after the hardening merge (`evidence/check_forward.txt`, `evidence/check_reverse.txt`,
+`evidence/hardening_flags.txt`):
+- forward: borrowed 11.666600, re-tuned 23.995858, federated 22.453905, NEWS2 24.531082
+- reverse: borrowed 93.547483, re-tuned 27.157763, federated 25.188213, NEWS2 30.729865
+
+All match the experiment exactly. All six containers run as `1000:1000` with a read-only root filesystem, `CapDrop [ALL]`
+and `no-new-privileges`. Both aggregators require client certificates (TLS 1.3). The API for the demo page is in
+`DEMO_API.md` and is unchanged by the hardening.
 
 ## Base image decision (Step 1)
 
@@ -218,44 +248,47 @@ weights or normalisation sums.
 
 ## What is NOT implemented / not protected
 
-- **By default there is no TLS.** The shared token and all aggregates (stats, weights) travel in **plain HTTP** inside the
-  docker bridge network. Anyone with root or docker access on this VM can read them. TLS is opt-in (`TLS=1`, below).
-- **There is no Secure Execution** (IBM Secure Execution for Linux) on this VM. It is an ordinary z/VM guest, so the host,
+- **No Secure Execution** (IBM Secure Execution for Linux) on this VM. It is an ordinary z/VM guest, so the host,
   hypervisor and VM admins can see container memory, data and keys.
-- **One shared token for all sites.** It authenticates "a member", not *which* member. Any token holder can post as any
-  `site_id`. There are no per-site credentials, and no mTLS.
-- **No differential privacy and no secure aggregation.** The aggregator sees each site's exact `sum/sumsq` and weights.
-- **`/score` on the hospitals has no authentication.** It is bound to `127.0.0.1` only, so it's reachable from the VM or through
-  the ssh tunnel.
-- The stub "trains" nothing. Its weights are the global model plus seeded noise, so the scores and alerts are meaningless.
-- There is no automatic restart policy. A crashed container stays down until you rerun.
+- **On-chip crypto (CPACF) is not claimed.** The processor has it, and a benchmark shows OpenSSL on this VM uses it, but we
+  could not confirm that our training traffic did (the counters need root). See `HARDENING.md`, B3.
+- **The demo port has no authentication.** The hospital `/score`, `/audit`, `/retune` and `/patient` endpoints are plain HTTP
+  bound to `127.0.0.1`, so they're reachable only on the VM or through the ssh tunnel.
+- **One shared API token**, in addition to mutual TLS. The client certificate identifies the site (its CN must equal the
+  posted `site_id`); the token only gates the API.
+- **Secure aggregation** (stretch, `fedsecure/`) has no dropout recovery and uses pre-shared pair seeds rather than
+  Diffie-Hellman. Two-site runs (the main demo) do not use it, because with two sites it cannot hide anything.
+- **No differential privacy.** In the two-site demo the aggregator sees each site's sums and weights.
+- **The throwaway CA has no revocation and no hardware key storage.** Keys are files on the VM (mode 600).
+- **No automatic restart policy.** A crashed container stays down until `./run_live.sh` is rerun.
+- The stub (`MODE=stub`) trains nothing. Its weights are the global model plus seeded noise.
 
-## TLS (optional, Step 8): what it does and does not do
+## TLS and mutual TLS
 
-```bash
-./setup_tls.sh                # once: self-signed P-256 cert, CN/SAN=aggregator, 30 days, in ~/.fedsepsis/tls/
-TLS=1 ./run_demo.sh
-./tests/test_tls.sh
-```
+The live stacks run **mutual TLS** (`MTLS=1`, see `HARDENING.md`):
+- The aggregator accepts TLS 1.3 only, and requires a client certificate from the project CA in `~/.fedsepsis/mtls/`.
+- Each hospital presents its own certificate (CN = site id), and pins the aggregator's certificate.
+- The aggregator rejects a POST whose `site_id` differs from the certificate's CN (403).
 
-- **How it works.** The aggregator wraps its socket with the `ssl` module and **accepts TLS 1.3 only**. The private key is mounted
-  read-only into the aggregator container only. Hospitals trust **only** the pinned certificate (no system CAs), check the
-  hostname `aggregator`, and also compare the server certificate's SHA-256 fingerprint to `TLS_PIN_SHA256`. On a mismatch they
-  stop immediately rather than retry.
-- **What it protects.** The token and the aggregates are encrypted between the containers. A container that impersonates
-  `aggregator` without the key is rejected (verified: a rogue self-signed cert for the same name fails, and so does a wrong pin).
-- **What it doesn't protect.**
-  - There is no client authentication beyond the shared token (no mTLS).
-  - Anyone who can read `~/.fedsepsis/` or run docker on the VM can take the key and token.
-  - It doesn't change anything about the host or hypervisor (no Secure Execution).
-  - `/score` on the hospitals is still plain HTTP on localhost.
-  - The TLS handshake runs in the server's accept loop, so a slow client can delay other connections (acceptable for a demo).
-- **Rotating the cert:** run `./setup_tls.sh --rotate`, then rerun. The pin is read from the cert at start time.
+`./setup_mtls.sh` creates the CA and certificates on first use. `run_live.sh` calls it if they're missing.
 
-## Where secrets live
+The older one-way TLS option (`TLS=1` with `./setup_tls.sh`, tested by `tests/test_tls.sh`) still works, but it's superseded.
 
-- `~/.fedsepsis/token`, `~/.fedsepsis/curl-header`, `~/.fedsepsis/tls/aggregator.key`: all mode 600, outside the project.
-- Containers get the token through `-e TOKEN` with the value taken from the environment. It never appears on a command
-  line or in the project.
-- `docker inspect <container>` **does** show `TOKEN` in its Env, so never paste that output anywhere. `collect_evidence.sh`
-  only inspects the network, and finishes with a token-leak scan over `evidence/`.
+## Where secrets live (never commit or share them)
+
+All of these are created **on the machine that runs the stack** by the setup scripts, live outside the project, and are mode 600.
+A new person or machine generates its own; nothing needs to be copied from this VM.
+
+| Path | What | Created by |
+|---|---|---|
+| `~/.fedsepsis/token`, `~/.fedsepsis/curl-header` | shared API token (and a curl header file, so it never appears on a command line) | `./setup_token.sh` |
+| `~/.fedsepsis/mtls/` | CA key + certificate, aggregator and per-site client certificates (`hospA`, `hospB`, `hospA1`, `hospA2`, `monitor`) | `./setup_mtls.sh` |
+| `~/.fedsepsis/pairs/*.seed` | pairwise seeds for secure aggregation (rotated every secure run) | `./setup_pairs.sh` (called by `run_secure.sh`) |
+| `~/.fedsepsis/tls/` | one-way TLS certificate (superseded option) | `./setup_tls.sh` |
+| `~/.fedsepsis-hardening/`, `~/.fedsepsis-mtest/` | the test stacks' own token and CA | `run_hardened.sh` / `tests/verify_merge.sh` |
+
+- **Containers get the token through `-e TOKEN`**, with the value taken from the environment, so it never appears on a
+  command line or in the project.
+- **`docker inspect <container>` shows `TOKEN` in its Env**, so never paste that output anywhere. `collect_evidence.sh`
+  captures only selected inspect fields and finishes with a token-leak scan.
+- **The SSH key for the VM is personal**: access comes from the organisers. It is not part of this project.
