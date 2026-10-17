@@ -2,6 +2,7 @@
 # Scene c: three sites train together; the aggregator only ever sees scrambled numbers.
 source "$(dirname "$0")/common.sh"
 MAP=${SPLIT_MAP:-$HOME/handoff/icu_map.json}
+export HARDEN=1 MTLS=1                  # same configuration as the live stacks (hardened, mutual TLS)
 title "Secure aggregation: 3 hospital sites"
 say "hospA1  medical ICU    (hospital A)"
 say "hospA2  surgical ICU   (hospital A)"

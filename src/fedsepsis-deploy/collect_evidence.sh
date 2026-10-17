@@ -16,6 +16,14 @@ hdr() { printf '# %s\n# captured %s on %s\n\n' "$1" "$(date -u +%Y-%m-%dT%H:%M:%
 { hdr "docker network inspect $NETWORK"; docker network inspect "$NETWORK"; } > $EV/docker_network_inspect.txt
 { hdr "aggregator log (docker logs $AGG_NAME)"; docker logs "$AGG_NAME" 2>&1; } > $EV/aggregator_log.txt
 for s in "${SITES[@]}"; do { hdr "$s log (docker logs $s)"; docker logs "$s" 2>&1; } > "$EV/${s}_log.txt"; done
+# hardening flags of the live containers: selected docker inspect fields only (never Env)
+{ hdr "hardening flags (docker inspect: User, ReadonlyRootfs, CapDrop, SecurityOpt, PidsLimit, published ports)"
+  for c in $(docker ps --format '{{.Names}}' | grep -E '^(rev-)?(fedsepsis-aggregator|hospA|hospB)$' | sort); do
+    docker inspect "$c" --format '{{.Name}}|{{.Config.User}}|{{.HostConfig.ReadonlyRootfs}}|{{.HostConfig.CapDrop}}|{{.HostConfig.SecurityOpt}}|{{.HostConfig.PidsLimit}}|{{range $p, $b := .HostConfig.PortBindings}}{{range $b}}{{.HostIp}}:{{.HostPort}} {{end}}{{end}}'
+  done | sed 's#^/##' | awk -F'|' '{printf "%-26s User=%-10s ReadonlyRootfs=%-5s CapDrop=%-6s SecurityOpt=%-27s Pids=%-4s Ports=%s\n", $1, $2, $3, $4, $5, $6, ($7 == "" ? "none" : $7)}'
+  echo; echo "mutual TLS (aggregator log):"
+  for a in fedsepsis-aggregator rev-fedsepsis-aggregator; do docker logs "$a" 2>&1 | grep -E "event=(tls_enabled|tls_session)" | sed "s/^/  $a  /"; done
+} > $EV/hardening_flags.txt
 { hdr "docker stats --no-stream"; docker stats --no-stream --format 'table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.MemPerc}}\t{{.NetIO}}\t{{.PIDs}}'; } > $EV/docker_stats.txt
 { hdr "base image Python probe"
   echo "\$ docker run --rm --entrypoint sh $BASE_IMAGE -c \"which python3; ls /opt/venv/bin | head; /opt/venv/bin/python -c 'import numpy,sys; print(numpy.__version__, sys.byteorder)'\""

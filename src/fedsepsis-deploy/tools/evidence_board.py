@@ -2,6 +2,7 @@
 Standard library only. Usage: python3 tools/evidence_board.py OUT.html"""
 import html
 import json
+import os
 import re
 import sys
 from datetime import datetime, timezone
@@ -33,6 +34,7 @@ agg_excerpt = agg[:8] + ["  ...  (" + str(sum("event=round_complete" in l for l 
 ends = read("test_real_endpoints.txt")
 fields = ends[ends.index("=== (f) allowed fields on the real run"):].split("\n", 1)[1].strip()
 sec = json.load(open("demo/secure_summary.json"))
+hard = read("hardening_flags.txt") if os.path.exists(E + "hardening_flags.txt") else ""
 pass_fields = "ASSERT subset of allowed : True" in fields
 
 
@@ -56,6 +58,11 @@ cards = [
          '<pre>torch.nnpa.is_available(), torch.nnpa.is_telum2_available()</pre>',
          f"Run in the Jupyter image on the VM, reported as is. The accelerator is visible; our logistic-regression model "
          f"does not use it. {esc(captured(torch))}"),
+    card("Container hardening + mutual TLS", f"<pre>{esc(body(hard))}</pre>",
+         "From docker inspect on the live containers: non-root 1000:1000, read-only root filesystem, all capabilities dropped, "
+         "no-new-privileges, pids limit, demo ports only on 127.0.0.1. Hospital-to-aggregator traffic is mutual TLS 1.3 "
+         "(client certificate required, CN = site). On-chip crypto (CPACF) use is NOT claimed: it could not be confirmed. "
+         f"{esc(captured(hard))}") if hard else "",
     card("Containers running", f"<pre>{esc(ps)}</pre>",
          f"docker ps: one aggregator + one container per hospital, each direction. Hospital /score ports are bound to "
          f"127.0.0.1 only. {esc(captured(read('docker_ps.txt')))}"),
