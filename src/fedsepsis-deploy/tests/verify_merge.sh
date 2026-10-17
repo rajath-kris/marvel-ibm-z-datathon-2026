@@ -9,7 +9,8 @@ cd "$(dirname "$0")/.."
 export SECRET_DIR=$HOME/.fedsepsis-mtest HARDEN=1 MTLS=1 MODE=real PORT_OFFSET=1000
 export AGG_IMAGE=fedsepsis-aggregator:mtest HOSP_IMAGE=fedsepsis-hospital:mtest   # never the live :dev tags
 export ALLOW_JOBS="fedsepsis-aggregator,hospA,hospB,rev-fedsepsis-aggregator,rev-hospA,rev-hospB,sec-.*,hard-.*,mtest-.*,fedseed_[0-9]+"
-OUT=evidence/verify_merge.txt; : > "$OUT"; fail=0
+SECTIONS=${1:-"forward reverse secure"}   # e.g. ./tests/verify_merge.sh secure
+OUT=evidence/verify_merge${1:+_$1}.txt; : > "$OUT"; fail=0
 log() { echo "$*" | tee -a "$OUT"; }
 res() { if [ "$1" = 0 ]; then log "PASS  $2"; else log "FAIL  $2"; fail=1; fi; }
 rm_stack() { docker rm -f $(docker ps -a --format '{{.Names}}' | grep -E "^$1") >/dev/null 2>&1; docker network rm "$2" >/dev/null 2>&1; true; }
@@ -54,6 +55,7 @@ log "# memory before: MemAvailable $(awk '/^MemAvailable:/ {print int($2/1024)}'
 ./setup_token.sh > /dev/null && ./setup_mtls.sh > run/mtest_setup_mtls.log && log "mTLS test CA + certificates in ~/.fedsepsis-mtest/mtls ($(ls $SECRET_DIR/mtls/clients | grep -c crt) client certs)"
 
 for d in forward reverse; do
+  case " $SECTIONS " in *" $d "*) ;; *) continue ;; esac
   if [ $d = forward ]; then P=mtest-; NET=mtest-net; RD=run/mtest; PORT=9102; REAL=$HOME/handoff/outputs/demo; CNS="hospA hospB"
   else P=mtest-rev-; NET=mtest-rev-net; RD=run/mtest-rev; PORT=9202; REAL=$HOME/handoff/outputs/demo_reverse; CNS="hospB hospA"; fi
   log ""; log "=== $d direction ($P*, 127.0.0.1:$PORT)"
@@ -70,6 +72,7 @@ for d in forward reverse; do
   rm_stack "$P" "$NET"; log "  removed ${P}* and $NET"
 done
 
+if [[ " $SECTIONS " == *" secure "* ]]; then
 log ""; log "=== secure 3-site run (mtest-sec-*, ICU-map split, plain vs masked, hardened + mTLS)"
 SEC_PREFIX=mtest-sec- SEC_RUN_DIR=run/mtest-secure SEC_NETWORK=mtest-sec-net SPLIT_MAP=$HOME/handoff/icu_map.json \
   ./tests/test_secure_e2e.sh > run/mtest_secure.log 2>&1; r=$?
@@ -79,6 +82,7 @@ grep -q "ASSERT subset of allowed : True" run/mtest_secure.log; res $? "secure: 
 hardening_checks mtest-sec-; res $? "secure: hardening flags on every mtest-sec-* container"
 mtls_checks mtest-sec-aggregator hospA1 hospA2 hospB
 rm_stack mtest-sec- mtest-sec-net; log "  removed mtest-sec-* and mtest-sec-net"
+fi
 log ""; log "# memory after: MemAvailable $(awk '/^MemAvailable:/ {print int($2/1024)}' /proc/meminfo) MB"
 [ $fail = 0 ] && log "ALL CHECKS PASSED" || log "SOME CHECKS FAILED"
 exit $fail

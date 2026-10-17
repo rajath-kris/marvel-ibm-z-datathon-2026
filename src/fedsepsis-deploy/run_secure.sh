@@ -10,7 +10,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 SEC_PREFIX=${SEC_PREFIX:-sec-}            # container prefix; a test stack uses another one (e.g. mtest-sec-)
 export FED_SITES="hospA1 hospA2 hospB" NAME_PREFIX=$SEC_PREFIX AGG_NAME=${SEC_PREFIX}aggregator MODE=real
-export RUN_DIR=${SEC_RUN_DIR:-$PWD/run/secure}
+export RUN_DIR=$(realpath -m "${SEC_RUN_DIR:-$PWD/run/secure}")   # absolute: docker -v needs a host path
 export SECURE_SAMPLE=${SECURE_SAMPLE:-3}   # keep the first 3 masked values each site sent (demo page)
 source ./config.sh
 NETWORK=${SEC_NETWORK:-fedsecure-net}
