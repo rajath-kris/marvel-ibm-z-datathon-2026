@@ -193,6 +193,9 @@ def load_model_file(path):
 
 
 # ---- aggregator HTTP(S) -----------------------------------------------------
+TLS_LOGGED = []
+
+
 class PinMismatch(Exception):
     """Fatal: the aggregator presented a certificate other than the pinned one."""
 
@@ -207,6 +210,9 @@ def make_opener():
     # Trust ONLY the pinned self-signed cert (no system CAs), verify hostname, TLS 1.3 only.
     ctx = ssl.create_default_context(cafile=ca)
     ctx.minimum_version = ssl.TLSVersion.TLSv1_3
+    cc, ck = os.environ.get("TLS_CLIENT_CERT"), os.environ.get("TLS_CLIENT_KEY")
+    if cc and ck:
+        ctx.load_cert_chain(cc, ck)   # mutual TLS: present this site's own certificate
 
     class PinnedConnection(http.client.HTTPSConnection):
         def connect(self):
@@ -215,6 +221,9 @@ def make_opener():
             if not hmac.compare_digest(got, pin):
                 self.sock.close()
                 raise PinMismatch(f"aggregator cert sha256 {got[:16]}... does not match pin {pin[:16]}...")
+            if not TLS_LOGGED:
+                TLS_LOGGED.append(1)
+                log("tls_connected", version=self.sock.version(), cipher=self.sock.cipher()[0], client_cert=bool(cc and ck))
 
     class PinnedHandler(urllib.request.HTTPSHandler):
         def https_open(self, req):

@@ -1,0 +1,66 @@
+{
+ "name": "/hard-hospA",
+ "user": "1000:1000",
+ "readonly_rootfs": true,
+ "cap_drop": [
+  "ALL"
+ ],
+ "cap_add": null,
+ "security_opt": [
+  "no-new-privileges:true"
+ ],
+ "privileged": false,
+ "memory_bytes": 2147483648,
+ "nano_cpus": 1000000000,
+ "pids_limit": 256,
+ "tmpfs": {
+  "/tmp": "rw,noexec,nosuid,nodev,size=128m"
+ },
+ "published_ports": {},
+ "networks": [
+  "hard-net"
+ ],
+ "mounts": [
+  {
+   "source": "/home/linux1/fedsepsis-deploy-hardening/run/hardened/out/hospA",
+   "destination": "/out",
+   "rw": true
+  },
+  {
+   "source": "/home/linux1/fedsepsis-deploy-hardening/lib",
+   "destination": "/app/lib",
+   "rw": false
+  },
+  {
+   "source": "/home/linux1/handoff/outputs/demo/site_big.npz",
+   "destination": "/data/site_big.npz",
+   "rw": false
+  },
+  {
+   "source": "/home/linux1/handoff/outputs/demo/demo_patient.json",
+   "destination": "/models/demo_patient.json",
+   "rw": false
+  },
+  {
+   "source": "/home/linux1/handoff/outputs/demo/model_big_asis.json",
+   "destination": "/models/model_big_asis.json",
+   "rw": false
+  },
+  {
+   "source": "/home/linux1/.fedsepsis-hardening/mtls/ca.crt",
+   "destination": "/tls/ca.crt",
+   "rw": false
+  },
+  {
+   "source": "/home/linux1/.fedsepsis-hardening/mtls/clients/hospA.crt",
+   "destination": "/tls/client.crt",
+   "rw": false
+  },
+  {
+   "source": "/home/linux1/.fedsepsis-hardening/mtls/clients/hospA.key",
+   "destination": "/tls/client.key",
+   "rw": false
+  }
+ ],
+ "image": "fedsepsis-hospital:hard"
+}

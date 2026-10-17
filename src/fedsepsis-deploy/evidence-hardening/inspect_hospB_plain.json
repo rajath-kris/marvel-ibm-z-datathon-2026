@@ -1,0 +1,78 @@
+{
+ "name": "/hard-hospB",
+ "user": "1000:1000",
+ "readonly_rootfs": true,
+ "cap_drop": [
+  "ALL"
+ ],
+ "cap_add": null,
+ "security_opt": [
+  "no-new-privileges:true"
+ ],
+ "privileged": false,
+ "memory_bytes": 1073741824,
+ "nano_cpus": 1000000000,
+ "pids_limit": 256,
+ "tmpfs": {
+  "/tmp": "rw,noexec,nosuid,nodev,size=128m"
+ },
+ "published_ports": {
+  "8100/tcp": [
+   {
+    "HostIp": "127.0.0.1",
+    "HostPort": "18102"
+   }
+  ]
+ },
+ "networks": [
+  "hard-net"
+ ],
+ "mounts": [
+  {
+   "source": "/home/linux1/fedsepsis-deploy-hardening/run/hardened/out/hospB",
+   "destination": "/out",
+   "rw": true
+  },
+  {
+   "source": "/home/linux1/fedsepsis-deploy-hardening/lib",
+   "destination": "/app/lib",
+   "rw": false
+  },
+  {
+   "source": "/home/linux1/handoff/outputs/demo/news2_scores.npz",
+   "destination": "/data/news2_scores.npz",
+   "rw": false
+  },
+  {
+   "source": "/home/linux1/handoff/outputs/demo/site_small.npz",
+   "destination": "/data/site_small.npz",
+   "rw": false
+  },
+  {
+   "source": "/home/linux1/handoff/outputs/demo/small_test_patients.npz",
+   "destination": "/data/small_test_patients.npz",
+   "rw": false
+  },
+  {
+   "source": "/home/linux1/handoff/outputs/demo/small_val_patients.npz",
+   "destination": "/data/small_val_patients.npz",
+   "rw": false
+  },
+  {
+   "source": "/home/linux1/handoff/outputs/demo/demo_patient.json",
+   "destination": "/models/demo_patient.json",
+   "rw": false
+  },
+  {
+   "source": "/home/linux1/handoff/outputs/demo/model_big_asis.json",
+   "destination": "/models/model_big_asis.json",
+   "rw": false
+  },
+  {
+   "source": "/home/linux1/handoff/outputs/demo/news2_thresholds.json",
+   "destination": "/models/news2_thresholds.json",
+   "rw": false
+  }
+ ],
+ "image": "fedsepsis-hospital:hard"
+}

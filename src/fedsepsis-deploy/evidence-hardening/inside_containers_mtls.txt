@@ -1,0 +1,27 @@
+--- hard-aggregator
+uid=1000 gid=1000
+CapPrm:	0000000000000000
+CapEff:	0000000000000000
+CapBnd:	0000000000000000
+NoNewPrivs:	1
+touch: cannot touch '/app/should-fail': Read-only file system
+/tmp writable (tmpfs)
+touch: cannot touch '/data/should-fail': No such file or directory
+--- hard-hospA
+uid=1000 gid=1000
+CapPrm:	0000000000000000
+CapEff:	0000000000000000
+CapBnd:	0000000000000000
+NoNewPrivs:	1
+touch: cannot touch '/app/should-fail': Read-only file system
+/tmp writable (tmpfs)
+touch: cannot touch '/data/should-fail': Read-only file system
+--- hard-hospB
+uid=1000 gid=1000
+CapPrm:	0000000000000000
+CapEff:	0000000000000000
+CapBnd:	0000000000000000
+NoNewPrivs:	1
+touch: cannot touch '/app/should-fail': Read-only file system
+/tmp writable (tmpfs)
+touch: cannot touch '/data/should-fail': Read-only file system

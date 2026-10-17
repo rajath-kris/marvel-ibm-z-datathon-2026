@@ -1,0 +1,40 @@
+### cpacfstatsd daemon / socket / perf (what is available to this user)
+groups: linux1 adm cdrom sudo dip plugdev cpacfstats lxd docker
+daemon process:   (empty = not running)
+ls: cannot access '/run/cpacfstatsd_socket': No such file or directory
+systemctl is-active cpacfstatsd: inactive
+kernel.perf_event_paranoid=4   (4 = no unprivileged perf)
+PAI event sources: pai_crypto pai_ext 
+msa vx vxd vxe vxe2 vxp vxp2 
+### before
+# 2026-10-17T15:05:45Z  cpacfstats -p all
+cpacfstats: Can't access domain socket file '/run/cpacfstatsd_socket', errno=2 [No such file or directory]
+cpacfstats: Maybe cpacfstatsd daemon is not running ???
+cpacfstats: Can't connect to daemon
+# exit code 1
+# cpacfstats -n (all PAI counters, non-zero)
+cpacfstats: Can't access domain socket file '/run/cpacfstatsd_socket', errno=2 [No such file or directory]
+cpacfstats: Maybe cpacfstatsd daemon is not running ???
+cpacfstats: Can't connect to daemon
+# exit code 1
+### one federated round over mutual TLS (fresh stack)
+run_hardened.sh MTLS=1 exit 0, 15:05:45 -> 15:06:33 UTC
+memory gate: free -m available = 3692 MB
+rounds completed: 40 / 40   done=True   sites=['hospA', 'hospB']
+runtime (aggregator start -> all final models written): 45.0s   rounds=40
+### after
+# 2026-10-17T15:06:33Z  cpacfstats -p all
+cpacfstats: Can't access domain socket file '/run/cpacfstatsd_socket', errno=2 [No such file or directory]
+cpacfstats: Maybe cpacfstatsd daemon is not running ???
+cpacfstats: Can't connect to daemon
+# exit code 1
+# cpacfstats -n (all PAI counters, non-zero)
+cpacfstats: Can't access domain socket file '/run/cpacfstatsd_socket', errno=2 [No such file or directory]
+cpacfstats: Maybe cpacfstatsd daemon is not running ???
+cpacfstats: Can't connect to daemon
+# exit code 1
+before readable: False (0 counters); after readable: False (0 counters); counters that increased: []
+VERDICT: CPACF NOT CONFIRMED  --  cpacfstats could not read the counters (daemon not running / no socket; see cpacfstats_before.txt)
+### indirect hint (NOT counters): SHA-256 throughput with and without OpenSSL's CPACF support, same container settings
+default  3944 MB/s sha256, OpenSSL 3.5.5 27 Jan 2026
+off      3974 MB/s sha256, OpenSSL 3.5.5 27 Jan 2026

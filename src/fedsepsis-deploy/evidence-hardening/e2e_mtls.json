@@ -1,0 +1,14 @@
+{
+ "tag": "mtls",
+ "rounds": 40,
+ "passed": 28,
+ "failed": 0,
+ "measured": {
+  "borrowed_rate_stored_threshold": 11.66660029469157,
+  "borrowed_rate_at_setup2_threshold": 23.995858388753934,
+  "retune_borrowed_threshold": 0.42531526551518406,
+  "retuned_rate": 23.995858388753934,
+  "federated_rate_stored_threshold": 22.45390466329497,
+  "hospA_borrowed_rate_on_its_training_rows": 25.712056993273045
+ }
+}

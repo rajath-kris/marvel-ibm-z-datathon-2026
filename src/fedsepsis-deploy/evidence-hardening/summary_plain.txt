@@ -1,0 +1,8 @@
+================ RESULTS (plain) ================
+PASS  docker inspect hardening checks (see hardening_checks_plain.txt)
+PASS  uid 1000 in every container
+PASS  CapEff is empty in every container
+PASS  NoNewPrivs is 1 in every container
+PASS  writing to the root filesystem fails (/app)
+PASS  hospital data mount is read-only (/data)
+PASS  end-to-end checks (see e2e_plain.txt)

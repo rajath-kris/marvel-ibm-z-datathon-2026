@@ -282,9 +282,42 @@ def weighted_average(updates):
     return {"w": w, "b": b}
 
 
-def make_handler(state, token):
+class HardenedServer(ThreadingHTTPServer):
+    """A refused TLS handshake or a malformed request is ONE event line (error class and reason), never a traceback."""
+
+    def handle_error(self, request, client_address):
+        e = sys.exc_info()[1]
+        log("connection_error", "-", "-", error=type(e).__name__,
+            reason=str(getattr(e, "reason", "") or e)[:60].replace(" ", "_"))
+
+
+def make_handler(state, token, bind_cn=False):
+    """bind_cn (mutual TLS): the client certificate's CN must equal the site_id in every POST body."""
+    seen_tls = set()
+
     class Handler(BaseHTTPRequestHandler):
         server_version = "fedsepsis-aggregator"
+        timeout = 30   # a client that never completes the TLS handshake or the request cannot hold a thread forever
+
+        def _peer_cn(self):
+            try:
+                cert = self.connection.getpeercert()
+            except (AttributeError, ValueError):
+                return None
+            for rdn in (cert or {}).get("subject", ()):
+                for k, v in rdn:
+                    if k == "commonName":
+                        return v
+            return None
+
+        def _note_tls(self):
+            """Log each distinct (client CN, TLS version, cipher) once: the negotiated session parameters."""
+            if not hasattr(self.connection, "cipher"):
+                return
+            key = (self._peer_cn(), self.connection.version(), self.connection.cipher()[0])
+            if key not in seen_tls:
+                seen_tls.add(key)
+                log("tls_session", "-", "-", client_cn=key[0], version=key[1], cipher=key[2])
 
         def log_message(self, fmt, *args):  # silence default access log (it would include client IPs only, but keep one format)
             pass
@@ -315,6 +348,11 @@ def make_handler(state, token):
                 raise ApiError(400, "body is not JSON")
             if not isinstance(body, dict):
                 raise ApiError(400, "body must be a JSON object")
+            if bind_cn:
+                cn = self._peer_cn()
+                if cn is None or body.get("site_id") != cn:
+                    log("cert_site_mismatch", "-", "-", client_cn=cn)
+                    raise ApiError(403, "site_id does not match the client certificate")
             keys = sorted(body)
             state.note_keys(keys)
             log("request_keys", body.get("site_id", "-") if isinstance(body.get("site_id"), str) else "-",
@@ -323,6 +361,7 @@ def make_handler(state, token):
             return body
 
         def _dispatch(self, routes):
+            self._note_tls()
             if not self._authorised():
                 return
             fn = routes.get(self.path.split("?")[0])
@@ -367,15 +406,20 @@ def main():
                             secure=os.environ.get("SECURE", "0") == "1")
     log("start", "-", state.s["round"], sites=",".join(state.s["expected_sites"]),
         expected_rounds=rounds, restored=state.restored, done=state.s["done"], secure=state.s["secure"])
-    server = ThreadingHTTPServer(("0.0.0.0", port), make_handler(state, token))
+    client_ca = os.environ.get("TLS_CLIENT_CA")
+    server = HardenedServer(("0.0.0.0", port), make_handler(state, token, bind_cn=bool(client_ca)))
     server.daemon_threads = True
     cert, key = os.environ.get("TLS_CERT"), os.environ.get("TLS_KEY")
     if cert and key:
         ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         ctx.minimum_version = ssl.TLSVersion.TLSv1_3
         ctx.load_cert_chain(cert, key)
-        server.socket = ctx.wrap_socket(server.socket, server_side=True)
-        log("tls_enabled", "-", "-", min_version="TLSv1.3")
+        if client_ca:   # mutual TLS: no certificate (or one not signed by this CA) = no connection
+            ctx.verify_mode = ssl.CERT_REQUIRED
+            ctx.load_verify_locations(cafile=client_ca)
+        # the handshake runs in the request thread (on first read, under Handler.timeout), not in the accept loop
+        server.socket = ctx.wrap_socket(server.socket, server_side=True, do_handshake_on_connect=False)
+        log("tls_enabled", "-", "-", min_version="TLSv1.3", client_cert_required=bool(client_ca))
     else:
         log("tls_disabled", "-", "-", note="plain HTTP inside the docker network")
     try:
