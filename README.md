@@ -136,11 +136,11 @@ The patient data is not in this repository (see Data), so the live stack needs t
 
 | Name | Role |
 | --- | --- |
-| Adhil | |
-| Bhavya | |
-| Mitul | |
-| Rajath | |
-| Unnati | |
+| Adhil | Co-developer: design, build and testing |
+| Bhavya | Co-developer: design, build and testing |
+| Mitul | Co-developer: design, build and testing |
+| Rajath | Co-developer: design, build and testing |
+| Unnati | Co-developer: design, build and testing |
 
 ## Demo video
 
